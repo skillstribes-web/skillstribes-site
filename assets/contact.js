@@ -3,7 +3,8 @@
 (function () {
   var CONTACT = [
     { label: "WhatsApp", value: "+92 333 8318082" },
-    { label: "Email", value: "info@skillstribes.com" }
+    { label: "Email", value: "info@skillstribes.com" },
+    { label: "LinkedIn", value: "linkedin.com/company/skillstribes" }
   ];
 
   var reach = document.getElementById("reach");
