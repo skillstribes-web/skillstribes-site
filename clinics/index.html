@@ -312,6 +312,15 @@
     .rise { animation: none; }
     .row, .bubble, .chip, .btn { transition: none; }
   }
+
+/* phones: keep the menu visible as a scrollable row under the logo */
+@media (max-width: 640px) {
+  header .wrap { flex-wrap: wrap; row-gap: 10px; }
+  header nav { order: 3; width: 100%; overflow-x: auto; gap: 18px; padding-bottom: 4px; scrollbar-width: none; }
+  header nav::-webkit-scrollbar { display: none; }
+  header nav a.nav-link { display: inline-block; white-space: nowrap; font-size: 0.95rem; }
+  header nav .btn { display: none; }
+}
 </style>
 <script>if ("IntersectionObserver" in window && !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) { document.documentElement.classList.add("js"); }</script>
 
@@ -321,6 +330,7 @@
   <div class="wrap">
     <a class="brand" href="/" aria-label="SkillsTribes home"><svg class="logo" viewBox="0 0 32 32" width="44" height="44" aria-hidden="true"><g class="orbit"><path d="M16 6 L6.5 23 L25.5 23 Z"/><circle class="c1" cx="16" cy="6" r="4.2"/><circle class="c2" cx="6.5" cy="23" r="4.2"/><circle class="c3" cx="25.5" cy="23" r="4.2"/></g></svg><span>Skills<b>Tribes</b></span></a>
     <nav aria-label="Main">
+      <a class="nav-link" href="/">Home</a>
       <a class="nav-link" href="#services">Services</a>
       <a class="nav-link" href="#features">Features</a>
       <a class="nav-link" href="#how">How it works</a>
@@ -565,7 +575,7 @@
   <div class="wrap"><div class="wm-big" aria-hidden="true">SkillsTribes</div></div>
   <div class="wrap">
     <span>&copy; 2026 SkillsTribes</span>
-    <span><a href="/clinics/">Healthcare</a> · <a href="/hvac/">Technical</a></span>
+    <span><a href="/">Home</a> · <a href="/hvac/">Technical</a> · <a href="/clinics/">Healthcare</a> · <a href="/#about">About us</a></span>
   </div>
 </footer>
 
