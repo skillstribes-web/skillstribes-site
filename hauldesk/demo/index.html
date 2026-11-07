@@ -310,7 +310,7 @@ select.status{height:34px; border-radius:7px; border:1px solid var(--line); back
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 (function(){
-const LS='hauldesk-demo-v5';
+const LS='hauldesk-demo-v6';
 const pad=n=>String(n).padStart(2,'0');
 const today=new Date(); today.setHours(0,0,0,0);
 const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
@@ -497,7 +497,7 @@ function seed(reg){
 
 let S, DB;
 try{ DB=JSON.parse(localStorage.getItem(LS)||'null'); }catch(e){ DB=null; }
-if(!DB||!DB.data) DB={region:'PK',usd:false,data:{}};
+if(!DB||!DB.data) DB={region:'PK',usd:true,data:{}};
 REG=RG[DB.region]?DB.region:'PK'; USD=!!DB.usd; applyRegion();
 if(!DB.data[REG]||!DB.data[REG].trips||!DB.data[REG].office) DB.data[REG]=seed(REG);
 S=DB.data[REG];
