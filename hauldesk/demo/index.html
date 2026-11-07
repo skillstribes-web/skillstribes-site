@@ -1,6 +1,13 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="HaulDesk demo by Skills Tribes: transport company software for Pakistan, UAE and Saudi Arabia.">
+<style>body{margin:0}</style>
+</head>
+<body>
 <title>HaulDesk Demo</title>
-<meta name="description" content="Live demo of HaulDesk, transport management software by SkillsTribes.">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -221,6 +228,10 @@ select.status{height:34px; border-radius:7px; border:1px solid var(--line); back
 .btn.xls{background:var(--xls); border-color:var(--xls); color:#FFFFFF}
 .btn.pdf:hover,.btn.xls:hover{filter:brightness(1.1)}
 .panel.wide{max-width:1100px}
+.regionbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.regionbar select{height:46px; border-radius:10px; border:1px solid var(--line); background:var(--surface); padding:0 10px; font-weight:600; color:var(--ink)}
+.usdtog{display:flex; align-items:center; gap:6px; font-size:14px; font-weight:600; color:var(--muted); min-height:44px; cursor:pointer}
+.demo-note a{color:inherit; font-weight:700}
 .btns .field{min-width:150px; flex:1 1 150px}
 .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(20px + env(safe-area-inset-bottom, 0px)); background:var(--ink); color:var(--bg); padding:12px 18px; border-radius:10px; font-weight:600; z-index:60; max-width:calc(100% - 32px); box-shadow:0 8px 24px rgba(0,0,0,.25)}
 
@@ -282,8 +293,13 @@ select.status{height:34px; border-radius:7px; border:1px solid var(--line); back
         <input id="gq" type="search" autocomplete="off" placeholder="Search client, truck owner, vehicle or bilty #">
         <div class="results" id="gres" hidden></div>
       </div>
+      <div class="regionbar">
+        <span class="chip neutral" id="today-chip"></span>
+        <label for="region"><span class="vh">Region</span><select id="region"><option value="PK">Pakistan (PKR)</option><option value="AE">UAE (AED)</option><option value="SA">Saudi Arabia (SAR)</option></select></label>
+        <label class="usdtog" for="usd"><input type="checkbox" id="usd"> Show in USD</label>
+      </div>
     </div>
-    <div class="demo-note"><a href="https://skillstribes.com/#transport" style="color:inherit;font-weight:700">← Back to skillstribes.com</a> · This is a HaulDesk demo. All companies, vehicles and amounts are made up, and amounts are shown in US dollars ($). Try adding a trip, receiving a payment, adding a cash entry or building a report.</div>
+    <div class="demo-note"><a href="https://skillstribes.com/#transport">← Back to skillstribes.com</a> · This is a HaulDesk demo. All companies, vehicles, phone numbers and amounts are made up. Switch the region at the top to see Pakistan, UAE or Saudi Arabia. Try adding a trip, receiving a payment, adding a cash entry or building a report.</div>
     <div class="view" id="main"></div>
   </main>
 </div>
@@ -294,7 +310,7 @@ select.status{height:34px; border-radius:7px; border:1px solid var(--line); back
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 (function(){
-const LS='hauldesk-demo-v4';
+const LS='hauldesk-demo-v5';
 const pad=n=>String(n).padStart(2,'0');
 const today=new Date(); today.setHours(0,0,0,0);
 const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
@@ -306,8 +322,9 @@ const diff=(a,b)=>Math.round((parse(b)-parse(a))/864e5);
 const age=s=>diff(s,TODAY);
 const until=s=>diff(TODAY,s);
 const addDays=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);const r=iso(d);return r>TODAY?TODAY:r;};
-const num=n=>Math.round(n).toLocaleString('en-US');
-const money=n=>(n<0?'-$':'$')+num(Math.abs(n));
+const cnt=n=>Math.round(n).toLocaleString('en-US');
+const num=n=>Math.round(conv(n)).toLocaleString('en-US');
+const money=n=>{const v=conv(n);return (v<0?'-':'')+(USD?'$':RG[REG].sym)+Math.round(Math.abs(v)).toLocaleString('en-US');};
 const nice=s=>parse(s).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
 const short=s=>parse(s).toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
 const monthName=k=>{const p=k.split('-');return new Date(+p[0],+p[1]-1,1).toLocaleDateString('en-GB',{month:'short',year:'numeric'});};
@@ -316,8 +333,68 @@ const sum=(a,f)=>a.reduce((s,x)=>s+(f?f(x):x),0);
 const $=id=>document.getElementById(id);
 const inRange=(d,f,t)=>(!f||d>=f)&&(!t||d<=t);
 
-const CITIES=['Karachi Port','Karachi','Hyderabad','Sukkur','Quetta','Multan','Sahiwal','Faisalabad','Lahore','Gujranwala','Islamabad','Peshawar'];
-const VTYPES=['10 wheeler','22 wheeler','Container carrier','Flatbed trailer','Lowbed'];
+const PK_CITIES=['Karachi Port','Karachi','Hyderabad','Sukkur','Quetta','Multan','Sahiwal','Faisalabad','Lahore','Gujranwala','Islamabad','Peshawar'];
+const PK_VTYPES=['10 wheeler','22 wheeler','Container carrier','Flatbed trailer','Lowbed'];
+const PK_PROV={'Karachi Port':'Sindh','Karachi':'Sindh','Hyderabad':'Sindh','Sukkur':'Sindh','Quetta':'Balochistan','Multan':'Punjab','Sahiwal':'Punjab','Faisalabad':'Punjab','Lahore':'Punjab','Gujranwala':'Punjab','Islamabad':'Islamabad','Peshawar':'Khyber Pakhtunkhwa'};
+let CITIES=PK_CITIES, VTYPES=PK_VTYPES, PROV=PK_PROV;
+const RG={
+  PK:{name:'Pakistan',cur:'PKR',sym:'Rs ',usd:280,cc:'92',pre:'300',tag:'Goods transport · All Pakistan',doc:'Bilty',vat:0,round:1000,opening:4200000,rent:50000,office:12000,maint:90000,trn:'',ex:{rate:'250000',hire:'225000',small:'5000'},rate:['Karachi Port','Lahore','Container carrier']},
+  AE:{name:'UAE',cur:'AED',sym:'AED ',usd:3.6725,cc:'971',pre:'50',tag:'Goods transport · UAE & GCC',doc:'Waybill',vat:0.05,round:50,opening:180000,rent:6000,office:900,maint:1200,trn:'100385729600003',ex:{rate:'1200',hire:'1050',small:'200'},rate:['Jebel Ali','Abu Dhabi','Container trailer']},
+  SA:{name:'Saudi Arabia',cur:'SAR',sym:'SAR ',usd:3.75,cc:'966',pre:'50',tag:'Goods transport · Saudi Arabia & GCC',doc:'Waybill',vat:0.15,round:50,opening:180000,rent:5000,office:800,maint:1200,trn:'300456789100003',ex:{rate:'2000',hire:'1750',small:'200'},rate:['Jeddah Port','Riyadh','Container trailer']}
+};
+const GCC_VT={'10 wheeler':'6-wheeler truck','22 wheeler':'Curtain-side trailer','Container carrier':'Container trailer','Flatbed trailer':'Trailer (flatbed)','Lowbed':'Lowbed'};
+const GCC_VTYPES=['6-wheeler truck','Curtain-side trailer','Container trailer','Trailer (flatbed)','Lowbed'];
+const REGDATA={
+  AE:{cities:['Jebel Ali','Dubai','Sharjah','Ajman','Abu Dhabi','Al Ain','Ras Al Khaimah','Fujairah','Riyadh','Dammam','Muscat','Sohar'],vtypes:GCC_VTYPES,vt:GCC_VT,fx:76,
+    city:{'Karachi Port':'Jebel Ali','Karachi':'Dubai','Hyderabad':'Dubai','Sukkur':'Fujairah','Quetta':'Ras Al Khaimah','Multan':'Sharjah','Sahiwal':'Ajman','Faisalabad':'Riyadh','Lahore':'Abu Dhabi','Gujranwala':'Muscat','Islamabad':'Al Ain','Peshawar':'Muscat'},
+    prov:{'Jebel Ali':'Dubai','Dubai':'Dubai','Sharjah':'Sharjah','Ajman':'Ajman','Abu Dhabi':'Abu Dhabi','Al Ain':'Abu Dhabi','Ras Al Khaimah':'Ras Al Khaimah','Fujairah':'Fujairah','Riyadh':'Saudi Arabia','Dammam':'Saudi Arabia','Muscat':'Oman','Sohar':'Oman'},
+    routes:{'Jebel Ali|Abu Dhabi':1400,'Dubai|Sharjah':650,'Dubai|Ras Al Khaimah':1100,'Ajman|Dubai':600,'Jebel Ali|Riyadh':7500,'Dubai|Muscat':3200,'Dubai|Abu Dhabi':1200,'Ras Al Khaimah|Dubai':1050,'Jebel Ali|Ajman':900,'Jebel Ali|Muscat':3600,'Dubai|Fujairah':1100},
+    clients:[['Al Noor Trading LLC','Dubai'],['Gulf Cement Supplies','Ras Al Khaimah'],['Falcon Steel Traders','Abu Dhabi'],['Desert Foods Distribution','Dubai'],['Sharjah Textile Mills','Sharjah'],['Green Oasis Fertilizers','Fujairah'],['Northern Minerals Trading','Ras Al Khaimah'],['Jebel Ali Machinery FZE','Jebel Ali']],
+    vendors:[['Al Barsha Transport LLC','Al Quoz, Dubai'],['Sharjah Heavy Haulers','Industrial Area 12, Sharjah'],['Gulf Line Trucking','Jebel Ali Free Zone'],['Mussafah Lowbed Services','Mussafah, Abu Dhabi'],['Ajman Container Movers','Ajman Industrial Area']],
+    plates:{'TLA-882':'DXB K 48211','TLA-990':'DXB K 48297','PSH-2210':'SHJ 3 22410','HYD-1123':'SHJ 3 22655','KHI-4410':'DXB L 51904','FSD-5603':'AUH 13 77021','LHR-8800':'AUH 13 77088','KHI-9021':'AJM B 30215','LES-4521':'DXB J 61234','TKA-310':'DXB J 61377','KHI-7788':'SHJ 2 41820','LHR-1290':'DXB J 61502','SWL-6402':'AUH 12 50311','MLT-3355':'SHJ 2 41955'},
+    drivers:[['Muhammad Iqbal',3500,1000],['Abdul Rehman',3600,500],['Rajesh Kumar',3000,0],['Shahid Khan',3200,0],['Joseph Mathew',3300,400],['Gul Zaman',3000,0]],
+    office:[['Ahmed Saleem','Accountant',7000,0],['Faisal Iqbal','Operations clerk',4000,500],['Ramesh Pillai','Office boy',1800,0]]},
+  SA:{cities:['Jeddah Port','Jeddah','Makkah','Madinah','Riyadh','Dammam','Khobar','Jubail','Buraidah','Hail','Tabuk','Abha'],vtypes:GCC_VTYPES,vt:GCC_VT,fx:75,
+    city:{'Karachi Port':'Jeddah Port','Karachi':'Jeddah','Hyderabad':'Dammam','Sukkur':'Madinah','Quetta':'Jubail','Multan':'Makkah','Sahiwal':'Khobar','Faisalabad':'Buraidah','Lahore':'Riyadh','Gujranwala':'Hail','Islamabad':'Abha','Peshawar':'Tabuk'},
+    prov:{'Jeddah Port':'Makkah Region','Jeddah':'Makkah Region','Makkah':'Makkah Region','Madinah':'Madinah Region','Riyadh':'Riyadh Region','Dammam':'Eastern Province','Khobar':'Eastern Province','Jubail':'Eastern Province','Buraidah':'Qassim Region','Hail':'Hail Region','Tabuk':'Tabuk Region','Abha':'Asir Region'},
+    routes:{'Jeddah Port|Riyadh':4200,'Jeddah|Makkah':750,'Jeddah|Jubail':4800,'Khobar|Jeddah':4500,'Jeddah Port|Buraidah':4000,'Dammam|Tabuk':5500,'Jeddah|Riyadh':3900,'Jubail|Jeddah':4700,'Jeddah Port|Khobar':4600,'Dammam|Riyadh':1900,'Jeddah Port|Hail':4300,'Jeddah|Madinah':1500},
+    clients:[['Al Nakheel Textiles','Jeddah'],['Makkah Cement Traders','Makkah'],['Eastern Steel Works','Dammam'],['Bahr Foods Trading','Jeddah'],['Qassim Cotton & Dates','Buraidah'],['Green Valley Fertilizers','Riyadh'],['Jubail Minerals Est.','Jubail'],['Hail Agri Machinery','Hail']],
+    vendors:[['Al Sulay Transport','Al Sulay, Riyadh'],['Dammam Heavy Transport','2nd Industrial City, Dammam'],['Al Sharq Trucking','Jeddah Industrial City'],['Najd Lowbed Services','Al Kharj Road, Riyadh'],['Port Haulage Co.','Jeddah Islamic Port']],
+    plates:{'TLA-882':'RSA 4821','TLA-990':'RSA 4897','PSH-2210':'DHA 2241','HYD-1123':'DHA 2265','KHI-4410':'JKA 5190','FSD-5603':'RLB 7702','LHR-8800':'RLB 7708','KHI-9021':'JPA 3021','LES-4521':'RTA 6123','TKA-310':'RTA 6137','KHI-7788':'JTB 4182','LHR-1290':'RTA 6150','SWL-6402':'DTA 5031','MLT-3355':'JTB 4195'},
+    drivers:[['Mohammed Ashraf',3800,1200],['Abdullah Saeed',3700,600],['Sanjay Yadav',3200,0],['Imran Ali',3400,0],['Noor Ahmed',3500,500],['Khalid Mehmood',3200,0]],
+    office:[['Yousef Al Harbi','Accountant',8000,0],['Arif Hussain','Operations clerk',4500,600],['Babu Thomas','Office boy',2000,0]]}
+};
+let REG='PK', USD=false;
+const R=()=>RG[REG];
+const NC=()=>RG[REG].cur;
+const cu=()=>USD?'USD':RG[REG].cur;
+const conv=n=>USD?n/RG[REG].usd:n;
+const vatOf=n=>Math.round(n*RG[REG].vat);
+const VDOCS=()=>REG==='PK'?[['token','Token tax'],['fitness','Fitness certificate'],['insurance','Insurance']]:[['token',REG==='AE'?'Mulkiya (registration)':'Istimara (registration)'],['insurance','Insurance']];
+function applyRegion(){ const X=REGDATA[REG]; CITIES=X?X.cities:PK_CITIES; VTYPES=X?X.vtypes:PK_VTYPES; PROV=X?X.prov:PK_PROV; }
+function L(s){ s=String(s).replace(/\(\$\)/g,'('+cu()+')'); if(REG!=='PK') s=s.replace(/\bBILTY\b/g,'WAYBILL').replace(/\bBilty\b/g,'Waybill').replace(/\bbilty\b/g,'waybill').replace(/\bPROVINCE\b/g,'REGION').replace(/\bProvince\b/g,'Region').replace(/\bprovince\b/g,'region'); return s; }
+function partyPhone(n){ const f=[...S.clients,...S.vendors,...S.drivers,...(S.office||[])].find(x=>x.name===n); return f?f.phone:''; }
+function regionalize(d,reg){
+  const X=REGDATA[reg], vt=t=>X.vt[t]||t, pl=p=>X.plates[p]||p;
+  d.clients.forEach((c,i)=>{c.name=X.clients[i][0]; c.city=X.clients[i][1]; c.trn=reg==='AE'?'100'+String(4100000+i*7919)+'00003':'3'+String(104500000+i*8123)+'00003';});
+  d.vendors.forEach((v,i)=>{v.name=X.vendors[i][0]; v.base=X.vendors[i][1]; v.trucks=v.trucks.map(s=>{const p=s.split(' · ');return pl(p[0])+' · '+vt(p[1]);});});
+  d.vehicles.forEach((v,i)=>{v.no=pl(v.no); v.type=vt(v.type); v.driver=X.drivers[i][0];});
+  d.drivers.forEach((x,i)=>{x.name=X.drivers[i][0]; x.vehicle=pl(x.vehicle); x.salary=X.drivers[i][1]; x.advance=X.drivers[i][2];});
+  d.office.forEach((x,i)=>{x.name=X.office[i][0]; x.role=X.office[i][1]; x.salary=X.office[i][2]; x.advance=X.office[i][3];});
+  d.trips.forEach((t,i)=>{
+    const old=t.rate; t.from=X.city[t.from]||t.from; t.to=X.city[t.to]||t.to; t.vtype=vt(t.vtype); t.vehicle=pl(t.vehicle);
+    const base=X.routes[t.from+'|'+t.to]||Math.round(old/X.fx), nr=Math.round(base*(1+(((i*37)%7)-3)/100)/10)*10, f=nr/old;
+    t.paid=t.paid>=old?nr:Math.round(t.paid*f/10)*10;
+    if(t.mode==='hire'){ const oh=t.hire; t.hire=Math.round(oh*f/10)*10; t.vpaid=t.vpaid>=oh?t.hire:Math.round(t.vpaid*f/10)*10; }
+    else Object.keys(t.exp).forEach(k=>t.exp[k]=Math.round(t.exp[k]*f));
+    t.rate=nr;
+    if(reg==='SA'&&i%3!==1) t.naql='NQ-'+(480000+i*1373);
+  });
+}
+function addPhones(d,reg){ let n=101; const ph=()=>RG[reg].cc+RG[reg].pre+'000'+String(n++).padStart(4,'0');
+  d.clients.forEach(c=>{c.phone=ph(); if(c.trn==null) c.trn='';}); d.vendors.forEach(v=>v.phone=ph()); d.drivers.forEach(x=>x.phone=ph()); d.office.forEach(x=>x.phone=ph()); }
+function resetRegionUI(){ const r=RG[REG].rate; UI.rate={from:r[0],to:r[1],vtype:r[2],margin:10}; UI.fq=''; UI.fstatus=''; UI.fmode=''; UI.selClient=null; UI.selVendor=null; UI.r2.sel={}; UI.r2.dparty=''; UI.r2.dq=''; UI.cf.party=''; UI.cf.head=''; UI.chat=null; updateChrome(); }
+function updateChrome(){ const g=$('gq'); if(g) g.placeholder='Search client, truck owner, vehicle or '+RG[REG].doc.toLowerCase()+' #'; const rs=$('region'); if(rs) rs.value=REG; const u=$('usd'); if(u) u.checked=USD; const dc=$('today-chip'); if(dc) dc.textContent=nice(TODAY); }
 const STATUSES=['Booked','Loaded','On the way','Delivered'];
 const ACTIVE=['Booked','Loaded','On the way'];
 const EXP=[['diesel','Diesel'],['toll','Toll'],['driver','Driver expense'],['loading','Loading/Unloading'],['other','Other']];
@@ -384,16 +461,15 @@ function seedPKR(){
     docs:[]
   };
 }
-const RATE=280, usd=n=>Math.round((Number(n)||0)/RATE);
-function seed(){
-  const d=seedPKR();
-  d.trips.forEach(t=>{t.rate=usd(t.rate);t.hire=usd(t.hire);t.paid=usd(t.paid);t.vpaid=usd(t.vpaid);if(t.exp)Object.keys(t.exp).forEach(k=>t.exp[k]=usd(t.exp[k]));});
-  d.drivers.forEach(x=>{x.salary=usd(x.salary);x.advance=usd(x.advance);});
-  d.office.forEach(x=>{x.salary=usd(x.salary);x.advance=usd(x.advance);});
+function seed(reg){
+  reg=reg||'PK';
+  const d=seedPKR(), cfg=RG[reg];
+  if(reg!=='PK') regionalize(d,reg);
+  addPhones(d,reg);
   const cl=id=>d.clients.find(c=>c.id===id).name, vn=id=>d.vendors.find(v=>v.id===id).name;
   const c=[];
   const E=(date,type,head,party,amount,mode,ref)=>{ if(amount>0) c.push({date,type,head,party,amount,mode:mode||'Cash',ref:ref||'',note:''}); };
-  E(ago(140),'in','Opening balance','Demo Goods Transport Co.',15000,'Bank');
+  E(ago(140),'in','Opening balance','Demo Goods Transport Co.',cfg.opening,'Bank');
   d.trips.forEach(t=>{
     if(t.paid) E(addDays(t.date,6),'in','Client payment',cl(t.client),t.paid,'Bank',t.id);
     if(t.mode==='hire'&&t.vpaid) E(addDays(t.date,4),'out','Hired truck payment',vn(t.vendor),t.vpaid,'Cash',t.id);
@@ -404,22 +480,29 @@ function seed(){
   for(let k=0;k<5;k++){
     d.drivers.forEach((x,i)=>{ if(k>0||i<3) c.push({date:mDate(k,5),type:'out',head:'Driver salary',party:x.name,amount:x.salary,mode:'Bank',ref:x.vehicle,note:'Salary '+mName(k)}); });
     d.office.forEach((x,i)=>{ if(k>0||i===0) c.push({date:mDate(k,5),type:'out',head:'Staff salary',party:x.name,amount:x.salary,mode:'Bank',ref:'',note:'Salary '+mName(k)}); });
-    E(mDate(k,3),'out','Office rent','Office landlord',180,'Bank');
-    E(mDate(k,15),'out','Office expense','Utilities & stationery',45,'Cash');
+    E(mDate(k,3),'out','Office rent','Office landlord',cfg.rent,'Bank');
+    E(mDate(k,15),'out','Office expense','Utilities & stationery',cfg.office,'Cash');
   }
-  E(ago(4),'out','Vehicle maintenance','LHR-1290 workshop',320,'Cash','LHR-1290');
+  E(ago(4),'out','Vehicle maintenance',d.vehicles[3].no+' workshop',cfg.maint,'Cash',d.vehicles[3].no);
   d.drivers.filter(x=>x.advance).forEach((x,i)=>E(ago(10+i*3),'out','Driver advance',x.name,x.advance,'Cash',x.vehicle));
   d.office.filter(x=>x.advance).forEach(x=>E(ago(12),'out','Staff advance',x.name,x.advance,'Cash'));
   c.sort((a,b)=>a.date.localeCompare(b.date));
   c.forEach((e,i)=>e.id='C-'+String(i+1).padStart(4,'0'));
+  let run=0, low=0; c.forEach(e=>{run+=e.type==='in'?e.amount:-e.amount; if(run<low) low=run;});
+  if(low<0) c[0].amount+=Math.ceil((-low+cfg.opening*0.1)/1000)*1000;
   d.cash=c;
+  d.company={trn:cfg.trn||''};
   return d;
 }
 
-let S;
-try{ const raw=localStorage.getItem(LS); S=raw?JSON.parse(raw):null; }catch(e){ S=null; }
-if(!S||!S.trips||!S.cash||!S.office) S=seed();
-function save(){ try{ localStorage.setItem(LS,JSON.stringify(S)); }catch(e){} }
+let S, DB;
+try{ DB=JSON.parse(localStorage.getItem(LS)||'null'); }catch(e){ DB=null; }
+if(!DB||!DB.data) DB={region:'PK',usd:false,data:{}};
+REG=RG[DB.region]?DB.region:'PK'; USD=!!DB.usd; applyRegion();
+if(!DB.data[REG]||!DB.data[REG].trips||!DB.data[REG].office) DB.data[REG]=seed(REG);
+S=DB.data[REG];
+function save(){ DB.region=REG; DB.usd=USD; DB.data[REG]=S; try{ localStorage.setItem(LS,JSON.stringify(DB)); }catch(e){} }
+function switchRegion(reg){ if(!RG[reg]||reg===REG) return; save(); REG=reg; applyRegion(); if(!DB.data[REG]||!DB.data[REG].trips||!DB.data[REG].office) DB.data[REG]=seed(REG); S=DB.data[REG]; resetRegionUI(); save(); closeModal(); render(); toast('Region: '+RG[REG].name+' · amounts in '+cu()); }
 
 const UI={view:'dashboard',fq:'',fstatus:'',fmode:'',selClient:null,selVendor:null,
   rate:{from:'Karachi Port',to:'Lahore',vtype:'Container carrier',margin:10},
@@ -432,6 +515,7 @@ const UI={view:'dashboard',fq:'',fstatus:'',fmode:'',selClient:null,selVendor:nu
   kpi:{date:'',month:'',year:''},
   wa:'',
   chat:null};
+resetRegionUI();
 
 const cost=t=>t.mode==='hire'?t.hire:sum(EXP,e=>Number(t.exp[e[0]])||0);
 const profit=t=>t.rate-cost(t);
@@ -469,12 +553,12 @@ function vendorRows(){
 function reminders(){
   const out=[];
   S.vehicles.forEach(v=>{
-    [['token','Token tax'],['fitness','Fitness certificate'],['insurance','Insurance']].forEach(([k,l])=>{
+    VDOCS().forEach(([k,l])=>{
       const d=until(v[k]);
       if(d<0) out.push({d,cls:'bad',html:`<b>${esc(v.no)}</b> · ${l} expired ${-d} days ago (${short(v[k])})`});
       else if(d<=30) out.push({d,cls:'warn',html:`<b>${esc(v.no)}</b> · ${l} due on <b>${short(v[k])}</b>, ${d} days left`});
     });
-    if(v.oilKm<2500) out.push({d:40,cls:'info',html:`<b>${esc(v.no)}</b> · Oil change due in ${num(v.oilKm)} km`});
+    if(v.oilKm<2500) out.push({d:40,cls:'info',html:`<b>${esc(v.no)}</b> · Oil change due in ${cnt(v.oilKm)} km`});
     if(v.repair) out.push({d:-50,cls:'bad',html:`<b>${esc(v.no)}</b> · In repair workshop`});
   });
   S.drivers.forEach(x=>{ const d=until(x.license); if(d<=30) out.push({d,cls:d<0?'bad':'warn',html:`<b>${esc(x.name)}</b> · Driving license ${d<0?'expired':'expires'} on <b>${short(x.license)}</b>`}); });
@@ -487,7 +571,7 @@ function reminders(){
 function head(title,sub,btns){ return `<div class="head"><div><h1>${title}</h1>${sub?`<p>${sub}</p>`:''}</div>${btns?`<div class="btns">${btns}</div>`:''}</div>`; }
 const NEWBTN='<button type="button" class="btn primary" data-act="newtrip">+ New Trip</button>';
 const XLBTN='<button type="button" class="btn" data-act="excel">Download Excel</button>';
-function waBtn(text,label,sm){ return `<a class="btn ${sm===false?'':'sm'}" href="https://wa.me/?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">${label||'WhatsApp'}</a>`; }
+function waBtn(text,label,sm,phone){ return `<a class="btn ${sm===false?'':'sm'}" href="https://wa.me/${phone?String(phone).replace(/\D/g,''):''}?text=${encodeURIComponent(L(text))}" target="_blank" rel="noopener">${label||'WhatsApp'}</a>`; }
 function clientReminderText(r){
   return `Assalam o Alaikum! As per our record, ${r.c.name} has a pending balance of ${money(r.bal)} for ${r.open.length} trip(s)${r.over30?`, of which ${money(r.over30)} is more than 30 days old`:''}. Kindly arrange the payment. Thank you, Demo Goods Transport Co.`;
 }
@@ -507,7 +591,7 @@ function tripTable(list,editable){
     <td class="num">${short(t.date)}</td>
     <td>${esc(t.from)} → ${esc(t.to)}</td>
     <td>${esc(client(t.client).name)}<small>${esc(t.goods)}${t.weight?' · '+esc(t.weight)+' ton':''}</small></td>
-    <td class="mono">${esc(t.vehicle)}<small style="font-family:var(--font-body)">${modeChip(t)} ${esc(t.vtype)}${t.mode==='hire'?' · '+esc(vendor(t.vendor).name):''}</small></td>
+    <td class="mono">${esc(t.vehicle)}<small style="font-family:var(--font-body)">${modeChip(t)} ${esc(t.vtype)}${t.mode==='hire'?' · '+esc(vendor(t.vendor).name):''}${t.naql?'<br>Naql: '+esc(t.naql):''}</small></td>
     <td class="r">${num(t.rate)}</td>
     <td class="r">${num(cost(t))}</td>
     <td class="r"><span class="${p>=0?'profit':'loss'}">${num(p)}</span></td>
@@ -588,7 +672,7 @@ function vDashboard(){
     <section class="card" aria-label="Overdue payments">
       <h2>Overdue More Than 30 Days</h2>
       <div class="sub num">Total ${money(sum(over,r=>r.over30))}</div>
-      <div class="list">${over.length?over.map(r=>`<div class="li"><span>${esc(r.c.name)} <span class="muted">· ${r.oldest} days old</span></span><span style="display:flex;gap:8px;align-items:center"><b class="num">${money(r.over30)}</b>${waBtn(clientReminderText(r))}</span></div>`).join(''):'<div class="empty">No overdue payments.</div>'}</div>
+      <div class="list">${over.length?over.map(r=>`<div class="li"><span>${esc(r.c.name)} <span class="muted">· ${r.oldest} days old</span></span><span style="display:flex;gap:8px;align-items:center"><b class="num">${money(r.over30)}</b>${waBtn(clientReminderText(r),'WhatsApp',true,r.c.phone)}</span></div>`).join(''):'<div class="empty">No overdue payments.</div>'}</div>
     </section>
     <section class="card" aria-label="Reminders">
       <div class="head"><h2>Reminders</h2><a class="btn sm" href="#whatsapp">WhatsApp Reminders</a></div>
@@ -649,7 +733,7 @@ function drawRates(){
   if(!st.n){ st=routeStats(R.from,R.to,null); exact=false; }
   const out=$('rate-out');
   if(!st.n){ out.innerHTML=`<section class="card"><div class="empty">No past trips from ${esc(R.from)} to ${esc(R.to)} yet. Rates will show here after the first trip.</div><div class="sub">Try for example: Karachi Port → Lahore, Karachi → Multan, Hyderabad → Peshawar.</div></section>`; return; }
-  const q=Math.round(st.cost*(1+R.margin/100)/10)*10;
+  const RU=RG[REG].round, q=Math.round(st.cost*(1+R.margin/100)/RU)*RU;
   const vs=[...new Set(st.m.filter(t=>t.mode==='hire').map(t=>t.vendor))].map(vendor);
   const text=`Assalam o Alaikum! Our rate from ${R.from} to ${R.to} (${R.vtype}) is ${money(q)}. Please contact us to confirm the vehicle. Thank you, Demo Goods Transport Co.`;
   out.innerHTML=`<div class="grid g2">
@@ -684,10 +768,10 @@ function vFleet(){
     <div class="card kpi"><div class="label">DRIVER MONTHLY SALARY</div><div class="big num">${money(sum(S.drivers,d=>d.salary))}</div><div class="meta num">Pending advance: ${money(sum(S.drivers,d=>d.advance))}</div></div>
   </div>
   <section class="card"><h2>Vehicles</h2>
-  <div class="tw"><table><thead><tr><th>VEHICLE</th><th>TYPE</th><th>DRIVER</th><th>STATUS</th><th class="r">TRIPS</th><th class="r">REVENUE ($)</th><th class="r">PROFIT ($)</th><th>TOKEN TAX</th><th>FITNESS</th><th>INSURANCE</th><th></th></tr></thead><tbody>
+  <div class="tw"><table><thead><tr><th>VEHICLE</th><th>TYPE</th><th>DRIVER</th><th>STATUS</th><th class="r">TRIPS</th><th class="r">REVENUE ($)</th><th class="r">PROFIT ($)</th>${VDOCS().map(x=>'<th>'+esc(x[1].toUpperCase())+'</th>').join('')}<th></th></tr></thead><tbody>
   ${rows.map(r=>`<tr><td class="mono">${esc(r.v.no)}</td><td>${esc(r.v.type)}</td><td>${esc(r.v.driver)}</td><td><span class="chip ${VSTAT[r.s][0]}">${VSTAT[r.s][1]}</span></td>
     <td class="r">${r.n}</td><td class="r">${num(r.rev)}</td><td class="r"><span class="profit">${num(r.p)}</span></td>
-    <td>${docChip(r.v.token)}</td><td>${docChip(r.v.fitness)}</td><td>${docChip(r.v.insurance)}</td>
+    ${VDOCS().map(x=>'<td>'+docChip(r.v[x[0]])+'</td>').join('')}
     <td><button type="button" class="btn sm" data-act="repair" data-no="${esc(r.v.no)}">${r.v.repair?'Back from repair':'Send to repair'}</button></td></tr>`).join('')}
   </tbody></table></div></section>
   <section class="card"><h2>Drivers</h2>
@@ -700,13 +784,13 @@ function vFleet(){
 function vClients(){
   const rows=clientRows().sort((a,b)=>b.bal-a.bal);
   const sel=UI.selClient&&rows.find(r=>r.c.id===UI.selClient);
-  return `${head('Clients (Receivable)','Money to receive from clients: bill record and pending amount for each client',XLBTN)}
+  return `${head('Clients (Receivable)','Money to receive from clients: bill record and pending amount for each client',XLBTN+(REG!=='PK'?'<button type="button" class="btn" data-act="cotrn">Company TRN / VAT no.</button>':''))}
   <section class="card"><div class="sub num" style="margin-top:0">Total pending: <b>${money(sum(rows,r=>r.bal))}</b></div>
-  <div class="tw"><table><thead><tr><th>CLIENT</th><th>CITY</th><th class="r">TRIPS</th><th class="r">TOTAL BILL ($)</th><th class="r">RECEIVED ($)</th><th class="r">PENDING ($)</th><th>PREVIOUS BILL</th><th></th></tr></thead><tbody>
-  ${rows.map(r=>`<tr class="${sel&&sel.c.id===r.c.id?'sel':''}"><td><b>${esc(r.c.name)}</b></td><td>${esc(r.c.city)}</td><td class="r">${r.ts.length}</td><td class="r">${num(r.billed)}</td><td class="r">${num(r.paid)}</td>
+  <div class="tw"><table><thead><tr><th>CLIENT</th><th>CITY</th>${REG!=='PK'?'<th>TRN / VAT NO.</th>':''}<th class="r">TRIPS</th><th class="r">TOTAL BILL ($)</th><th class="r">RECEIVED ($)</th><th class="r">PENDING ($)</th><th>PREVIOUS BILL</th><th></th></tr></thead><tbody>
+  ${rows.map(r=>`<tr class="${sel&&sel.c.id===r.c.id?'sel':''}"><td><b>${esc(r.c.name)}</b><small>+${esc(r.c.phone||'')}</small></td><td>${esc(r.c.city)}</td>${REG!=='PK'?`<td class="mono">${esc(r.c.trn||'—')}</td>`:''}<td class="r">${r.ts.length}</td><td class="r">${num(r.billed)}</td><td class="r">${num(r.paid)}</td>
     <td class="r"><b>${r.bal?num(r.bal):'—'}</b></td>
     <td>${r.bal?`<span class="chip ${r.oldest>60?'bad':r.oldest>30?'warn':'neutral'}">${r.oldest} days</span>`:'<span class="chip good">Clear</span>'}</td>
-    <td><div class="btns" style="flex-wrap:nowrap"><button type="button" class="btn sm" data-act="selclient" data-id="${r.c.id}">Bill Record</button>${r.bal?`<button type="button" class="btn sm" data-act="pay" data-kind="client" data-id="${r.c.id}">Receive Payment</button>`:''}</div></td></tr>`).join('')}
+    <td><div class="btns" style="flex-wrap:nowrap"><button type="button" class="btn sm" data-act="editclient" data-id="${r.c.id}">Edit</button><button type="button" class="btn sm" data-act="selclient" data-id="${r.c.id}">Bill Record</button>${r.bal?`<button type="button" class="btn sm" data-act="pay" data-kind="client" data-id="${r.c.id}">Receive Payment</button>`:''}</div></td></tr>`).join('')}
   </tbody></table></div></section>
   ${sel?ledger(sel.c.name,byDate(sel.ts),'client',sel):''}`;
 }
@@ -716,7 +800,7 @@ function vVendors(){
   return `${head('Hired Trucks (Payable)','Trucks hired from the market: how much each truck owner is owed',XLBTN)}
   <section class="card"><div class="sub num" style="margin-top:0">Total pending: <b>${money(sum(rows,r=>r.bal))}</b></div>
   <div class="tw"><table><thead><tr><th>TRUCK OWNER</th><th>BASE</th><th>TRUCKS</th><th class="r">TRIPS</th><th class="r">TOTAL HIRE ($)</th><th class="r">PAID ($)</th><th class="r">PENDING ($)</th><th></th></tr></thead><tbody>
-  ${rows.map(r=>`<tr class="${sel&&sel.v.id===r.v.id?'sel':''}"><td><b>${esc(r.v.name)}</b></td><td>${esc(r.v.base)}</td><td><small style="color:inherit;font-size:13px">${esc(r.v.trucks.join(', '))}</small></td><td class="r">${r.ts.length}</td><td class="r">${num(r.total)}</td><td class="r">${num(r.paid)}</td>
+  ${rows.map(r=>`<tr class="${sel&&sel.v.id===r.v.id?'sel':''}"><td><b>${esc(r.v.name)}</b><small>+${esc(r.v.phone||'')}</small></td><td>${esc(r.v.base)}</td><td><small style="color:inherit;font-size:13px">${esc(r.v.trucks.join(', '))}</small></td><td class="r">${r.ts.length}</td><td class="r">${num(r.total)}</td><td class="r">${num(r.paid)}</td>
     <td class="r"><b>${r.bal?num(r.bal):'—'}</b></td>
     <td><div class="btns" style="flex-wrap:nowrap"><button type="button" class="btn sm" data-act="selvendor" data-id="${r.v.id}">Payment Record</button>${r.bal?`<button type="button" class="btn sm" data-act="pay" data-kind="vendor" data-id="${r.v.id}">Make Payment</button>`:''}</div></td></tr>`).join('')}
   </tbody></table></div></section>
@@ -724,7 +808,7 @@ function vVendors(){
 }
 function ledger(name,ts,kind,r){
   const isC=kind==='client';
-  const wa=r.bal?waBtn(isC?clientReminderText(r):vendorReminderText(r),'WhatsApp reminder'):'';
+  const wa=r.bal?waBtn(isC?clientReminderText(r):vendorReminderText(r),'WhatsApp reminder',true,isC?r.c.phone:r.v.phone):'';
   return `<section class="card" id="ledger"><div class="head"><h2>${esc(name)} · ${isC?'Bill Record':'Payment Record'}</h2>${wa}</div>
   <div class="tw"><table style="min-width:680px"><thead><tr><th>DATE</th><th>BILTY #</th><th>ROUTE</th><th>VEHICLE</th><th class="r">${isC?'TOTAL BILL ($)':'TOTAL HIRE ($)'}</th><th class="r">${isC?'RECEIVED ($)':'PAID ($)'}</th><th class="r">PENDING ($)</th><th>DAYS</th></tr></thead><tbody>
   ${ts.map(t=>{const b=isC?bal(t):vbal(t);return `<tr><td class="num">${short(t.date)}</td><td class="mono">${esc(t.id)}</td><td>${esc(t.from)} → ${esc(t.to)}</td><td class="mono">${esc(t.vehicle)}</td><td class="r">${num(isC?t.rate:t.hire)}</td><td class="r">${num(isC?t.paid:t.vpaid)}</td><td class="r"><b>${b?num(b):'—'}</b></td><td>${b?age(t.date):'—'}</td></tr>`;}).join('')}
@@ -753,7 +837,7 @@ function vSalaries(){
   <div class="tw"><table><thead><tr><th>EMPLOYEE</th><th>ROLE</th><th>VEHICLE</th><th class="r">BASIC SALARY ($)</th><th class="r">PENDING ADVANCE ($)</th><th>STATUS</th><th></th></tr></thead><tbody>
   ${rows.map((r,i)=>`<tr><td><b>${esc(r.e.name)}</b></td><td>${esc(r.e.role)}</td><td class="mono">${esc(r.e.vehicle||'—')}</td><td class="r">${num(r.e.ref.salary)}</td><td class="r">${r.e.ref.advance?num(r.e.ref.advance):'—'}</td>
     <td>${r.paid?`<span class="chip good">Paid ${short(r.paid.date)}</span><small>${money(r.paid.amount)} · ${esc(r.paid.mode)}</small>`:'<span class="chip warn">Unpaid</span>'}</td>
-    <td><div class="btns" style="flex-wrap:nowrap">${r.paid?waBtn(salText(r.e,r.paid),'Send slip on WhatsApp'):`<button type="button" class="btn sm primary" data-act="paysal" data-i="${i}">Pay Salary</button>`}<button type="button" class="btn sm" data-act="advance" data-i="${i}">Give Advance</button></div></td></tr>`).join('')}
+    <td><div class="btns" style="flex-wrap:nowrap">${r.paid?waBtn(salText(r.e,r.paid),'Send slip on WhatsApp',true,r.e.ref.phone):`<button type="button" class="btn sm primary" data-act="paysal" data-i="${i}">Pay Salary</button>`}<button type="button" class="btn sm" data-act="advance" data-i="${i}">Give Advance</button></div></td></tr>`).join('')}
   </tbody></table></div></section>
   <section class="card"><h2>Salary History</h2>
   <div class="tw"><table style="min-width:420px"><thead><tr><th>MONTH</th><th class="r">EMPLOYEES PAID</th><th class="r">TOTAL PAID ($)</th></tr></thead><tbody>
@@ -766,9 +850,9 @@ function salForm(i){
   <h2 id="sf-h">Pay Salary: ${esc(e.name)}</h2>
   <div class="sub" style="margin-top:0">${esc(e.role)}${e.vehicle?' · '+esc(e.vehicle):''} · ${monthName(CUR)}</div>
   <div class="fgrid">
-    <label class="field" for="s-basic">Basic salary ($)<input id="s-basic" type="number" min="0" step="1" value="${s.salary}"></label>
-    <label class="field" for="s-bonus">Bonus / overtime ($)<input id="s-bonus" type="number" min="0" step="1" value="0"></label>
-    <label class="field" for="s-ded">Deduct from advance ($)<input id="s-ded" type="number" min="0" step="1" value="${ded}"></label>
+    <label class="field" for="s-basic">Basic salary (${NC()})<input id="s-basic" type="number" min="0" step="1" value="${s.salary}"></label>
+    <label class="field" for="s-bonus">Bonus / overtime (${NC()})<input id="s-bonus" type="number" min="0" step="1" value="0"></label>
+    <label class="field" for="s-ded">Deduct from advance (${NC()})<input id="s-ded" type="number" min="0" step="1" value="${ded}"></label>
     <label class="field" for="s-mode">Method<select id="s-mode"><option>Cash</option><option selected>Bank</option></select></label>
   </div>
   <div class="profitbox" aria-live="polite"><div><label>Pending advance</label><b>${money(s.advance)}</b></div><div><label>Net pay</label><b id="s-net">$0</b></div><div><label>Advance left</label><b id="s-left">$0</b></div></div>
@@ -793,7 +877,7 @@ function advForm(i){
   <h2 id="af-h">Give Advance: ${esc(e.name)}</h2>
   <div class="sub" style="margin-top:0">Pending advance: <b>${money(e.ref.advance)}</b>. It can be deducted when the salary is paid.</div>
   <div class="fgrid">
-    <label class="field" for="a-amt">Amount ($)<input id="a-amt" type="number" min="1" step="1" placeholder="Example: 50"></label>
+    <label class="field" for="a-amt">Amount (${NC()})<input id="a-amt" type="number" min="1" step="1" placeholder="Example: ${RG[REG].ex.small}"></label>
     <label class="field" for="a-mode">Method<select id="a-mode"><option>Cash</option><option>Bank</option></select></label>
   </div>
   <div class="err" id="a-err" hidden></div>
@@ -808,6 +892,17 @@ function saveAdv(ev){
   addCash({date:TODAY,type:'out',head:e.adv,party:e.name,amount:amt,mode:val('a-mode'),ref:e.vehicle||'',note:'Salary advance'});
   save(); closeModal(); toast(e.name+': '+money(amt)+' advance given · added to Cash Book'); render();
 }
+
+/* ---------- Client / company details ---------- */
+function clientForm(id){ const c=client(id); return `<form class="panel" id="clf" data-id="${id}" aria-labelledby="clf-h" novalidate><h2 id="clf-h">Edit Client: ${esc(c.name)}</h2>
+  <div class="fgrid"><label class="field" for="cl-phone">WhatsApp number<input id="cl-phone" value="+${esc(c.phone||'')}" placeholder="+${RG[REG].cc} ..."></label>${REG!=='PK'?`<label class="field" for="cl-trn">TRN / VAT number<input id="cl-trn" value="${esc(c.trn||'')}" placeholder="15 digits"></label>`:''}</div>
+  <div class="sub" style="margin:0">${REG!=='PK'?'The TRN / VAT number is printed on this client’s invoices. ':''}A number without the country code gets +${RG[REG].cc} added.</div>
+  <div class="actions"><button type="button" class="btn" data-act="close">Cancel</button><button type="submit" class="btn primary">Save</button></div></form>`; }
+function companyForm(){ return `<form class="panel" id="cof" aria-labelledby="cof-h" novalidate><h2 id="cof-h">Company TRN / VAT number</h2>
+  <div class="sub" style="margin:0">Printed on every client invoice in ${esc(RG[REG].name)}.</div>
+  <div class="fgrid"><label class="field" for="co-trn">TRN / VAT number<input id="co-trn" value="${esc((S.company||{}).trn||'')}" placeholder="15 digits"></label></div>
+  <div class="actions"><button type="button" class="btn" data-act="close">Cancel</button><button type="submit" class="btn primary">Save</button></div></form>`; }
+function normPhone(p){ p=String(p||'').replace(/\D/g,''); if(!p) return ''; if(p.startsWith('00')) p=p.slice(2); else if(p.startsWith('0')) p=RG[REG].cc+p.slice(1); else if(!p.startsWith(RG[REG].cc)) p=RG[REG].cc+p; return p; }
 
 /* ---------- Cash Book ---------- */
 function vCashbook(){
@@ -1052,10 +1147,9 @@ function docSheet(kind,id){
 
 /* ---------- Reports & Documents (full) ---------- */
 const COMPANY='Demo Goods Transport Co.';
-const PROV={'Karachi Port':'Sindh','Karachi':'Sindh','Hyderabad':'Sindh','Sukkur':'Sindh','Quetta':'Balochistan','Multan':'Punjab','Sahiwal':'Punjab','Faisalabad':'Punjab','Lahore':'Punjab','Gujranwala':'Punjab','Islamabad':'Islamabad','Peshawar':'Khyber Pakhtunkhwa'};
 const pct=(a,b)=>b?a/b*100:0;
 const C=(h,t)=>({h,t:t||'text'});
-const fmtCell=(v,t)=>v==null||v===''?'':t==='money'?(v<0?'-':'')+num(Math.abs(v)):t==='int'?num(v):t==='pct'?Number(v).toFixed(1)+'%':t==='date'?nice(v):String(v);
+const fmtCell=(v,t)=>v==null||v===''?'':t==='money'?(v<0?'-':'')+num(Math.abs(v)):t==='int'?cnt(v):t==='pct'?Number(v).toFixed(1)+'%':t==='date'?nice(v):String(v);
 function rTrips(){ const R=UI.r2; return byDate(S.trips).filter(t=>inRange(t.date,R.from,R.to)); }
 function rCash(){ const R=UI.r2; return cashSorted().filter(e=>inRange(e.date,R.from,R.to)); }
 function periodText(){ const R=UI.r2; return (R.from?nice(R.from):'Start')+' to '+(R.to?nice(R.to):nice(TODAY)); }
@@ -1106,7 +1200,7 @@ const REPORTS=[
      totals:['Total ('+ts.length+')','','','','','','','',sum(ts,t=>t.rate),sum(ts,cost),sum(ts,profit),pct(sum(ts,profit),sum(ts,t=>t.rate)),sum(ts,t=>t.paid),sum(ts,bal),'']}; }},
  {sec:'ops',k:'fleet',title:'Fleet Status',desc:'Own vehicles: status, trips and document expiry dates',build(){
    const ts=rTrips();
-   return {asOf:true,cols:[C('Vehicle'),C('Type'),C('Driver'),C('Status'),C('Trips in period','int'),C('Token tax','date'),C('Fitness','date'),C('Insurance','date'),C('Insurance days left','int')],rows:S.vehicles.map(v=>[v.no,v.type,v.driver,VSTAT[vStatus(v)][1],ts.filter(t=>t.mode==='own'&&t.vehicle===v.no).length,v.token,v.fitness,v.insurance,until(v.insurance)])}; }},
+   return {asOf:true,cols:[C('Vehicle'),C('Type'),C('Driver'),C('Status'),C('Trips in period','int'),...VDOCS().map(x=>C(x[1],'date')),C('Insurance days left','int')],rows:S.vehicles.map(v=>[v.no,v.type,v.driver,VSTAT[vStatus(v)][1],ts.filter(t=>t.mode==='own'&&t.vehicle===v.no).length,...VDOCS().map(x=>v[x[0]]),until(v.insurance)])}; }},
  {sec:'ops',k:'route',title:'Route Profitability',desc:'Best and worst routes by revenue, cost and margin',build(){
    const gs=groupRows(rTrips(),t=>t.from+' → '+t.to).sort((a,b)=>b.p-a.p); return {cols:GCOLS('Route'),rows:gs.map(grow),totals:gtot(gs)}; }},
  {sec:'ops',k:'crev',title:'Client Wise Revenue',desc:'Revenue, trips, profit and pending of each client, ranked',build(){
@@ -1126,7 +1220,11 @@ const REPORTS=[
    const ts=rTrips().filter(t=>pct(profit(t),t.rate)<10);
    return {cols:[C('Bilty #'),C('Date','date'),C('Route'),C('Client'),C('Own / Hire'),C('Client rate ($)','money'),C('Cost / hire ($)','money'),C('Profit ($)','money'),C('Margin','pct'),C('Status')],rows:ts.map(t=>[t.id,t.date,t.from+' → '+t.to,client(t.client).name,t.mode==='own'?'Own':'Hire',t.rate,cost(t),profit(t),pct(profit(t),t.rate),t.status])}; }},
  {sec:'inv',k:'inv',sel:'client',title:'Client Invoice',desc:'Invoice of all trips for one client in the period',build(id){
-   const ts=rTrips().filter(t=>t.client===id).reverse();
+   const ts=rTrips().filter(t=>t.client===id).reverse(), V=RG[REG].vat, cc=client(id);
+   if(V) return {cols:[C('Bilty #'),C('Date','date'),C('Route'),C('Goods'),C('Vehicle'),C('Subtotal ($)','money'),C('VAT '+Math.round(V*100)+'% ($)','money'),C('Total ($)','money'),C('Received ($)','money'),C('Balance due ($)','money')],
+     rows:ts.map(t=>{const v=vatOf(t.rate);return [t.id,t.date,t.from+' → '+t.to,t.goods,t.vehicle,t.rate,v,t.rate+v,t.paid,t.rate+v-t.paid];}),
+     totals:['Total','','','','',sum(ts,t=>t.rate),sum(ts,t=>vatOf(t.rate)),sum(ts,t=>t.rate+vatOf(t.rate)),sum(ts,t=>t.paid),sum(ts,t=>t.rate+vatOf(t.rate)-t.paid)],
+     note:'Bill to: '+cc.name+', '+cc.city+' · Client TRN / VAT no.: '+(cc.trn||'-')+' · Our TRN / VAT no.: '+((S.company||{}).trn||'-')+'. Please pay the balance due. Thank you for your business.'};
    return {cols:[C('Bilty #'),C('Date','date'),C('Route'),C('Goods'),C('Vehicle'),C('Amount ($)','money'),C('Received ($)','money'),C('Pending ($)','money')],rows:ts.map(t=>[t.id,t.date,t.from+' → '+t.to,t.goods,t.vehicle,t.rate,t.paid,bal(t)]),totals:['Total','','','','',sum(ts,t=>t.rate),sum(ts,t=>t.paid),sum(ts,bal)],note:'Bill to: '+client(id).name+', '+client(id).city+'. Please pay the pending amount. Thank you for your business.'}; }},
  {sec:'inv',k:'cled',sel:'client',title:'Client Ledger',desc:'Full account statement with bills, payments and running balance',build(id){
    const name=client(id).name, R=UI.r2;
@@ -1164,12 +1262,12 @@ function reportTable(rep){
 }
 function reportModal(rep,k){
   return `<div class="panel wide" role="dialog" aria-labelledby="rv-h">
-  <div class="head"><div><h2 id="rv-h">${esc(rep.title)}</h2><p>${esc(COMPANY)} · ${esc(rep.sub)}</p></div><div class="btns"><button type="button" class="btn sm pdf" style="--sec:var(--sec-acc)" data-act="r2pdf" data-k="${k}">Download PDF</button><button type="button" class="btn sm xls" data-act="r2xls" data-k="${k}">Download Excel</button><button type="button" class="btn sm" data-act="close">Close</button></div></div>
+  <div class="head"><div><h2 id="rv-h">${esc(rep.title)}</h2><p>${esc(COMPANY)} · ${esc(RG[REG].tag)} · ${esc(rep.sub)} · Amounts in ${cu()}</p></div><div class="btns"><button type="button" class="btn sm pdf" style="--sec:var(--sec-acc)" data-act="r2pdf" data-k="${k}">Download PDF</button><button type="button" class="btn sm xls" data-act="r2xls" data-k="${k}">Download Excel</button><button type="button" class="btn sm" data-act="close">Close</button></div></div>
   ${reportTable(rep)}</div>`;
 }
 function makePDF(rep){
   const J=window.jspdf&&window.jspdf.jsPDF; if(!J) return null;
-  const P=s=>String(s).replace(/→/g,'->').replace(/[–—]/g,'-').replace(/×/g,'x');
+  const P=s=>L(String(s)).replace(/→/g,'->').replace(/[–—]/g,'-').replace(/×/g,'x');
   const doc=new J({orientation:rep.cols.length>6?'landscape':'portrait',unit:'pt',format:'a4'});
   const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), M=32;
   const wts=rep.cols.map(c=>c.t==='text'?2:1), tw=wts.reduce((a,b)=>a+b,0), ws=wts.map(w=>w/tw*(W-2*M));
@@ -1185,9 +1283,9 @@ function makePDF(rep){
     let x=M; lines.forEach((l,i)=>{ if(right(i)) doc.text(l,x+ws[i]-3,y+10,{align:'right'}); else doc.text(l,x+3,y+10); x+=ws[i]; });
     y+=h; doc.setDrawColor(221,226,234); doc.line(M,y,W-M,y);
   };
-  doc.setTextColor(21,26,36); doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.text(COMPANY,M,y+8); y+=26;
+  doc.setTextColor(21,26,36); doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.text(COMPANY,M,y+8); doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(85,93,110); doc.text(P(RG[REG].tag),M,y+21); doc.setTextColor(21,26,36); doc.setFont('helvetica','bold'); y+=38;
   doc.setFontSize(12); doc.text(P(rep.title),M,y); y+=15;
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(85,93,110); doc.text(P(rep.sub),M,y); y+=14;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(85,93,110); doc.text(P(rep.sub+' · Amounts in '+cu()),M,y); y+=14;
   draw(rep.cols.map(c=>c.h),{head:true,bold:true});
   if(!rep.rows.length){ doc.setTextColor(85,93,110); doc.setFontSize(9); doc.text('No records for this period.',M,y+14); y+=20; }
   rep.rows.forEach(r=>draw(r.map((v,i)=>fmtCell(v,rep.cols[i].t))));
@@ -1198,12 +1296,13 @@ function makePDF(rep){
   return doc.output('arraybuffer');
 }
 function makeXLSX(rep){
-  const aoa=[[COMPANY],[rep.title],[rep.sub],[],rep.cols.map(c=>c.h),...rep.rows.map(r=>r.map((v,i)=>{const t=rep.cols[i].t;return v==null?'':t==='date'?(v?nice(v):''):t==='pct'?Math.round(v*10)/10:v;})),...(rep.totals?[rep.totals.map((v,i)=>v==null?'':(i&&rep.cols[i].t==='pct'?Math.round(v*10)/10:v))]:[])];
-  if(rep.note) aoa.push([],[rep.note]);
+  const xv=(v,t)=>v==null||v===''?'':t==='date'?nice(v):t==='pct'?Math.round(v*10)/10:t==='money'?Math.round(conv(v)*100)/100:typeof v==='string'?L(v):v;
+  const aoa=[[COMPANY],[RG[REG].tag],[L(rep.title)],[rep.sub+' · Amounts in '+cu()],[],rep.cols.map(c=>L(c.h)),...rep.rows.map(r=>r.map((v,i)=>xv(v,rep.cols[i].t))),...(rep.totals?[rep.totals.map((v,i)=>xv(v,i?rep.cols[i].t:'text'))]:[])];
+  if(rep.note) aoa.push([],[L(rep.note)]);
   if(window.XLSX){ const ws=XLSX.utils.aoa_to_sheet(aoa); ws['!cols']=rep.cols.map(c=>({wch:c.t==='text'?28:15})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Report'); return {ext:'.xlsx',data:XLSX.write(wb,{bookType:'xlsx',type:'array'})}; }
   return {ext:'.csv',data:aoa.map(r=>r.map(v=>{const s=String(v==null?'':v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(',')).join('\n')};
 }
-const fileBase=rep=>(rep.title.replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'')+'_'+(rep.asOf?TODAY:(UI.r2.from||'start')+'_to_'+(UI.r2.to||TODAY)));
+const fileBase=rep=>(L(rep.title).replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'')+'_'+(rep.asOf?TODAY:(UI.r2.from||'start')+'_to_'+(UI.r2.to||TODAY)));
 let DLP=null;
 function getDL(){ if(!DLP) DLP=(window.claude&&window.claude.use?window.claude.use('downloads'):Promise.resolve(null)).catch(()=>null); return DLP; }
 async function saveFile(filename,data){
@@ -1227,48 +1326,48 @@ function cashDocKind(e){ if(e.type==='in') return {type:'receipt',title:'Payment
 function docData(kind,id){
   if(kind==='bilty'||kind==='invoice'){
     const t=S.trips.find(x=>x.id===id); if(!t) return null; const c=client(t.client), isB=kind==='bilty';
-    return {title:isB?'Bilty':'Invoice',no:isB?t.id:'INV-'+t.id.slice(2),date:t.date,
-      fields:[[isB?'Consignor (client)':'Bill to',c.name+', '+c.city],['Route',t.from+' → '+t.to],['Goods',t.goods+' · '+t.weight+' ton'],['Vehicle',t.vehicle+' · '+t.vtype],isB?['Driver / truck owner',t.mode==='own'?((S.vehicles.find(v=>v.no===t.vehicle)||{}).driver||'-'):vendor(t.vendor).name]:['Bilty #',t.id],['Status',t.status]],
-      amounts:[[isB?'Freight':'Amount',t.rate],[isB?'Advance':'Received',t.paid],[isB?'Balance':'Pending',bal(t)]],
-      share:isB?`Bilty ${t.id}: ${t.from} to ${t.to}, ${t.goods} (${t.weight} ton), vehicle ${t.vehicle}. Freight ${money(t.rate)}, advance ${money(t.paid)}, balance ${money(bal(t))}. ${COMPANY}`:`Invoice INV-${t.id.slice(2)} for ${c.name}: bilty ${t.id}, ${t.from} to ${t.to}. Amount ${money(t.rate)}, received ${money(t.paid)}, pending ${money(bal(t))}. ${COMPANY}`};
+    return {phone:c.phone,title:isB?'Bilty':'Invoice',no:isB?t.id:'INV-'+t.id.slice(2),date:t.date,
+      fields:[[isB?'Consignor (client)':'Bill to',c.name+', '+c.city],['Route',t.from+' → '+t.to],['Goods',t.goods+' · '+t.weight+' ton'],['Vehicle',t.vehicle+' · '+t.vtype],isB?['Driver / truck owner',t.mode==='own'?((S.vehicles.find(v=>v.no===t.vehicle)||{}).driver||'-'):vendor(t.vendor).name]:['Bilty #',t.id],['Status',t.status],...(isB&&REG==='SA'?[['Naql e-transport document no.',t.naql||'-']]:[]),...(!isB&&RG[REG].vat?[['Client TRN / VAT no.',c.trn||'-'],['Our TRN / VAT no.',(S.company||{}).trn||'-']]:[])],
+      amounts:(!isB&&RG[REG].vat)?[['Subtotal',t.rate],['VAT '+Math.round(RG[REG].vat*100)+'%',vatOf(t.rate)],['Total',t.rate+vatOf(t.rate)],['Received',t.paid],['Balance due',t.rate+vatOf(t.rate)-t.paid]]:[[isB?'Freight':'Amount',t.rate],[isB?'Advance':'Received',t.paid],[isB?'Balance':'Pending',bal(t)]],
+      share:isB?`Bilty ${t.id}: ${t.from} to ${t.to}, ${t.goods} (${t.weight} ton), vehicle ${t.vehicle}. Freight ${money(t.rate)}, advance ${money(t.paid)}, balance ${money(bal(t))}. ${COMPANY}`:`Invoice INV-${t.id.slice(2)} for ${c.name}: bilty ${t.id}, ${t.from} to ${t.to}. Amount ${money(t.rate+vatOf(t.rate))}${RG[REG].vat?' incl. VAT':''}, received ${money(t.paid)}, pending ${money(t.rate+vatOf(t.rate)-t.paid)}. ${COMPANY}`};
   }
   const e=S.cash.find(x=>x.id===id); if(!e) return null; const k=cashDocKind(e);
-  return {title:k.title,no:k.pre+e.id.slice(2),date:e.date,fields:[[e.type==='in'?'Received from':'Paid to',e.party],['Head',e.head],['Mode',e.mode],['Reference',e.ref||'-'],['Note',e.note||'-']],amounts:[['Amount',e.amount]],
+  return {phone:partyPhone(e.party),title:k.title,no:k.pre+e.id.slice(2),date:e.date,fields:[[e.type==='in'?'Received from':'Paid to',e.party],['Head',e.head],['Mode',e.mode],['Reference',e.ref||'-'],['Note',e.note||'-']],amounts:[['Amount',e.amount]],
     share:`${k.title} ${k.pre}${e.id.slice(2)}: ${money(e.amount)} ${e.type==='in'?'received from':'paid to'} ${e.party} on ${nice(e.date)} (${e.mode}). ${COMPANY}`};
 }
 function docModal(kind,id){
   const d=docData(kind,id); if(!d) return '';
   return `<div class="panel" role="dialog" aria-labelledby="dm-h"><h2 id="dm-h">${esc(d.title)} ${esc(d.no)}</h2>
-  <div class="docsheet"><div class="dh"><div><b>${esc(COMPANY)}</b><div class="sub" style="margin:2px 0 0">Goods transport · All Pakistan</div></div><div style="text-align:right"><b class="mono" style="font-size:16px">${esc(d.no)}</b><div class="sub" style="margin:2px 0 0">${nice(d.date)}</div></div></div>
+  <div class="docsheet"><div class="dh"><div><b>${esc(COMPANY)}</b><div class="sub" style="margin:2px 0 0">${esc(RG[REG].tag)}${d.title==='Invoice'&&RG[REG].vat&&(S.company||{}).trn?' · TRN '+esc(S.company.trn):''}</div></div><div style="text-align:right"><b class="mono" style="font-size:16px">${esc(d.no)}</b><div class="sub" style="margin:2px 0 0">${nice(d.date)}</div></div></div>
   <div class="kv">${d.fields.map(f=>`<div><label>${esc(f[0].toUpperCase())}</label><div>${esc(f[1])}</div></div>`).join('')}</div>
   <div class="stat3">${d.amounts.map(a=>`<div><label>${esc(a[0].toUpperCase())}</label><b>${money(a[1])}</b></div>`).join('')}</div></div>
-  <div class="actions">${waBtn(d.share,'Share on WhatsApp',false)}<button type="button" class="btn" data-act="doc2pdf" data-kind="${kind}" data-id="${esc(id)}">Download PDF</button><button type="button" class="btn primary" data-act="close">Close</button></div></div>`;
+  <div class="actions">${waBtn(d.share,'Share on WhatsApp',false,d.phone)}<button type="button" class="btn" data-act="doc2pdf" data-kind="${kind}" data-id="${esc(id)}">Download PDF</button><button type="button" class="btn primary" data-act="close">Close</button></div></div>`;
 }
 function downloadDoc(kind,id){
   const d=docData(kind,id); const J=window.jspdf&&window.jspdf.jsPDF;
   if(!d) return; if(!J){ toast('The PDF tool did not load. Check the internet and refresh the page.'); return; }
-  const P=s=>String(s).replace(/→/g,'->').replace(/[–—]/g,'-');
+  const P=s=>L(String(s)).replace(/→/g,'->').replace(/[–—]/g,'-');
   const doc=new J({unit:'pt',format:'a4'}), W=doc.internal.pageSize.getWidth(), M=48; let y=M+8;
   doc.setTextColor(21,26,36); doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.text(COMPANY,M,y);
   doc.setFontSize(14); doc.text(P(d.title),W-M,y,{align:'right'});
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(85,93,110); doc.text('Goods transport · All Pakistan',M,y+14); doc.text(d.no+'  ·  '+nice(d.date),W-M,y+14,{align:'right'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(85,93,110); doc.text(P(RG[REG].tag),M,y+14); doc.text(d.no+'  ·  '+nice(d.date),W-M,y+14,{align:'right'});
   y+=26; doc.setDrawColor(21,26,36); doc.setLineWidth(1.2); doc.line(M,y,W-M,y); y+=24;
   d.fields.forEach((f,i)=>{ const x=i%2?W/2:M; if(i%2===0&&i) y+=36; doc.setFontSize(8); doc.setTextColor(85,93,110); doc.text(P(f[0]).toUpperCase(),x,y); doc.setFontSize(11); doc.setTextColor(21,26,36); doc.text(doc.splitTextToSize(P(f[1]),W/2-M-10),x,y+14); });
   y+=52; const bw=(W-2*M-16*(d.amounts.length-1))/d.amounts.length;
-  d.amounts.forEach((a,i)=>{ const x=M+i*(bw+16); doc.setFillColor(237,240,245); doc.roundedRect(x,y,bw,52,6,6,'F'); doc.setFontSize(8); doc.setTextColor(85,93,110); doc.text(a[0].toUpperCase(),x+10,y+18); doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(21,26,36); doc.text(money(a[1]),x+10,y+40); doc.setFont('helvetica','normal'); });
+  d.amounts.forEach((a,i)=>{ const x=M+i*(bw+16); doc.setFillColor(237,240,245); doc.roundedRect(x,y,bw,52,6,6,'F'); doc.setFontSize(8); doc.setTextColor(85,93,110); doc.text(a[0].toUpperCase(),x+10,y+18); doc.setFont('helvetica','bold'); doc.setFontSize(d.amounts.length>3?11:15); doc.setTextColor(21,26,36); doc.text(money(a[1]),x+10,y+40); doc.setFont('helvetica','normal'); });
   y+=110; doc.setDrawColor(150); doc.setLineWidth(.6); doc.line(M,y,M+170,y); doc.line(W-M-170,y,W-M,y); doc.setFontSize(9); doc.setTextColor(85,93,110); doc.text('Prepared by',M,y+14); doc.text('Received / Signature',W-M-170,y+14);
   doc.setFontSize(7.5); doc.text('HaulDesk demo · generated '+nice(TODAY),M,doc.internal.pageSize.getHeight()-20);
-  saveFile(d.title.replace(/\s+/g,'_')+'_'+d.no+'.pdf',doc.output('arraybuffer'));
+  saveFile(L(d.title).replace(/\s+/g,'_')+'_'+d.no+'.pdf',doc.output('arraybuffer'));
 }
 const DTYPES=[['','All documents'],['bilty','Bilty'],['invoice','Invoice'],['receipt','Payment receipt (from clients)'],['voucher','Payment voucher (to truck owners)'],['expense','Expense voucher'],['salary','Salary slip'],['vehicle','Vehicle documents'],['driver','Driver license'],['upload','Uploaded files']];
 function docList2(){
   const R=UI.r2, out=[];
   rTrips().forEach(t=>{
     out.push({type:'bilty',kind:'bilty',id:t.id,name:'Bilty '+t.id,party:client(t.client).name,link:t.from+' → '+t.to,date:t.date,amt:t.rate,chip:['good','Generated']});
-    out.push({type:'invoice',kind:'invoice',id:t.id,name:'Invoice INV-'+t.id.slice(2),party:client(t.client).name,link:'Bilty '+t.id,date:t.date,amt:t.rate,chip:bal(t)?['warn','Pending '+money(bal(t))]:['good','Paid']});
+    out.push({type:'invoice',kind:'invoice',id:t.id,name:'Invoice INV-'+t.id.slice(2),party:client(t.client).name,link:'Bilty '+t.id,date:t.date,amt:t.rate+vatOf(t.rate),chip:(t.rate+vatOf(t.rate)-t.paid)>0?['warn','Pending '+money(t.rate+vatOf(t.rate)-t.paid)]:['good','Paid']});
   });
   rCash().filter(e=>e.head!=='Opening balance').forEach(e=>{const k=cashDocKind(e); out.push({type:k.type,kind:'cash',id:e.id,name:k.title+' '+k.pre+e.id.slice(2),party:e.party,link:e.head+(e.ref?' · '+e.ref:''),date:e.date,amt:e.amount,chip:e.type==='in'?['good','Received']:['bad','Paid']});});
-  S.vehicles.forEach(v=>[['token','Token tax'],['fitness','Fitness certificate'],['insurance','Insurance']].forEach(([k,l])=>{const u=until(v[k]); out.push({type:'vehicle',name:l,party:v.no,link:v.type,date:v[k],exp:true,chip:u<0?['bad','Expired']:u<=30?['warn',u+' days left']:['neutral','Valid']});}));
+  S.vehicles.forEach(v=>VDOCS().forEach(([k,l])=>{const u=until(v[k]); out.push({type:'vehicle',name:l,party:v.no,link:v.type,date:v[k],exp:true,chip:u<0?['bad','Expired']:u<=30?['warn',u+' days left']:['neutral','Valid']});}));
   S.drivers.forEach(x=>{const u=until(x.license); out.push({type:'driver',name:'Driving license',party:x.name,link:x.vehicle,date:x.license,exp:true,chip:u<0?['bad','Expired']:u<=30?['warn',u+' days left']:['neutral','Valid']});});
   (S.docs||[]).filter(d=>inRange(d.date,R.from,R.to)).forEach(d=>out.push({type:'upload',name:d.name,party:'Uploaded file',link:Math.max(1,Math.round(d.size/1024))+' KB',date:d.date,chip:['info','Uploaded']}));
   return out.sort((a,b)=>(a.exp?1:0)-(b.exp?1:0)||b.date.localeCompare(a.date));
@@ -1321,14 +1420,14 @@ function vReports2(){
 /* ---------- WhatsApp Reminders ---------- */
 function waItems(){
   const out=[];
-  clientRows().filter(r=>r.bal>0).sort((a,b)=>b.bal-a.bal).forEach(r=>out.push({grp:'client',to:r.c.name,why:`Payment reminder · ${money(r.bal)} pending, oldest ${r.oldest} days`,text:clientReminderText(r),cls:r.oldest>30?'bad':'warn'}));
-  byDate(S.trips.filter(t=>ACTIVE.includes(t.status))).forEach(t=>out.push({grp:'client',to:client(t.client).name,why:`Load update · ${t.id} is ${t.status}`,text:statusText(t),cls:'info'}));
-  vendorRows().filter(r=>r.bal>0).sort((a,b)=>b.bal-a.bal).forEach(r=>out.push({grp:'vendor',to:r.v.name,why:`Payment confirmation · ${money(r.bal)} pending to them`,text:vendorReminderText(r),cls:'accent'}));
+  clientRows().filter(r=>r.bal>0).sort((a,b)=>b.bal-a.bal).forEach(r=>out.push({grp:'client',phone:r.c.phone,to:r.c.name,why:`Payment reminder · ${money(r.bal)} pending, oldest ${r.oldest} days`,text:clientReminderText(r),cls:r.oldest>30?'bad':'warn'}));
+  byDate(S.trips.filter(t=>ACTIVE.includes(t.status))).forEach(t=>out.push({grp:'client',phone:client(t.client).phone,to:client(t.client).name,why:`Load update · ${t.id} is ${t.status}`,text:statusText(t),cls:'info'}));
+  vendorRows().filter(r=>r.bal>0).sort((a,b)=>b.bal-a.bal).forEach(r=>out.push({grp:'vendor',phone:r.v.phone,to:r.v.name,why:`Payment confirmation · ${money(r.bal)} pending to them`,text:vendorReminderText(r),cls:'accent'}));
   S.vehicles.forEach(v=>{
-    [['token','Token tax'],['fitness','Fitness certificate'],['insurance','Insurance']].forEach(([k,l])=>{const d=until(v[k]); if(d<=30) out.push({grp:'driver',to:v.driver+' ('+v.no+')',why:`${l} ${d<0?'expired':'due'} on ${short(v[k])}`,text:`Assalam o Alaikum ${v.driver}! ${l} of vehicle ${v.no} ${d<0?'expired on':'is due on'} ${nice(v[k])}. Please bring the vehicle documents to the office. Thank you, Demo Goods Transport Co.`,cls:d<0?'bad':'warn'});});
+    VDOCS().forEach(([k,l])=>{const d=until(v[k]); if(d<=30) out.push({grp:'driver',phone:(S.drivers.find(x=>x.name===v.driver)||{}).phone,to:v.driver+' ('+v.no+')',why:`${l} ${d<0?'expired':'due'} on ${short(v[k])}`,text:`Assalam o Alaikum ${v.driver}! ${l} of vehicle ${v.no} ${d<0?'expired on':'is due on'} ${nice(v[k])}. Please bring the vehicle documents to the office. Thank you, Demo Goods Transport Co.`,cls:d<0?'bad':'warn'});});
   });
-  S.drivers.forEach(x=>{const d=until(x.license); if(d<=30) out.push({grp:'driver',to:x.name,why:`Driving license ${d<0?'expired':'expires'} on ${short(x.license)}`,text:`Assalam o Alaikum ${x.name}! Your driving license ${d<0?'expired on':'expires on'} ${nice(x.license)}. Please renew it and share a copy with the office. Thank you, Demo Goods Transport Co.`,cls:d<0?'bad':'warn'});});
-  S.trips.filter(t=>t.ret&&!t.returned).forEach(t=>{const v=S.vehicles.find(x=>x.no===t.vehicle);out.push({grp:'driver',to:(v?v.driver:'Driver')+' ('+t.vehicle+')',why:`Return empty container by ${short(t.ret)}`,text:`Assalam o Alaikum! Please return the empty container of bilty ${t.id} by ${nice(t.ret)} to avoid detention charges. Thank you, Demo Goods Transport Co.`,cls:'bad'});});
+  S.drivers.forEach(x=>{const d=until(x.license); if(d<=30) out.push({grp:'driver',phone:x.phone,to:x.name,why:`Driving license ${d<0?'expired':'expires'} on ${short(x.license)}`,text:`Assalam o Alaikum ${x.name}! Your driving license ${d<0?'expired on':'expires on'} ${nice(x.license)}. Please renew it and share a copy with the office. Thank you, Demo Goods Transport Co.`,cls:d<0?'bad':'warn'});});
+  S.trips.filter(t=>t.ret&&!t.returned).forEach(t=>{const v=S.vehicles.find(x=>x.no===t.vehicle);out.push({grp:'driver',phone:v?(S.drivers.find(x=>x.name===v.driver)||{}).phone:'',to:(v?v.driver:'Driver')+' ('+t.vehicle+')',why:`Return empty container by ${short(t.ret)}`,text:`Assalam o Alaikum! Please return the empty container of bilty ${t.id} by ${nice(t.ret)} to avoid detention charges. Thank you, Demo Goods Transport Co.`,cls:'bad'});});
   return out;
 }
 function vWhatsapp(){
@@ -1339,12 +1438,12 @@ function vWhatsapp(){
   return `${head('WhatsApp Reminders','Ready-made messages for clients, truck owners and drivers. Tap send and choose the contact in WhatsApp.')}
   <section class="card">
     <div class="btns">${G.map(g=>`<button type="button" class="btn sm ${UI.wa===g[0]?'on':''}" data-act="wafilter" data-g="${g[0]}">${g[1]} (${g[0]?all.filter(x=>x.grp===g[0]).length:all.length})</button>`).join('')}</div>
-    <div class="list">${l.length?l.map(x=>`<div class="wa"><div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="chip ${LBL[x.grp][0]}">${LBL[x.grp][1]}</span><b>${esc(x.to)}</b><span class="chip ${x.cls}">${esc(x.why)}</span></div><p>${esc(x.text)}</p></div>${waBtn(x.text,'Send on WhatsApp',false)}</div>`).join(''):'<div class="empty">No reminders in this group.</div>'}</div>
+    <div class="list">${l.length?l.map(x=>`<div class="wa"><div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="chip ${LBL[x.grp][0]}">${LBL[x.grp][1]}</span><b>${esc(x.to)}</b>${x.phone?'<span class="mono" style="color:var(--muted)">+'+esc(x.phone)+'</span>':''}<span class="chip ${x.cls}">${esc(x.why)}</span></div><p>${esc(x.text)}</p></div>${waBtn(x.text,'Send on WhatsApp',false,x.phone)}</div>`).join(''):'<div class="empty">No reminders in this group.</div>'}</div>
   </section>`;
 }
 
 /* ---------- Ask HaulDesk ---------- */
-const SUGG=['Who owes us the most?','What is our cash balance?','Profit in the last 30 days?','Which vehicles are free?','Rate from Karachi Port to Lahore?','How much do we owe truck owners?','Salaries paid this month?','Mehran Cement pending balance?','Any reminders?'];
+const SUGG=()=>['Who owes us the most?','What is our cash balance?','Profit in the last 30 days?','Which vehicles are free?','Rate from '+RG[REG].rate[0]+' to '+RG[REG].rate[1]+'?','How much do we owe truck owners?','Salaries paid this month?',S.clients[1].name+' pending balance?','Any reminders?'];
 function vAsk(){
   if(!UI.chat) UI.chat=[{me:false,html:'Assalam o Alaikum! I am the HaulDesk assistant. Ask me about pending payments, cash, profit, vehicles or rates.'}];
   return `${head('Ask HaulDesk','Ask questions about your business in plain words')}
@@ -1352,13 +1451,13 @@ function vAsk(){
   <section class="card">
     <div class="chat" id="chat" aria-live="polite">${UI.chat.map(m=>`<div class="msg ${m.me?'me':'bot'}">${m.html}</div>`).join('')}</div>
     <form class="askrow" id="askform"><label for="ask-in" class="vh">Question</label><input id="ask-in" autocomplete="off" placeholder="Example: How much does Ravi Steel owe?"><button class="btn primary" type="submit">Ask</button></form>
-    <div class="sugg">${SUGG.map(s=>`<button type="button" data-act="ask" data-q="${esc(s)}">${esc(s)}</button>`).join('')}</div>
+    <div class="sugg">${SUGG().map(s=>`<button type="button" data-act="ask" data-q="${esc(s)}">${esc(s)}</button>`).join('')}</div>
   </section>`;
 }
 function answer(q){
   const s=q.toLowerCase();
   const cr=clientRows();
-  const cl=S.clients.find(c=>s.includes(c.name.toLowerCase().split(' ')[0]));
+  const cl=S.clients.find(c=>{const w=c.name.toLowerCase().split(' ');return s.includes(w[0].length>3?w[0]:w.slice(0,2).join(' '));});
   const has=re=>re.test(s);
   if(cl&&!has(/rate|kiraya|bhara/)){
     const r=cr.find(x=>x.c.id===cl.id);
@@ -1371,7 +1470,7 @@ function answer(q){
     if(found.length>=2){
       const st=routeStats(found[0].c,found[1].c,null);
       if(!st.n) return `No past trips found from ${found[0].c} to ${found[1].c}.`;
-      return `${found[0].c} → ${found[1].c}: in the last <b>${st.n}</b> trips, the average client rate was <b>${money(st.rate)}</b> and the average cost/hire was <b>${money(st.cost)}</b>. Quote with 10% margin: <b>${money(Math.round(st.cost*1.1/10)*10)}</b>.`;
+      return `${found[0].c} → ${found[1].c}: in the last <b>${st.n}</b> trips, the average client rate was <b>${money(st.rate)}</b> and the average cost/hire was <b>${money(st.cost)}</b>. Quote with 10% margin: <b>${money(Math.round(st.cost*1.1/RG[REG].round)*RG[REG].round)}</b>.`;
     }
     return 'Please mention the route, for example "Rate from Karachi Port to Lahore?"';
   }
@@ -1457,12 +1556,13 @@ function tripForm(pre){
   <div class="fgrid">
     <label class="field" for="t-date">Date<input type="date" id="t-date" value="${TODAY}"></label>
     <label class="field" for="t-client">Client<select id="t-client">${S.clients.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></label>
-    <label class="field" for="t-from">From<select id="t-from">${opts(CITIES,pre.from||'Karachi Port')}</select></label>
-    <label class="field" for="t-to">To<select id="t-to">${opts(CITIES,pre.to||'Lahore')}</select></label>
+    <label class="field" for="t-from">From<select id="t-from">${opts(CITIES,pre.from||RG[REG].rate[0])}</select></label>
+    <label class="field" for="t-to">To<select id="t-to">${opts(CITIES,pre.to||RG[REG].rate[1])}</select></label>
     <label class="field" for="t-goods">Goods<input id="t-goods" placeholder="Example: Cotton bales"></label>
     <label class="field" for="t-weight">Weight (ton)<input id="t-weight" type="number" min="0" value="25"></label>
-    <label class="field" for="t-vtype">Vehicle type<select id="t-vtype">${opts(VTYPES,pre.vtype||'22 wheeler')}</select></label>
-    <label class="field" for="t-rate">Client rate ($)<input id="t-rate" type="number" min="0" step="1" value="${pre.rate||''}" placeholder="Example: 900"></label>
+    <label class="field" for="t-vtype">Vehicle type<select id="t-vtype">${opts(VTYPES,pre.vtype||VTYPES[1])}</select></label>
+    <label class="field" for="t-rate">Client rate (${NC()})<input id="t-rate" type="number" min="0" step="1" value="${pre.rate||''}" placeholder="Example: ${RG[REG].ex.rate}"></label>
+    ${REG==='SA'?'<label class="field" for="t-naql">Naql e-transport document no. (optional)<input id="t-naql" placeholder="Example: NQ-480137"></label>':''}
   </div>
   <div id="t-hint" class="hint" hidden></div>
   <fieldset class="seg"><legend>Whose vehicle?</legend>
@@ -1471,14 +1571,14 @@ function tripForm(pre){
   </fieldset>
   <div id="own-box" class="fgrid">
     <label class="field" for="t-veh">Own vehicle<select id="t-veh">${own.map(v=>`<option value="${esc(v.no)}">${esc(v.no)} · ${esc(v.type)} · ${VSTAT[vStatus(v)][1]}</option>`).join('')}</select></label>
-    ${EXP.map(e=>`<label class="field" for="t-${e[0]}">${e[1]} ($)<input id="t-${e[0]}" type="number" min="0" step="1" value="0"></label>`).join('')}
+    ${EXP.map(e=>`<label class="field" for="t-${e[0]}">${e[1]} (${NC()})<input id="t-${e[0]}" type="number" min="0" step="1" value="0"></label>`).join('')}
   </div>
   <div id="hire-box" class="fgrid" hidden>
     <label class="field" for="t-vendor">Truck owner<select id="t-vendor">${S.vendors.map(v=>`<option value="${v.id}">${esc(v.name)}</option>`).join('')}</select></label>
     <label class="field" for="t-vno">Vehicle number<input id="t-vno" placeholder="Example: TLA-882"></label>
-    <label class="field" for="t-hire">Truck owner rate ($)<input id="t-hire" type="number" min="0" step="1" placeholder="Example: 800"></label>
+    <label class="field" for="t-hire">Truck owner rate (${NC()})<input id="t-hire" type="number" min="0" step="1" placeholder="Example: ${RG[REG].ex.hire}"></label>
   </div>
-  <div class="fgrid"><label class="field" for="t-paid">Advance received from client ($)<input id="t-paid" type="number" min="0" step="1" value="0"></label></div>
+  <div class="fgrid"><label class="field" for="t-paid">Advance received from client (${NC()})<input id="t-paid" type="number" min="0" step="1" value="0"></label></div>
   <div class="profitbox" aria-live="polite"><div><label>Cost / Hire</label><b id="p-cost">$0</b></div><div><label>Profit</label><b id="p-profit">$0</b></div><div><label>Margin</label><b id="p-margin">0%</b></div></div>
   <div class="err" id="t-err" hidden></div>
   <div class="actions"><button type="button" class="btn" data-act="close">Cancel</button><button type="submit" class="btn primary">Save Trip</button></div>
@@ -1503,7 +1603,7 @@ function saveTrip(e){
   e.preventDefault();
   const m=mode(), err=$('t-err');
   const t={id:'B-'+(Math.max(...S.trips.map(x=>Number(x.id.slice(2))))+1),date:val('t-date')||TODAY,from:val('t-from'),to:val('t-to'),client:val('t-client'),
-    goods:val('t-goods').trim()||'Goods',weight:nv('t-weight'),vtype:val('t-vtype'),mode:m,rate:nv('t-rate'),status:'Booked',paid:nv('t-paid'),vpaid:0,hire:0,exp:null,vendor:null,vehicle:''};
+    goods:val('t-goods').trim()||'Goods',weight:nv('t-weight'),vtype:val('t-vtype'),mode:m,rate:nv('t-rate'),status:'Booked',paid:nv('t-paid'),vpaid:0,hire:0,exp:null,vendor:null,vehicle:'',naql:REG==='SA'?val('t-naql').trim():''};
   let msg='';
   if(t.from===t.to) msg='"From" and "To" must be different.';
   else if(!t.rate) msg='Enter the client rate.';
@@ -1524,7 +1624,7 @@ function payForm(kind,id){
   <h2 id="pf-h">${isC?'Receive Payment':'Make Payment'}: ${esc(name)}</h2>
   <div class="sub num" style="margin-top:0">Pending: <b>${money(r.bal)}</b>. The amount is applied to the oldest trips first and added to the Cash Book.</div>
   <div class="fgrid">
-    <label class="field" for="p-amt">Amount ($)<input id="p-amt" type="number" min="1" step="1" value="${r.bal}"></label>
+    <label class="field" for="p-amt">Amount (${NC()})<input id="p-amt" type="number" min="1" step="1" value="${r.bal}"></label>
     <label class="field" for="p-how">Method<select id="p-how"><option>Cash</option><option>Bank</option><option>Cheque</option></select></label>
   </div>
   <div class="err" id="p-err" hidden></div>
@@ -1554,7 +1654,7 @@ function cashForm(){
     <label class="field" for="c-date">Date<input id="c-date" type="date" value="${TODAY}"></label>
     <label class="field" for="c-head">Head<select id="c-head">${opts(HEADS_OUT.filter(h=>h!=='Hired truck payment'),'Office expense')}</select></label>
     <label class="field" for="c-party">Party / Paid to<input id="c-party" placeholder="Example: Shell petrol pump"></label>
-    <label class="field" for="c-amt">Amount ($)<input id="c-amt" type="number" min="1" step="1" placeholder="Example: 50"></label>
+    <label class="field" for="c-amt">Amount (${NC()})<input id="c-amt" type="number" min="1" step="1" placeholder="Example: ${RG[REG].ex.small}"></label>
     <label class="field" for="c-mode">Mode<select id="c-mode"><option>Cash</option><option>Bank</option></select></label>
     <label class="field" for="c-note">Note<input id="c-note" placeholder="Optional"></label>
   </div>
@@ -1580,6 +1680,7 @@ function saveCash(e){
 /* ---------- router & events ---------- */
 const VIEWS={dashboard:vDashboard,trips:vTrips,rates:vRates,fleet:vFleet,whatsapp:vWhatsapp,clients:vClients,vendors:vVendors,salaries:vSalaries,cashbook:vCashbook,cashflow:vCashflow,reports:vReports2,ask:vAsk};
 function render(){
+  updateChrome();
   $('main').innerHTML=VIEWS[UI.view]();
   document.querySelectorAll('#nav a').forEach(a=>{a.classList.toggle('on',a.dataset.v===UI.view); if(a.dataset.v===UI.view) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');});
   if(UI.view==='trips') drawTrips();
@@ -1612,6 +1713,8 @@ document.addEventListener('click',e=>{
   else if(a==='r2range'){ const r=b.dataset.r, y=today.getFullYear(), m=today.getMonth();
     if(r==='month'){UI.r2.from=iso(new Date(y,m,1));UI.r2.to=TODAY;} else if(r==='last'){UI.r2.from=iso(new Date(y,m-1,1));UI.r2.to=iso(new Date(y,m,0));} else if(r==='3m'){UI.r2.from=iso(new Date(y,m-2,1));UI.r2.to=TODAY;} else {UI.r2.from=iso(new Date(y,0,1));UI.r2.to=TODAY;}
     render(); }
+  else if(a==='editclient') openModal(clientForm(b.dataset.id));
+  else if(a==='cotrn') openModal(companyForm());
   else if(a==='kclear'){ UI.kpi={date:'',month:'',year:''}; render(); }
   else if(a==='r2view'||a==='r2pdf'||a==='r2xls') reportAction(a,b.dataset.k);
   else if(a==='doc2view') openModal(docModal(b.dataset.kind,b.dataset.id));
@@ -1624,7 +1727,7 @@ document.addEventListener('click',e=>{
   else if(a==='wafilter'){ UI.wa=b.dataset.g; render(); }
   else if(a==='preset'){ const p=PRESETS[Number(b.dataset.i)][1]; Object.assign(UI.rp,{client:'',vendor:'',vehicle:'',status:'',mode:'',pending:false},p); render(); }
   else if(a==='viewdoc') openModal(docSheet(b.dataset.doc,b.dataset.id));
-  else if(a==='reset'){ if(b.dataset.sure){ S=seed(); save(); UI.chat=null; UI.selClient=UI.selVendor=null; delete b.dataset.sure; b.textContent='Reset demo data'; render(); toast('Demo data has been reset'); } else { b.dataset.sure='1'; b.textContent='Sure? Click again'; } }
+  else if(a==='reset'){ if(b.dataset.sure){ S=seed(REG); DB.data[REG]=S; save(); UI.chat=null; UI.selClient=UI.selVendor=null; delete b.dataset.sure; b.textContent='Reset demo data'; render(); toast('Demo data has been reset'); } else { b.dataset.sure='1'; b.textContent='Sure? Click again'; } }
 });
 $('modal').addEventListener('click',e=>{ if(e.target.id==='modal') closeModal(); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(!$('modal').hidden) closeModal(); $('gres').hidden=true; } });
@@ -1641,6 +1744,8 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('change',e=>{
   const t=e.target, id=t.id, v=t.value;
+  if(id==='region'){ switchRegion(v); return; }
+  if(id==='usd'){ USD=t.checked; save(); render(); toast('Amounts in '+cu()); return; }
   if(t.closest('#tf')) calcForm();
   if(t.name==='c-type') syncCashHeads();
   if(t.dataset.status){ const tr=S.trips.find(x=>x.id===t.dataset.status); tr.status=v; save(); toast(tr.id+': '+v); }
@@ -1674,11 +1779,17 @@ document.addEventListener('submit',e=>{
   else if(e.target.id==='pf') savePay(e);
   else if(e.target.id==='cf') saveCash(e);
   else if(e.target.id==='sf') saveSal(e);
+  else if(e.target.id==='clf'){ e.preventDefault(); const c=client(e.target.dataset.id); c.phone=normPhone(val('cl-phone')); if(REG!=='PK') c.trn=val('cl-trn').trim(); save(); closeModal(); toast(c.name+' updated'); render(); }
+  else if(e.target.id==='cof'){ e.preventDefault(); S.company={trn:val('co-trn').trim()}; save(); closeModal(); toast('Company TRN / VAT number saved'); render(); }
   else if(e.target.id==='af') saveAdv(e);
   else if(e.target.id==='askform'){ e.preventDefault(); const i=$('ask-in'); ask(i.value); i.value=''; i.focus(); }
 });
+function fixText(x){ if(x.nodeType===3){ const t=L(x.nodeValue); if(t!==x.nodeValue) x.nodeValue=t; } else if(x.nodeType===1&&x.hasAttribute('placeholder')){ const p=x.getAttribute('placeholder'), q=L(p); if(q!==p) x.setAttribute('placeholder',q); } }
+function fixNode(n){ if(n.nodeType===3){ fixText(n); return; } if(n.nodeType!==1||n.tagName==='SCRIPT'||n.tagName==='STYLE') return; fixText(n); const w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT|NodeFilter.SHOW_ELEMENT); let x; while((x=w.nextNode())) fixText(x); }
+new MutationObserver(ms=>ms.forEach(m=>{ if(m.type==='characterData') fixText(m.target); else m.addedNodes.forEach(fixNode); })).observe(document.body,{childList:true,subtree:true,characterData:true});
 route();
 })();
 </script>
 
-</body></html>
+</body>
+</html>
