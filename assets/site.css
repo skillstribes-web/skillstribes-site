@@ -343,3 +343,37 @@ footer a { color: var(--muted); }
 .svc-grid.svc-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 @media (max-width: 1000px) { .svc-grid.svc-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .svc-grid.svc-3 { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Motion (homepage slider, scroll reveal, sticky header) ---------- */
+header { position: sticky; top: 0; z-index: 30; transition: background 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease; }
+header.scrolled { background: color-mix(in srgb, var(--bg) 84%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 1px 0 var(--line), 0 10px 30px rgb(0 0 0 / 0.12); }
+header.scrolled .wrap { padding-block: 12px; }
+header .wrap { transition: padding 0.3s ease; }
+.rotator { display: inline-grid; vertical-align: top; }
+.rotator > span { grid-area: 1 / 1; opacity: 0; transform: translateY(0.45em); filter: blur(4px); transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1), filter 0.6s ease; }
+.rotator > span.on { opacity: 1; transform: none; filter: none; }
+.rotator > span.out { opacity: 0; transform: translateY(-0.45em); filter: blur(4px); }
+.slide-dots { display: flex; gap: 8px; margin-top: 22px; }
+.slide-dots button { width: 28px; height: 4px; border: 0; border-radius: 4px; padding: 0; background: var(--line); cursor: pointer; position: relative; overflow: hidden; }
+.slide-dots button::after { content: ""; position: absolute; inset: 0; background: var(--gold); transform: scaleX(0); transform-origin: left; }
+.slide-dots button.on::after { animation: dotfill var(--slide-ms, 3600ms) linear forwards; }
+@keyframes dotfill { to { transform: scaleX(1); } }
+.scroll-cue { display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; color: var(--muted); font: 500 0.78rem var(--mono); letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; }
+.scroll-cue i { width: 22px; height: 34px; border: 1.5px solid var(--line); border-radius: 12px; position: relative; }
+.scroll-cue i::after { content: ""; position: absolute; left: 50%; top: 7px; width: 4px; height: 7px; margin-left: -2px; border-radius: 2px; background: var(--gold); animation: wheel 1.8s ease-in-out infinite; }
+@keyframes wheel { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(12px); } }
+.scroll-cue:hover { color: var(--fg); }
+.marquee.feats .track { animation-duration: 40s; }
+.division, .svc { transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.35s ease, border-color 0.2s ease, opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.division:hover, .svc:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgb(0 0 0 / 0.14); }
+.js .reveal.in:hover { transform: translateY(-4px); }
+.haul-shot img { transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.haul-shot:hover img { transform: scale(1.03); }
+@media (prefers-reduced-motion: reduce) {
+  .rotator > span, .rotator > span.out { transition: none; transform: none; filter: none; }
+  .slide-dots button.on::after { animation: none; transform: scaleX(1); }
+  .scroll-cue i::after { animation: none; }
+  .division:hover, .svc:hover, .js .reveal.in:hover { transform: none; }
+  .haul-shot:hover img { transform: none; }
+}
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
