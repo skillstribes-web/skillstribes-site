@@ -732,7 +732,7 @@ function drawRates(){
   let st=routeStats(R.from,R.to,R.vtype), exact=true;
   if(!st.n){ st=routeStats(R.from,R.to,null); exact=false; }
   const out=$('rate-out');
-  if(!st.n){ out.innerHTML=`<section class="card"><div class="empty">No past trips from ${esc(R.from)} to ${esc(R.to)} yet. Rates will show here after the first trip.</div><div class="sub">Try for example: Karachi Port → Lahore, Karachi → Multan, Hyderabad → Peshawar.</div></section>`; return; }
+  if(!st.n){ out.innerHTML=`<section class="card"><div class="empty">No past trips from ${esc(R.from)} to ${esc(R.to)} yet. Rates will show here after the first trip.</div><div class="sub">Try for example: ${{PK:'Karachi Port → Lahore, Karachi → Multan, Hyderabad → Peshawar',AE:'Jebel Ali → Abu Dhabi, Jebel Ali → Riyadh, Dubai → Muscat',SA:'Jeddah Port → Riyadh, Dammam → Riyadh, Jeddah → Riyadh'}[REG]}.</div></section>`; return; }
   const RU=RG[REG].round, q=Math.round(st.cost*(1+R.margin/100)/RU)*RU;
   const vs=[...new Set(st.m.filter(t=>t.mode==='hire').map(t=>t.vendor))].map(vendor);
   const text=`Assalam o Alaikum! Our rate from ${R.from} to ${R.to} (${R.vtype}) is ${money(q)}. Please contact us to confirm the vehicle. Thank you, Demo Goods Transport Co.`;
@@ -1450,7 +1450,7 @@ function vAsk(){
   <div class="demo-note">Demo: this assistant answers a few types of questions for now. In the full version, AI will understand any question in English and Urdu.</div>
   <section class="card">
     <div class="chat" id="chat" aria-live="polite">${UI.chat.map(m=>`<div class="msg ${m.me?'me':'bot'}">${m.html}</div>`).join('')}</div>
-    <form class="askrow" id="askform"><label for="ask-in" class="vh">Question</label><input id="ask-in" autocomplete="off" placeholder="Example: How much does Ravi Steel owe?"><button class="btn primary" type="submit">Ask</button></form>
+    <form class="askrow" id="askform"><label for="ask-in" class="vh">Question</label><input id="ask-in" autocomplete="off" placeholder="Example: How much does ${esc(S.clients[2].name)} owe?"><button class="btn primary" type="submit">Ask</button></form>
     <div class="sugg">${SUGG().map(s=>`<button type="button" data-act="ask" data-q="${esc(s)}">${esc(s)}</button>`).join('')}</div>
   </section>`;
 }
@@ -1472,7 +1472,7 @@ function answer(q){
       if(!st.n) return `No past trips found from ${found[0].c} to ${found[1].c}.`;
       return `${found[0].c} → ${found[1].c}: in the last <b>${st.n}</b> trips, the average client rate was <b>${money(st.rate)}</b> and the average cost/hire was <b>${money(st.cost)}</b>. Quote with 10% margin: <b>${money(Math.round(st.cost*1.1/RG[REG].round)*RG[REG].round)}</b>.`;
     }
-    return 'Please mention the route, for example "Rate from Karachi Port to Lahore?"';
+    return 'Please mention the route, for example "Rate from '+RG[REG].rate[0]+' to '+RG[REG].rate[1]+'?"';
   }
   if(has(/cash|turnover|bank|galla/)){
     const es=S.cash.filter(e=>e.date===TODAY);
@@ -1575,7 +1575,7 @@ function tripForm(pre){
   </div>
   <div id="hire-box" class="fgrid" hidden>
     <label class="field" for="t-vendor">Truck owner<select id="t-vendor">${S.vendors.map(v=>`<option value="${v.id}">${esc(v.name)}</option>`).join('')}</select></label>
-    <label class="field" for="t-vno">Vehicle number<input id="t-vno" placeholder="Example: TLA-882"></label>
+    <label class="field" for="t-vno">Vehicle number<input id="t-vno" placeholder="Example: ${{PK:'TLA-882',AE:'DXB K 48211',SA:'RSA 4821'}[REG]}"></label>
     <label class="field" for="t-hire">Truck owner rate (${NC()})<input id="t-hire" type="number" min="0" step="1" placeholder="Example: ${RG[REG].ex.hire}"></label>
   </div>
   <div class="fgrid"><label class="field" for="t-paid">Advance received from client (${NC()})<input id="t-paid" type="number" min="0" step="1" value="0"></label></div>
