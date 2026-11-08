@@ -377,3 +377,7 @@ header .wrap { transition: padding 0.3s ease; }
   .haul-shot:hover img { transform: none; }
 }
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tour { max-width: 1040px; margin: 0 auto clamp(28px, 4vw, 48px); display: grid; gap: 12px; scroll-margin-top: 90px; }
+.tour video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 14px; border: 1px solid var(--line); background: #0a1020; box-shadow: 0 18px 44px rgb(0 0 0 / 0.18); }
+.tour-cap { margin: 0; text-align: center; color: var(--muted); font-size: 0.95rem; }
+.division .go { display: flex; flex-wrap: wrap; gap: 10px; }
