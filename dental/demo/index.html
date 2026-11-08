@@ -1,0 +1,1112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SkillsTribes Dental Demo</title>
+<meta name="description" content="SkillsTribes Dental demo: dental clinic software with appointments by chair, tooth chart, treatment plans with several visits, payments, lab work and WhatsApp reminders.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://skillstribes.com/dental/demo/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230F766E'/%3E%3Cpath d='M10 7c-3 0-4.5 3-3.5 7 .6 2.5 1.6 4 2 7 .3 2.4 1 4 2.2 4 1.4 0 1.6-2.3 2.3-5 .4-1.5 1.8-1.5 2.2 0 .7 2.7.9 5 2.3 5 1.2 0 1.9-1.6 2.2-4 .4-3 1.4-4.5 2-7 1-4-.5-7-3.5-7-2 0-3 1-4.5 1S12 7 10 7z' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: navy side rail (menu) beside a scrolling work area with a global search bar; rail turns into a top bar on phones. */
+:root{
+  --bg:#F2F4F8; --surface:#FFFFFF; --surface2:#EDF0F5; --ink:#151A24; --muted:#555D6E; --line:#DDE2EA;
+  --rail:#14213D; --rail2:#22325C; --on-rail:#ECEFF6; --on-rail-muted:#AEB7CC;
+  --accent:#C2410C; --accent-ink:#FFFFFF; --accent-soft:#FFEDD5; --accent-text:#9A3412;
+  --good:#166534; --good-soft:#DCFCE7; --warn:#8A4B06; --warn-soft:#FEF3C7;
+  --bad:#B42318; --bad-soft:#FEE2E2; --info:#1E40AF; --info-soft:#DBEAFE;
+  --neutral-soft:#E9ECF2; --neutral-text:#3F4654; --overlay:rgba(12,16,26,.55);
+  --bar-in:#1E40AF; --bar-out:#C2410C;
+  --sec-acc:#1E3A8A; --sec-ops:#B4530E; --sec-inv:#166534; --sec-hr:#334155; --sec-doc:#6D28D9; --xls:#15803D;
+  --font-display:'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --font-body:'Source Sans 3', 'Segoe UI', Roboto, Arial, sans-serif;
+  --font-mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0E121A; --surface:#161B26; --surface2:#1E2432; --ink:#E8EBF2; --muted:#A4ABBB; --line:#2A3142;
+  --rail:#0A0F1C; --rail2:#1B2645; --on-rail:#ECEFF6; --on-rail-muted:#A3ADC4;
+  --accent:#C2410C; --accent-ink:#FFFFFF; --accent-soft:#3A1E10; --accent-text:#FDBA8C;
+  --good:#6EE7A8; --good-soft:#12321F; --warn:#FCD34D; --warn-soft:#3A2E0E;
+  --bad:#FCA5A5; --bad-soft:#3B1515; --info:#93C5FD; --info-soft:#15264A;
+  --neutral-soft:#262D3D; --neutral-text:#C9CFDB; --overlay:rgba(0,0,0,.65);
+  --bar-in:#6B9BF5; --bar-out:#F08A4B; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E121A; --surface:#161B26; --surface2:#1E2432; --ink:#E8EBF2; --muted:#A4ABBB; --line:#2A3142;
+  --rail:#0A0F1C; --rail2:#1B2645; --on-rail:#ECEFF6; --on-rail-muted:#A3ADC4;
+  --accent:#C2410C; --accent-ink:#FFFFFF; --accent-soft:#3A1E10; --accent-text:#FDBA8C;
+  --good:#6EE7A8; --good-soft:#12321F; --warn:#FCD34D; --warn-soft:#3A2E0E;
+  --bad:#FCA5A5; --bad-soft:#3B1515; --info:#93C5FD; --info-soft:#15264A;
+  --neutral-soft:#262D3D; --neutral-text:#C9CFDB; --overlay:rgba(0,0,0,.65);
+  --bar-in:#6B9BF5; --bar-out:#F08A4B; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:15px; line-height:1.45}
+h1,h2,h3{font-family:var(--font-display); margin:0; text-wrap:balance; letter-spacing:-.01em}
+button,input,select{font:inherit; color:inherit}
+:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--font-mono); font-size:13px}
+.vh{position:absolute; left:-9999px}
+
+.app{display:grid; grid-template-columns:250px minmax(0,1fr); min-height:100vh}
+.rail{background:var(--rail); color:var(--on-rail); padding-block:22px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:16px; display:flex; flex-direction:column; gap:18px; position:sticky; top:0; height:100vh; overflow-y:auto}
+.brand{display:flex; align-items:center; gap:12px; padding:0 6px}
+.logo{width:42px; height:42px; border-radius:10px; background:var(--accent); display:grid; place-items:center; flex:none}
+.brand b{font-family:var(--font-display); font-weight:800; font-size:21px; display:block; color:var(--on-rail)}
+.brand small{font-size:12px; color:var(--on-rail-muted)}
+.nav{display:flex; flex-direction:column; gap:16px}
+.navgroup{display:flex; flex-direction:column; gap:1px}
+.navlabel{font-size:11px; letter-spacing:.09em; color:var(--on-rail-muted); padding:0 12px 5px; font-weight:600}
+.nav a{display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:8px; color:var(--on-rail); text-decoration:none; font-size:15px; min-height:42px}
+.nav a:hover{background:var(--rail2)}
+.nav a.on{background:var(--rail2); font-weight:700; box-shadow:inset 3px 0 0 var(--accent)}
+.nav svg{flex:none; opacity:.85}
+.backup{margin-top:auto; background:var(--rail2); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:6px; font-size:13px}
+.backup strong{display:flex; align-items:center; gap:8px; color:var(--on-rail)}
+.backup span{color:var(--on-rail-muted)}
+.linkbtn{background:none; border:0; padding:0; color:var(--on-rail-muted); text-decoration:underline; cursor:pointer; font-size:13px; text-align:left; min-height:28px}
+
+.main{padding-block:20px 56px; padding-left:28px; padding-right:max(16px, env(safe-area-inset-right, 0px)); display:flex; flex-direction:column; gap:18px; min-width:0}
+.view{display:flex; flex-direction:column; gap:20px; min-width:0}
+.topbar{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+.search{position:relative; flex:1 1 320px; max-width:640px}
+.search input{width:100%; height:46px; border-radius:10px; border:1px solid var(--line); background:var(--surface); padding:0 14px 0 42px; font-size:15px}
+.search svg{position:absolute; left:14px; top:14px; color:var(--muted)}
+.results{position:absolute; top:calc(100% + 6px); left:0; right:0; background:var(--surface); border:1px solid var(--line); border-radius:10px; box-shadow:0 12px 32px rgba(0,0,0,.18); z-index:40; padding:6px; display:flex; flex-direction:column; max-height:380px; overflow-y:auto}
+.results button{display:flex; justify-content:space-between; align-items:center; gap:10px; text-align:left; background:none; border:0; padding:10px; border-radius:8px; cursor:pointer; min-height:44px}
+.results button:hover,.results button:focus-visible{background:var(--surface2)}
+.results small{color:var(--muted)}
+.demo-note{background:var(--warn-soft); color:var(--warn); border-radius:10px; padding:10px 14px; font-size:14px}
+.head{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:12px}
+.head h1{font-size:30px; font-weight:800}
+.head p{margin:4px 0 0; color:var(--muted)}
+.btns{display:flex; flex-wrap:wrap; gap:10px}
+.btn{height:44px; padding:0 16px; border-radius:8px; border:1px solid var(--line); background:var(--surface); font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:8px; text-decoration:none; color:var(--ink); white-space:nowrap}
+.btn:hover{background:var(--surface2)}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.sm{height:36px; padding:0 11px; font-size:13.5px}
+.btn.on{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-text)}
+
+.card{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px; display:flex; flex-direction:column; gap:12px; min-width:0}
+.card h2{font-size:17px; font-weight:700}
+.card .sub{color:var(--muted); font-size:13.5px; margin-top:-6px}
+.grid{display:grid; gap:16px}
+.g4{grid-template-columns:repeat(auto-fit, minmax(210px, 1fr))}
+.g3{grid-template-columns:repeat(auto-fit, minmax(300px, 1fr))}
+.g2{grid-template-columns:repeat(auto-fit, minmax(340px, 1fr))}
+
+.brief{background:var(--rail); color:var(--on-rail); border-radius:12px; padding:18px 22px; display:flex; flex-direction:column; gap:14px}
+.brief .top{display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; align-items:baseline}
+.brief h2{font-size:19px}
+.brief .top span{color:var(--on-rail-muted); font-size:13px}
+.brief .vals{display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:14px}
+.brief label{display:block; font-size:12.5px; color:var(--on-rail-muted)}
+.brief .v{font-family:var(--font-display); font-size:21px; font-weight:700}
+
+.kpi .label{font-size:12.5px; letter-spacing:.06em; color:var(--muted); font-weight:700}
+.kpi .big{font-family:var(--font-display); font-size:27px; font-weight:800; line-height:1.1}
+.kpi .meta{font-size:13.5px; color:var(--muted)}
+a.kpi{text-decoration:none; color:inherit}
+a.kpi:hover{border-color:var(--accent)}
+.c-info{color:var(--info)} .c-bad{color:var(--bad)} .c-good{color:var(--good)}
+
+.chip{display:inline-flex; align-items:center; padding:3px 9px; border-radius:999px; font-size:12px; font-weight:700; white-space:nowrap}
+.chip.neutral{background:var(--neutral-soft); color:var(--neutral-text)}
+.chip.info{background:var(--info-soft); color:var(--info)}
+.chip.accent{background:var(--accent-soft); color:var(--accent-text)}
+.chip.good{background:var(--good-soft); color:var(--good)}
+.chip.bad{background:var(--bad-soft); color:var(--bad)}
+.chip.warn{background:var(--warn-soft); color:var(--warn)}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+
+.bars{display:flex; flex-direction:column; gap:11px}
+.bar{display:grid; grid-template-columns:78px minmax(0,1fr) 112px; gap:10px; align-items:center; font-size:14px}
+.track{height:10px; border-radius:6px; background:var(--surface2); overflow:hidden}
+.fill{height:100%; border-radius:6px}
+.bar b{text-align:right; font-variant-numeric:tabular-nums}
+.inbar{height:8px; border-radius:4px; background:var(--bar-in); margin-top:5px; min-width:2px}
+
+.list{display:flex; flex-direction:column}
+.li{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line); flex-wrap:wrap}
+.li:last-child{border-bottom:0}
+.li .muted{color:var(--muted); font-size:13px}
+.rem{display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border-radius:9px; font-size:14px}
+.rem.warn{background:var(--warn-soft); color:var(--warn)}
+.rem.bad{background:var(--bad-soft); color:var(--bad)}
+.rem.info{background:var(--info-soft); color:var(--info)}
+
+.tw{overflow-x:auto; border-radius:8px}
+table{width:100%; border-collapse:collapse; font-size:14px; min-width:820px}
+th{text-align:left; font-size:11.5px; letter-spacing:.07em; color:var(--muted); font-weight:700; padding:9px 8px; border-bottom:1px solid var(--line); white-space:nowrap}
+td{padding:10px 8px; border-bottom:1px solid var(--line); vertical-align:top}
+tr:last-child td{border-bottom:0}
+tfoot td{font-weight:700; border-top:2px solid var(--line); border-bottom:0}
+td.r, th.r{text-align:right; font-variant-numeric:tabular-nums}
+td small{display:block; color:var(--muted); font-size:12.5px}
+.profit{font-weight:700; color:var(--good)}
+.loss{font-weight:700; color:var(--bad)}
+.in{color:var(--good); font-weight:600}
+.out{color:var(--bad); font-weight:600}
+tr.sel td{background:var(--surface2)}
+select.status{height:34px; border-radius:7px; border:1px solid var(--line); background:var(--surface); padding:0 6px; font-size:13px}
+
+.filters{display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end}
+.field{display:flex; flex-direction:column; gap:5px; font-size:13px; font-weight:600; color:var(--muted); min-width:0}
+.field input,.field select{height:42px; border-radius:8px; border:1px solid var(--line); background:var(--surface); padding:0 10px; font-size:15px; font-weight:400; color:var(--ink); min-width:0; width:100%}
+.filters .field{flex:1 1 150px}
+
+.overlay{position:fixed; inset:0; background:var(--overlay); display:flex; align-items:flex-start; justify-content:center; padding:max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); z-index:50; overflow-y:auto}
+.panel{background:var(--surface); border-radius:14px; width:100%; max-width:700px; padding:22px; display:flex; flex-direction:column; gap:16px; margin-block:auto}
+.panel h2{font-size:21px}
+.fgrid{display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:12px}
+.seg{display:flex; gap:8px; border:0; padding:0; margin:0; flex-wrap:wrap}
+.seg legend{font-size:13px; font-weight:600; color:var(--muted); margin-bottom:6px; padding:0}
+.seg label{flex:1 1 160px; display:flex; align-items:center; gap:8px; border:1px solid var(--line); border-radius:9px; padding:10px 12px; cursor:pointer; font-weight:600; min-height:44px}
+.seg label:has(input:checked){border-color:var(--accent); background:var(--accent-soft); color:var(--accent-text)}
+.hint{background:var(--info-soft); color:var(--info); border-radius:9px; padding:10px 12px; font-size:14px}
+.profitbox{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px; background:var(--surface2); border-radius:10px; padding:12px 14px}
+.profitbox label{display:block; font-size:12px; color:var(--muted); font-weight:600}
+.profitbox b{font-family:var(--font-display); font-size:19px; font-variant-numeric:tabular-nums}
+.actions{display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap}
+.err{color:var(--bad); font-size:14px; font-weight:600}
+
+.chat{display:flex; flex-direction:column; gap:12px; max-height:520px; overflow-y:auto; padding:4px}
+.msg{max-width:80%; padding:11px 14px; border-radius:12px; font-size:15px}
+.msg.bot{background:var(--surface2); align-self:flex-start; border-top-left-radius:4px}
+.msg.me{background:var(--accent); color:var(--accent-ink); align-self:flex-end; border-top-right-radius:4px}
+.msg ul{margin:6px 0 0; padding-left:18px}
+.askrow{display:flex; gap:10px}
+.askrow input{flex:1; height:46px; border-radius:9px; border:1px solid var(--line); background:var(--surface); padding:0 12px; min-width:0}
+.sugg{display:flex; flex-wrap:wrap; gap:8px}
+.sugg button{border:1px solid var(--line); background:var(--surface); border-radius:999px; padding:8px 13px; cursor:pointer; font-size:13.5px; min-height:38px}
+.sugg button:hover{background:var(--surface2)}
+.quote{font-family:var(--font-display); font-size:34px; font-weight:800; color:var(--accent-text)}
+.stat3{display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:12px}
+.stat3 div{background:var(--surface2); border-radius:10px; padding:12px}
+.stat3 label{display:block; font-size:12.5px; color:var(--muted); font-weight:600}
+.stat3 b{font-family:var(--font-display); font-size:19px; font-variant-numeric:tabular-nums}
+.empty{color:var(--muted); padding:14px; text-align:center; background:var(--surface2); border-radius:10px}
+
+.cfchart{display:flex; align-items:flex-end; gap:14px; height:230px; padding-top:10px; overflow-x:auto}
+.cfgrp{flex:1 0 70px; display:flex; flex-direction:column; align-items:center; gap:6px}
+.cfpair{display:flex; align-items:flex-end; gap:5px; height:180px}
+.cfpair div{width:24px; border-radius:5px 5px 0 0}
+.cfgrp span{font-size:12.5px; color:var(--muted); white-space:nowrap}
+.legend{display:flex; gap:16px; flex-wrap:wrap; font-size:13px; color:var(--muted)}
+.legend i{display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:-1px}
+
+.wa{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid var(--line)}
+.wa:last-child{border-bottom:0}
+.wa p{margin:4px 0 0; color:var(--muted); font-size:13.5px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+
+.docsheet{border:1px solid var(--line); border-radius:10px; padding:18px; display:flex; flex-direction:column; gap:14px}
+.docsheet .dh{display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; border-bottom:2px solid var(--ink); padding-bottom:10px}
+.docsheet .dh b{font-family:var(--font-display); font-size:20px}
+.kv{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:10px 18px}
+.kv label{display:block; font-size:12px; color:var(--muted); font-weight:600; letter-spacing:.04em}
+.kv div{font-size:15px}
+.upload{border:2px dashed var(--line); border-radius:10px; padding:14px; display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+
+.rsec{display:flex; align-items:center; gap:12px; margin-top:6px; flex-wrap:wrap}
+.rsec h2{background:var(--sec); color:#FFFFFF; font-size:16px; padding:8px 16px; border-radius:8px}
+.rsec span{color:var(--muted); font-size:13px}
+.rgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px}
+.rcard{background:var(--surface); border:1px solid var(--line); border-top:4px solid var(--sec); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:10px; min-width:0}
+.rcard h3{font-size:16px}
+.rcard p{margin:0; color:var(--muted); font-size:13.5px; flex:1}
+.rbtns{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px}
+.rbtns .btn{justify-content:center; padding:0 6px}
+.btn.pdf{background:var(--sec); border-color:var(--sec); color:#FFFFFF}
+.btn.xls{background:var(--xls); border-color:var(--xls); color:#FFFFFF}
+.btn.pdf:hover,.btn.xls:hover{filter:brightness(1.1)}
+.panel.wide{max-width:1100px}
+.regionbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.regionbar select{height:46px; border-radius:10px; border:1px solid var(--line); background:var(--surface); padding:0 10px; font-weight:600; color:var(--ink)}
+.usdtog{display:flex; align-items:center; gap:6px; font-size:14px; font-weight:600; color:var(--muted); min-height:44px; cursor:pointer}
+.demo-note a{color:inherit; font-weight:700}
+.btns .field{min-width:150px; flex:1 1 150px}
+.toast{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(20px + env(safe-area-inset-bottom, 0px)); background:var(--ink); color:var(--bg); padding:12px 18px; border-radius:10px; font-weight:600; z-index:60; max-width:calc(100% - 32px); box-shadow:0 8px 24px rgba(0,0,0,.25)}
+
+@media (max-width: 900px){
+  .app{grid-template-columns:1fr}
+  .rail{position:static; height:auto; padding-block:14px 10px; padding-right:max(16px, env(safe-area-inset-right, 0px)); gap:12px}
+  .navlabel,.backup{display:none}
+  .nav{flex-direction:row; overflow-x:auto; gap:4px; padding-bottom:4px}
+  .navgroup{flex-direction:row; gap:4px}
+  .nav a{white-space:nowrap; padding:8px 12px}
+  .main{padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-block:16px 48px}
+  .head h1{font-size:25px}
+  .msg{max-width:92%}
+  .profitbox{grid-template-columns:1fr 1fr}
+  .wa{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important; animation:none!important}}
+
+/* ---- Dental colours: teal accent on a deep sea-blue rail ---- */
+:root{
+  --rail:#0B2A36; --rail2:#16414F; --on-rail:#ECF3F5; --on-rail-muted:#A9BEC6;
+  --accent:#0F766E; --accent-ink:#FFFFFF; --accent-soft:#CCFBF1; --accent-text:#115E59;
+  --bar-in:#0F766E; --bar-out:#B45309;
+  --d1:#0F766E; --d2:#7C3AED; --d3:#B45309;
+  --sec-acc:#0F766E; --sec-ops:#1E40AF; --sec-inv:#B45309;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --rail:#071A22; --rail2:#123642; --on-rail:#ECF3F5; --on-rail-muted:#9FB4BC;
+  --accent:#0F766E; --accent-ink:#FFFFFF; --accent-soft:#0E2F2C; --accent-text:#5EEAD4;
+  --bar-in:#2DD4BF; --bar-out:#F59E0B; --d1:#2DD4BF; --d2:#A78BFA; --d3:#F59E0B;
+}}
+:root[data-theme="dark"]{
+  --rail:#071A22; --rail2:#123642; --on-rail:#ECF3F5; --on-rail-muted:#9FB4BC;
+  --accent:#0F766E; --accent-ink:#FFFFFF; --accent-soft:#0E2F2C; --accent-text:#5EEAD4;
+  --bar-in:#2DD4BF; --bar-out:#F59E0B; --d1:#2DD4BF; --d2:#A78BFA; --d3:#F59E0B;
+}
+a.plink{color:inherit; font-weight:700; text-decoration:none; border-bottom:1px dotted var(--muted)}
+a.plink:hover{color:var(--accent-text)}
+.dot{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0}
+
+/* chair schedule */
+.daybar{display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap}
+.daybar .field{flex:0 1 190px}
+.sw{overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--surface)}
+.sched{display:grid; grid-template-columns:58px repeat(var(--cols), minmax(190px, 1fr)); grid-auto-rows:54px; min-width:460px; position:relative}
+.sched .ch{grid-row:1; position:sticky; top:0; background:var(--surface2); font-weight:700; font-size:13.5px; display:flex; align-items:center; justify-content:center; border-bottom:1px solid var(--line); z-index:3}
+.sched .tl{grid-column:1; white-space:nowrap; font-size:12px; color:var(--muted); padding:4px 8px 0 0; text-align:right; font-variant-numeric:tabular-nums; border-right:1px solid var(--line)}
+.sched .cell{border:0; border-bottom:1px dashed var(--line); border-right:1px solid var(--line); background:none; cursor:pointer; color:transparent; font-size:13px; font-weight:600}
+.sched .cell:hover,.sched .cell:focus-visible{background:var(--accent-soft); color:var(--accent-text)}
+.sched .cell.past{cursor:default}
+.sched .cell.past:hover{background:none; color:transparent}
+.ap{margin:2px 4px; border-radius:8px; border:1px solid var(--line); border-left:5px solid var(--dc); background:var(--surface); box-shadow:0 1px 3px rgba(0,0,0,.08); padding:5px 8px; font-size:13px; text-align:left; cursor:pointer; overflow:hidden; display:flex; flex-direction:column; gap:1px; z-index:2; min-width:0}
+.ap:hover{box-shadow:0 4px 14px rgba(0,0,0,.16)}
+.ap b{font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.ap span{color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:12.5px}
+.ap.st-done{opacity:.72}
+.ap.st-noshow,.ap.st-cancelled{opacity:.55; text-decoration:line-through}
+.ap.st-inchair{background:var(--accent-soft)}
+.ap.st-waiting{background:var(--warn-soft)}
+.nowline{grid-column:2 / -1; height:0; border-top:2px solid var(--bad); z-index:4; pointer-events:none; align-self:start}
+
+/* today list */
+.trow{display:grid; grid-template-columns:72px minmax(0,1fr) auto; gap:12px; align-items:center; padding:11px 0; border-bottom:1px solid var(--line)}
+.trow:last-child{border-bottom:0}
+.trow .tm{font-family:var(--font-mono); font-size:13px; font-weight:600}
+.trow .who{display:flex; flex-direction:column; gap:2px; min-width:0}
+.trow .who span{color:var(--muted); font-size:13.5px}
+.trow .acts{display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; align-items:center}
+
+/* tooth chart */
+.chartwrap{overflow-x:auto; padding-bottom:4px}
+.teeth{display:grid; grid-template-columns:repeat(16, minmax(36px, 1fr)); gap:5px; min-width:620px}
+.jaw{font-size:11.5px; letter-spacing:.08em; color:var(--muted); font-weight:700; margin:4px 0}
+.tooth{position:relative; border:1px solid var(--line); background:var(--surface); border-radius:10px 10px 14px 14px; height:58px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; font-size:12px; font-weight:700; color:var(--ink); padding:0}
+.tooth.lower{border-radius:14px 14px 10px 10px}
+.tooth:hover{border-color:var(--accent)}
+.tooth i{width:18px; height:18px; border-radius:6px; background:var(--surface2); display:block}
+.tooth.c-decay i{background:var(--bad)}
+.tooth.c-filled i{background:var(--info)}
+.tooth.c-rct i{background:var(--warn)}
+.tooth.c-crown i{background:var(--accent)}
+.tooth.c-implant i{background:var(--good)}
+.tooth.c-missing{background:var(--surface2); color:var(--muted); border-style:dashed}
+.tooth.c-missing i{background:none; border:2px solid var(--muted); border-radius:50%; width:14px; height:14px}
+.tooth.plan::after{content:""; position:absolute; top:5px; right:5px; width:8px; height:8px; border-radius:50%; background:var(--bar-out)}
+.midline{border-left:2px solid var(--line)}
+.tlegend{display:flex; flex-wrap:wrap; gap:14px; font-size:13px; color:var(--muted)}
+.tlegend span{display:inline-flex; align-items:center; gap:6px}
+.tlegend i{width:12px; height:12px; border-radius:4px; display:inline-block}
+
+.prog{display:flex; align-items:center; gap:10px; min-width:150px}
+.prog .track{flex:1}
+.prog small{white-space:nowrap; color:var(--muted); font-size:12.5px; display:inline}
+.pcard{border:1px solid var(--line); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:8px}
+.pcard .top{display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:baseline}
+.pcard .meta{color:var(--muted); font-size:13.5px}
+.phead{display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; align-items:flex-start}
+.phead h1{font-size:28px; font-weight:800}
+.phead .info{display:flex; flex-wrap:wrap; gap:6px 16px; color:var(--muted); font-size:14px; margin-top:6px}
+.back{color:var(--muted); text-decoration:none; font-weight:600; font-size:14px}
+.back:hover{color:var(--ink)}
+.tabs{display:flex; gap:8px; flex-wrap:wrap}
+.sent{opacity:.6}
+.chartbars{display:flex; align-items:flex-end; gap:14px; height:220px; padding-top:10px; overflow-x:auto}
+.chartbars .g{flex:1 0 64px; display:flex; flex-direction:column; align-items:center; gap:6px}
+.chartbars .col{width:34px; border-radius:6px 6px 0 0; background:var(--bar-in); min-height:2px}
+.chartbars span{font-size:12.5px; color:var(--muted); white-space:nowrap}
+.chartbars b{font-size:12px; font-variant-numeric:tabular-nums}
+.split{grid-template-columns:minmax(0,2fr) minmax(260px,1fr)}
+@media (max-width: 900px){
+  .trow{grid-template-columns:60px minmax(0,1fr)}
+  .trow .acts{grid-column:1 / -1; justify-content:flex-start}
+  .phead h1{font-size:24px}
+  .split{grid-template-columns:1fr}
+}
+@media print{ .rail,.topbar,.demo-note,.btns,.actions{display:none!important} .app{display:block} }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <div class="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 3.5c-2.6 0-3.8 2.4-3 5.6.5 1.9 1.3 3.1 1.6 5.4.3 2.3.9 6 2.2 6 1.2 0 1.4-2.4 2-4.6.4-1.3 2-1.3 2.4 0 .6 2.2.8 4.6 2 4.6 1.3 0 1.9-3.7 2.2-6 .3-2.3 1.1-3.5 1.6-5.4.8-3.2-.4-5.6-3-5.6-1.8 0-2.7.9-4 .9s-2.2-.9-4-.9z"/></svg></div>
+      <div><b>SkillsTribes Dental</b><small id="clinic-name">Demo Dental Care</small></div>
+    </div>
+    <nav class="nav" aria-label="Main menu" id="nav">
+      <div class="navgroup"><div class="navlabel">DAILY</div>
+        <a href="#today" data-v="today"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Today</a>
+        <a href="#appointments" data-v="appointments"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Appointments</a>
+        <a href="#whatsapp" data-v="whatsapp"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>WhatsApp Reminders</a>
+      </div>
+      <div class="navgroup"><div class="navlabel">PATIENTS</div>
+        <a href="#patients" data-v="patients"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg>Patients</a>
+        <a href="#plans" data-v="plans"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1.2 1.2L6.8 5M3.5 12l1.2 1.2 2.1-2.2"/><circle cx="5" cy="18" r="1.4"/></svg>Treatment Plans</a>
+        <a href="#lab" data-v="lab"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 3h6M10 3v6l-5.5 9.5A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-2.5L14 9V3"/><path d="M7.5 15h9"/></svg>Lab Work</a>
+      </div>
+      <div class="navgroup"><div class="navlabel">MONEY</div>
+        <a href="#payments" data-v="payments"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20M16 15h2"/></svg>Payments &amp; Dues</a>
+        <a href="#reports" data-v="reports"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Reports</a>
+      </div>
+    </nav>
+    <div class="backup">
+      <strong><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6EE7A8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Automatic Backup ON</strong>
+      <span>Last backup: today, 3:00 AM</span>
+      <button class="linkbtn" type="button" data-act="reset">Reset demo data</button>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div class="search" role="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <label for="gq" class="vh">Search patients</label>
+        <input id="gq" type="search" autocomplete="off" placeholder="Search patient name, phone or file number">
+        <div class="results" id="gres" hidden></div>
+      </div>
+      <div class="regionbar">
+        <span class="chip neutral" id="today-chip"></span>
+        <label for="region"><span class="vh">Region</span><select id="region"><option value="PK">Pakistan (PKR)</option><option value="AE">UAE (AED)</option><option value="SA">Saudi Arabia (SAR)</option></select></label>
+        <label class="usdtog" for="usd"><input type="checkbox" id="usd"> Show in USD</label>
+      </div>
+    </div>
+    <div class="demo-note"><a href="https://skillstribes.com/clinics/#services">← Back to skillstribes.com</a> · This is a demo of SkillsTribes Dental. All patients, phone numbers and amounts are made up. Try booking an appointment, marking a visit as done, opening a patient's tooth chart or receiving a payment.</div>
+    <div class="view" id="main"></div>
+  </main>
+</div>
+<div class="overlay" id="modal" hidden></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+(function(){
+const LS='st-dental-demo-v1';
+const CLINIC='Demo Dental Care';
+const pad=n=>String(n).padStart(2,'0');
+const NOW=new Date();
+const today=new Date(); today.setHours(0,0,0,0);
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=s=>{const p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2]);};
+const shift=n=>{const d=new Date(today);d.setDate(d.getDate()+n);return iso(d);};
+const ago=n=>shift(-n), ahead=n=>shift(n);
+const TODAY=iso(today);
+const addD=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return iso(d);};
+const diff=(a,b)=>Math.round((parse(b)-parse(a))/864e5);
+const NOWMIN=NOW.getHours()*60+NOW.getMinutes();
+const tmin=t=>{const p=t.split(':');return Number(p[0])*60+Number(p[1]);};
+const tstr=m=>pad(Math.floor(m/60))+':'+pad(m%60);
+const t12=t=>{const m=tmin(t);let h=Math.floor(m/60);const ap=h>=12?'PM':'AM';h=h%12||12;return h+':'+pad(m%60)+' '+ap;};
+const OPEN=600, CLOSE=1200, SLOT=30;
+const SLOTS=[]; for(let m=OPEN;m<CLOSE;m+=SLOT) SLOTS.push(tstr(m));
+const nice=s=>parse(s).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+const short=s=>parse(s).toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+const dayName=s=>parse(s).toLocaleDateString('en-GB',{weekday:'long'});
+const rel=s=>{const d=diff(TODAY,s); return d===0?'Today':d===1?'Tomorrow':d===-1?'Yesterday':(d>0?'in '+d+' days':d*-1+' days ago');};
+const monthName=k=>{const p=k.split('-');return new Date(+p[0],+p[1]-1,1).toLocaleDateString('en-GB',{month:'short',year:'numeric'});};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sum=(a,f)=>a.reduce((s,x)=>s+(f?f(x):x),0);
+const $=id=>document.getElementById(id);
+const inRange=(d,f,t)=>(!f||d>=f)&&(!t||d<=t);
+
+const RG={
+  PK:{name:'Pakistan',cur:'PKR',sym:'Rs ',usd:280,cc:'92',ix:0,city:'Lahore',greet:'Assalam o Alaikum',modes:['Cash','Card','Bank transfer','JazzCash / Easypaisa'],round:500},
+  AE:{name:'UAE',cur:'AED',sym:'AED ',usd:3.6725,cc:'971',ix:1,city:'Dubai',greet:'Hello',modes:['Cash','Card','Bank transfer'],round:50},
+  SA:{name:'Saudi Arabia',cur:'SAR',sym:'SAR ',usd:3.75,cc:'966',ix:2,city:'Riyadh',greet:'Hello',modes:['Cash','Card (mada)','Bank transfer'],round:50}
+};
+const NAMES={
+  PK:{m:['Ahmed','Usman','Bilal','Hamza','Ali','Imran','Faisal','Kashif','Saad','Zain','Tariq','Waleed','Asad','Hassan','Junaid','Shahid'],f:['Ayesha','Fatima','Sana','Hira','Maryam','Nida','Rabia','Amna','Zainab','Saima','Mehwish','Iqra','Sadia','Hina'],l:['Khan','Malik','Ahmed','Butt','Chaudhry','Qureshi','Sheikh','Raza','Iqbal','Hussain','Siddiqui','Javed','Mirza','Aslam'],a:['DHA Phase 5','Gulberg','Model Town','Johar Town','Bahria Town','Garden Town','Faisal Town','Cantt','Wapda Town','Iqbal Town'],
+    dent:[['Dr. Ayesha Malik','General dentist'],['Dr. Bilal Qureshi','Orthodontist (braces)'],['Dr. Sana Tariq','Root canal & implants']],labs:['Precision Dental Lab','Smile Craft Lab'],pre:['300','301','321','333','345']},
+  AE:{m:['Omar','Khalid','Ahmed','Rashid','Arjun','Rahul','Mohammed','Faisal','John','Yousef','Imran','Hassan'],f:['Fatima','Mariam','Aisha','Noor','Priya','Sara','Layla','Huda','Anjali','Maria','Zainab','Hessa'],l:['Al Mansoori','Al Hashemi','Khan','Nair','Menon','Al Suwaidi','Haddad','Fernandes','Qureshi','Al Marri','Pillai','Saleh'],a:['Al Barsha','JLT','Deira','Bur Dubai','Al Nahda','Jumeirah','Mirdif','Karama','Silicon Oasis','Al Qusais'],
+    dent:[['Dr. Mariam Al Hashemi','General dentist'],['Dr. Arjun Menon','Orthodontist (braces)'],['Dr. Omar Haddad','Root canal & implants']],labs:['Gulf Dental Lab','Emirates Crown Lab'],pre:['50','52','55','56','58']},
+  SA:{m:['Abdullah','Mohammed','Faisal','Saud','Khalid','Turki','Omar','Imran','Rahul','Yasir','Nasser','Fahad'],f:['Nora','Sara','Reem','Lama','Hessa','Aisha','Fatima','Maha','Priya','Huda','Abeer','Amal'],l:['Al Qahtani','Al Otaibi','Al Harbi','Al Ghamdi','Al Zahrani','Khan','Al Shehri','Al Dosari','Siddiqui','Al Mutairi','Nair','Al Anazi'],a:['Al Olaya','Al Malqa','Al Nakheel','Al Yasmin','Al Sulimaniyah','Al Rawdah','Al Wurud','Hittin','Al Murabba','Al Aqiq'],
+    dent:[['Dr. Reem Al Otaibi','General dentist'],['Dr. Faisal Al Ghamdi','Orthodontist (braces)'],['Dr. Imran Siddiqui','Root canal & implants']],labs:['Riyadh Dental Lab','Najd Ceramics Lab'],pre:['50','53','54','55','56']}
+};
+/* treatments: code, name, fee [PKR, AED, SAR], visits, days between visits, needs lab, needs tooth, minutes, usual dentist (0 general, 1 braces, 2 root canal & implants) */
+const TX=[
+  {c:'CON',n:'Checkup & consultation',f:[1500,200,200],v:1,gap:0,lab:0,tooth:0,dur:30,d:0},
+  {c:'SCL',n:'Scaling & polishing',f:[4000,350,350],v:1,gap:0,lab:0,tooth:0,dur:30,d:0},
+  {c:'FIL',n:'Tooth-coloured filling',f:[5000,450,450],v:1,gap:0,lab:0,tooth:1,dur:30,d:0},
+  {c:'RCT',n:'Root canal treatment',f:[18000,1800,1700],v:3,gap:7,lab:0,tooth:1,dur:60,d:2},
+  {c:'CRN',n:'Porcelain crown',f:[25000,2200,2000],v:2,gap:10,lab:1,tooth:1,dur:60,d:0},
+  {c:'EXT',n:'Tooth extraction',f:[3000,400,350],v:1,gap:0,lab:0,tooth:1,dur:30,d:0},
+  {c:'WIS',n:'Wisdom tooth surgery',f:[15000,1500,1400],v:2,gap:7,lab:0,tooth:1,dur:60,d:2},
+  {c:'WHT',n:'Teeth whitening',f:[20000,1500,1400],v:1,gap:0,lab:0,tooth:0,dur:60,d:0},
+  {c:'BRC',n:'Braces (orthodontics)',f:[180000,12000,11000],v:12,gap:30,lab:0,tooth:0,dur:30,d:1},
+  {c:'IMP',n:'Dental implant',f:[150000,7500,7000],v:3,gap:45,lab:1,tooth:1,dur:90,d:2},
+  {c:'DEN',n:'Full denture',f:[60000,4000,3800],v:4,gap:7,lab:1,tooth:0,dur:30,d:0},
+  {c:'KID',n:'Kids fluoride & sealant',f:[2500,300,300],v:1,gap:0,lab:0,tooth:0,dur:30,d:0}
+];
+const TXM=Object.fromEntries(TX.map(t=>[t.c,t]));
+const VLAB={RCT:['Opening & cleaning','Shaping & medicine','Final filling'],CRN:['Preparation & impression','Crown fitting'],WIS:['Surgery','Review & stitches out'],IMP:['Implant placement','Healing check','Crown on implant'],DEN:['Impressions','Bite record','Try-in','Delivery']};
+const visitLabel=(c,n)=>c==='BRC'?(n===1?'Braces fitting':'Monthly adjustment'):(VLAB[c]?VLAB[c][n-1]||'Visit':'');
+const DONE_COND={FIL:'filled',RCT:'rct',CRN:'crown',EXT:'missing',WIS:'missing',IMP:'implant'};
+const UPPER=[18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28], LOWER=[48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
+const ALLT=UPPER.concat(LOWER);
+const MOLARS=[16,17,26,27,36,37,46,47], WISDOM=[18,28,38,48];
+const COND={none:{t:'Healthy'},decay:{t:'Decay',k:'bad'},filled:{t:'Filled',k:'info'},rct:{t:'Root canal done',k:'warn'},crown:{t:'Crown',k:'accent'},implant:{t:'Implant',k:'good'},missing:{t:'Missing',k:'neutral'}};
+function toothName(n){ const q=Math.floor(n/10), p=n%10; const side=['','upper right','upper left','lower left','lower right'][q]; const kind=p<=2?(p===1?'central incisor':'lateral incisor'):p===3?'canine':p<=5?(p===4?'first premolar':'second premolar'):p===6?'first molar':p===7?'second molar':'wisdom tooth'; return '#'+n+' · '+side+' '+kind; }
+const ST={booked:['Booked','info'],waiting:['Waiting','warn'],inchair:['In chair','accent'],done:['Done','good'],noshow:['No-show','bad'],cancelled:['Cancelled','neutral']};
+
+let REG='PK', USD=false;
+const R=()=>RG[REG];
+const cu=()=>USD?'USD':R().cur;
+const conv=n=>USD?n/R().usd:n;
+const money=n=>{const v=conv(n);return (v<0?'-':'')+(USD?'$':R().sym)+Math.round(Math.abs(v)).toLocaleString('en-US');};
+const fee=t=>TXM[t].f[R().ix];
+const compact=n=>{const v=conv(n), s=USD?'$':R().sym; return s+(v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e4?Math.round(v/1e3)+'k':Math.round(v).toLocaleString('en-US'));};
+
+/* ---------- demo data ---------- */
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function seed(reg){
+  const r=rng(reg==='PK'?101:reg==='AE'?202:303);
+  const pick=a=>a[Math.floor(r()*a.length)], ri=(a,b)=>a+Math.floor(r()*(b-a+1));
+  const N=NAMES[reg], X=RG[reg].ix, rd=RG[reg].round;
+  const S={dent:N.dent.map((d,i)=>({id:'D'+(i+1),name:d[0],spec:d[1],k:'d'+(i+1)})),chairs:['Chair 1','Chair 2'],patients:[],plans:[],appts:[],pays:[],labs:[],sent:{},seq:{p:1000,pl:0,a:0,py:0,lb:0}};
+  const occ={};
+  const byDate={};
+  const free=(date,chair,did,s,e,pid)=>(byDate[date]||[]).every(a=>a.date!==date||['cancelled','noshow'].includes(a.st)||tmin(a.time)+a.dur<=s||tmin(a.time)>=e||(a.chair!==chair&&a.did!==did&&a.pid!==pid));
+  function slotFor(date,did,dur,pid,from,to){
+    from=from==null?OPEN:from; to=to==null?CLOSE:to;
+    for(let k=0;k<40;k++){ const s=Math.max(from,OPEN)+SLOT*ri(0,Math.max(0,Math.floor((Math.min(to,CLOSE)-Math.max(from,OPEN)-dur)/SLOT))); const e=s+dur; if(e>CLOSE) continue; const chair=pick(S.chairs); if(free(date,chair,did,s,e,pid)) return {time:tstr(s),chair}; const other=chair===S.chairs[0]?S.chairs[1]:S.chairs[0]; if(free(date,other,did,s,e,pid)) return {time:tstr(s),chair:other}; }
+    return null;
+  }
+  const rnd=n=>Math.round(n/rd)*rd;
+  const toothFor=c=>c==='WIS'?pick(WISDOM):c==='EXT'?pick(WISDOM.concat(MOLARS)):pick(MOLARS.concat([14,15,24,25,34,35,44,45]));
+  function addPlan(pid,c,tooth,did,start){ const t=TXM[c]; const disc=r()<.15?rnd(t.f[X]*0.1):0; const pl={id:'TP-'+(++S.seq.pl+300),pid,c,tooth:tooth||null,did,fee:t.f[X],disc,v:t.v,done:0,st:'active',start}; S.plans.push(pl); return pl; }
+  function addAppt(pid,pl,did,date,st,dur,fromM,toM){ const t=pl?TXM[pl.c]:TXM.CON; dur=dur||t.dur; const sl=slotFor(date,did,dur,pid,fromM,toM); if(!sl) return null; const a={id:'A-'+(++S.seq.a+5000),pid,plan:pl?pl.id:null,did,chair:sl.chair,date,time:sl.time,dur,st,visit:null}; S.appts.push(a); (byDate[date]=byDate[date]||[]).push(a); return a; }
+  function complete(a,payShare){ const pl=S.plans.find(x=>x.id===a.plan); a.st='done'; if(pl){ a.visit=++pl.done; if(pl.done>=pl.v){ pl.st='done'; const p=S.patients.find(x=>x.id===pl.pid); if(DONE_COND[pl.c]&&pl.tooth) p.chart[pl.tooth]=DONE_COND[pl.c]; } const ch=visitCharge(pl,a.visit); const amt=payShare==null?ch:rnd(ch*payShare); if(amt>0) S.pays.push({id:'R-'+(++S.seq.py+2000),pid:a.pid,date:a.date,amt,mode:pick(RG[reg].modes.slice(0,r()<.6?1:RG[reg].modes.length)),plan:pl.id}); } }
+  /* patients */
+  const used=new Set();
+  for(let i=0;i<70;i++){
+    const g=r()<.52?'F':'M'; let name; do{ name=pick(g==='F'?N.f:N.m)+' '+pick(N.l); }while(used.has(name)); used.add(name);
+    const kid=i>=63, age=kid?ri(6,13):ri(18,67);
+    const p={id:'P-'+(++S.seq.p),name,g,age,phone:'+'+RG[reg].cc+' '+pick(N.pre)+' '+String(ri(1000000,9999999)),area:pick(N.a),alert:'',chart:{},since:ago(i>=55&&i<59?ri(1,6):i>=59&&i<62?ri(9,25):ri(40,330))};
+    if(!kid&&r()<.2) p.alert=pick(['Diabetic','Allergic to penicillin','On blood thinner','Heart patient','High blood pressure']);
+    if(!kid){ for(let j=ri(0,3);j>0;j--) p.chart[pick(MOLARS.concat([14,15,24,25,34,35,44,45]))]='filled'; if(r()<.3) p.chart[pick(WISDOM)]='missing'; if(r()<.2) p.chart[pick(MOLARS)]='rct'; if(r()<.25) p.chart[pick([16,26,36,46,15,25])]='decay'; }
+    S.patients.push(p);
+  }
+  /* past single visits */
+  S.patients.forEach((p,i)=>{
+    const old=i%8===3;  // some patients last came long ago: they show up in the 6-month recall list
+    const span=diff(p.since,TODAY)-1; const n=old?1:ri(1,3);
+    for(let k=0;k<n;k++){
+      const back=old?ri(185,Math.max(186,span)):ri(2,Math.max(3,span));
+      const date=ago(Math.min(back,span)); if(date<p.since) continue;
+      const c=p.age<14?pick(['CON','KID','FIL']):pick(['CON','CON','SCL','SCL','FIL','FIL','EXT','WHT']);
+      const t=TXM[c]; const tooth=t.tooth?(c==='EXT'?pick(WISDOM.concat(MOLARS)):pick(MOLARS.concat([14,15,24,25]))):null;
+      const pl=addPlan(p.id,c,tooth,'D1',date); const a=addAppt(p.id,pl,'D1',date,'booked'); if(!a){ S.plans.pop(); continue; }
+      complete(a,r()<.12?0.5:1);
+    }
+  });
+  /* a normal flow of single visits over the last five months */
+  for(let d=150;d>=1;d--){
+    const date=ago(d);
+    for(let k=ri(4,8);k>0;k--){
+      const i=ri(0,S.patients.length-1), p=S.patients[i]; if(i%8===3||p.since>date) continue;
+      const c=p.age<14?pick(['CON','KID']):pick(['CON','CON','SCL','SCL','FIL','FIL','FIL','EXT','WHT','CON']);
+      const t=TXM[c]; const did=c==='CON'?pick(['D1','D1','D2','D3']):'D1';
+      const pl=addPlan(p.id,c,t.tooth?toothFor(c):null,did,date); const a=addAppt(p.id,pl,did,date,'booked'); if(!a){ S.plans.pop(); continue; }
+      if(r()<.06){ a.st='noshow'; S.plans.pop(); a.plan=null; continue; }
+      complete(a,r()<.08?0.5:1);
+      if(c==='FIL'&&pl.tooth) p.chart[pl.tooth]='filled';
+    }
+  }
+  /* treatments that need several visits */
+  const adults=S.patients.filter(p=>p.age>=18&&diff(p.since,TODAY)>30);
+  const multi=[['RCT',2,4],['RCT',1,3],['RCT',2,2],['RCT',1,0],['BRC',5,12],['BRC',3,6],['BRC',8,20],['IMP',1,30],['IMP',2,10],['CRN',1,1],['CRN',1,0],['CRN',1,-1],['DEN',2,3],['DEN',1,0]];
+  multi.forEach((m,i)=>{
+    const p=adults[(i*3+1)%adults.length]; const c=m[0], doneN=m[1], next=m[2]; const t=TXM[c];
+    const tooth=t.tooth?(c==='RCT'?pick([16,26,36,46,37,47]):c==='IMP'?pick([36,46,26,16]):pick([16,26,36,46,15,25])):null;
+    const did='D'+(t.d+1); const start=ago(doneN*t.gap+ri(2,Math.max(3,t.gap-2)));
+    const pl=addPlan(p.id,c,tooth,did,start); if(start<p.since) p.since=start;
+    if(c==='CRN'&&tooth) p.chart[tooth]=p.chart[tooth]||'rct';
+    for(let k=0;k<doneN;k++){ const a=addAppt(p.id,pl,did,addD(start,k*t.gap),'booked'); if(a) complete(a,c==='BRC'?(k===0?1.6:1):(r()<.25?0.5:1)); }
+    if(next>0){ addAppt(p.id,pl,did,ahead(next),'booked'); }
+    if(next===0){ /* booked today, handled below */ pl.today=1; }
+    if(t.lab&&doneN>=1){ const sent=addD(start,(doneN-1)*t.gap); const lb={id:'LB-'+(++S.seq.lb+100),pid:p.id,plan:pl.id,item:c==='DEN'?'Full denture, upper & lower':(c==='IMP'?'Implant crown #':'Porcelain crown #')+tooth,lab:pick(N.labs),sent,due:addD(sent,c==='IMP'?14:7),st:diff(sent,TODAY)>6?'received':'sent',cost:rnd(t.f[X]*0.3)}; if(next===-1){ lb.st='received'; } if(c==='DEN'&&doneN===2){ lb.st='sent'; lb.due=ago(2); } S.labs.push(lb); }
+  });
+  /* today's day: plan visits plus new patients */
+  const todayList=[];
+  S.plans.filter(pl=>pl.today).forEach(pl=>{ delete pl.today; todayList.push({pid:pl.pid,pl}); });
+  const pool=S.patients.filter(p=>!S.plans.some(pl=>pl.pid===p.id&&pl.st==='active'));
+  ['CON','SCL','FIL','CON','EXT','WHT','CON','FIL'].forEach((c,i)=>{ const p=pool[(i*5+2)%pool.length]; const t=TXM[c]; const pl=addPlan(p.id,c,t.tooth?toothFor(c):null,'D1',TODAY); todayList.push({pid:p.id,pl}); });
+  todayList.forEach((x,i)=>{
+    const t=TXM[x.pl.c]; const a=addAppt(x.pid,x.pl,x.pl.did,TODAY,'booked',t.dur); if(!a) return;
+    const s=tmin(a.time), e=s+a.dur;
+    if(e<=NOWMIN){ if(i===3){ a.st='noshow'; } else complete(a,i===5?0.5:1); }
+    else if(s<=NOWMIN) a.st='inchair';
+    else if(s-NOWMIN<=40) a.st='waiting';
+  });
+  /* coming days */
+  for(let d=1;d<=14;d++){
+    const n=d===1?7:d<=3?5:ri(2,4);
+    for(let k=0;k<n;k++){ const p=pick(pool); if(S.appts.some(a=>a.pid===p.id&&a.date>=TODAY&&a.st==='booked')) continue; const c=p.age<14?'KID':pick(['CON','CON','SCL','FIL','FIL','EXT','WHT','WIS','RCT','CRN']); const t=TXM[c]; const did='D'+(t.d+1); const pl=addPlan(p.id,c,t.tooth?toothFor(c):null,did,ahead(d)); if(!addAppt(p.id,pl,did,ahead(d),'booked')) S.plans.pop(); }
+  }
+  S.plans=S.plans.filter(pl=>pl.done>0||S.appts.some(a=>a.plan===pl.id));
+  return S;
+}
+function visitCharge(pl,n){ const net=pl.fee-pl.disc; return Math.round(net*n/pl.v)-Math.round(net*(n-1)/pl.v); }
+
+/* ---------- storage ---------- */
+let DB, S;
+try{ DB=JSON.parse(localStorage.getItem(LS)||'null'); }catch(e){ DB=null; }
+if(!DB||DB.day!==TODAY||!DB.data){ DB={day:TODAY,reg:(DB&&DB.reg)||'PK',usd:!!(DB&&DB.usd),data:{}}; }
+REG=RG[DB.reg]?DB.reg:'PK'; USD=!!DB.usd;
+S=DB.data[REG]||(DB.data[REG]=seed(REG));
+function save(){ DB.reg=REG; DB.usd=USD; DB.data[REG]=S; try{ localStorage.setItem(LS,JSON.stringify(DB)); }catch(e){} }
+save();
+function switchRegion(v){ REG=v; S=DB.data[REG]||(DB.data[REG]=seed(REG)); UI.pid=null; save(); render(); toast('Showing the '+R().name+' clinic, amounts in '+cu()); }
+
+/* ---------- lookups ---------- */
+const P=id=>S.patients.find(p=>p.id===id);
+const D=id=>S.dent.find(d=>d.id===id);
+const PL=id=>S.plans.find(p=>p.id===id);
+const live=a=>!['cancelled','noshow'].includes(a.st);
+const net=pl=>pl.fee-pl.disc;
+const billed=pl=>Math.round(net(pl)*pl.done/pl.v);
+function bal(pid){ return sum(S.plans.filter(p=>p.pid===pid),billed)-sum(S.pays.filter(x=>x.pid===pid),x=>x.amt); }
+const lastVisit=pid=>S.appts.filter(a=>a.pid===pid&&a.st==='done').map(a=>a.date).sort().pop()||null;
+const nextAppt=pid=>S.appts.filter(a=>a.pid===pid&&a.st==='booked'&&(a.date>TODAY||(a.date===TODAY))).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0]||null;
+const planNext=pl=>S.appts.filter(a=>a.plan===pl.id&&['booked','waiting','inchair'].includes(a.st)).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0]||null;
+function visitNo(a){ if(a.visit) return a.visit; const pl=PL(a.plan); if(!pl) return 1; const earlier=S.appts.filter(x=>x.plan===pl.id&&x.id!==a.id&&['booked','waiting','inchair'].includes(x.st)&&(x.date+x.time)<(a.date+a.time)).length; return pl.done+1+earlier; }
+function what(a){ const pl=PL(a.plan); if(!pl) return 'Checkup'; const t=TXM[pl.c]; let s=t.n+(pl.tooth?' #'+pl.tooth:''); if(pl.v>1){ const n=visitNo(a); s+=' · visit '+n+' of '+pl.v+(visitLabel(pl.c,n)?' ('+visitLabel(pl.c,n)+')':''); } return s; }
+const chip=(t,k)=>`<span class="chip ${k||'neutral'}">${esc(t)}</span>`;
+const stChip=s=>chip(ST[s][0],ST[s][1]);
+const pLink=pid=>{const p=P(pid);return `<a class="plink" href="#patient" data-act="openp" data-id="${pid}">${esc(p.name)}</a>`;};
+const dDot=did=>{const d=D(did);return `<span class="dot" style="background:var(--${d.k})"></span>${esc(d.name)}`;};
+function clash(o,skip){
+  const s=tmin(o.time), e=s+Number(o.dur);
+  if(s<OPEN||e>CLOSE) return 'The clinic is open from '+t12(tstr(OPEN))+' to '+t12(tstr(CLOSE))+'. Choose a time inside these hours.';
+  for(const a of S.appts){ if(a.id===skip||a.date!==o.date||!live(a)||a.st==='done') continue; const as=tmin(a.time), ae=as+a.dur; if(e<=as||s>=ae) continue;
+    if(a.chair===o.chair) return o.chair+' is busy from '+t12(a.time)+' to '+t12(tstr(ae))+' with '+P(a.pid).name+'. Choose another time or chair.';
+    if(a.did===o.did) return D(o.did).name+' already has '+P(a.pid).name+' from '+t12(a.time)+' to '+t12(tstr(ae))+'.';
+    if(a.pid===o.pid) return P(o.pid).name+' already has an appointment at '+t12(a.time)+' on this day.'; }
+  return '';
+}
+
+/* ---------- helpers for views ---------- */
+let UI={view:'today',pid:null,day:TODAY,dfilter:'',pq:'',ptab:'active',wa:'tomorrow',per:'month',pf:''};
+function head(title,sub,btns){ return `<div class="head"><div><h1>${title}</h1>${sub?`<p>${sub}</p>`:''}</div>${btns?`<div class="btns">${btns}</div>`:''}</div>`; }
+const NEWAPPT='<button type="button" class="btn primary" data-act="book">+ New Appointment</button>';
+const NEWPAT='<button type="button" class="btn" data-act="newp">+ New Patient</button>';
+function waLink(text,label,sm){ return `<a class="btn ${sm===false?'':'sm'}" href="https://wa.me/?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">${label||'WhatsApp'}</a>`; }
+function prog(pl){ const pc=Math.round(pl.done/pl.v*100); return `<div class="prog"><div class="track"><div class="fill" style="width:${pc}%;background:${pl.st==='done'?'var(--good)':'var(--accent)'}"></div></div><small>${pl.done} of ${pl.v} visits</small></div>`; }
+function remindText(a){ const p=P(a.pid); return `${R().greet} ${p.name}, this is a reminder of your dental appointment at ${CLINIC} ${a.date===ahead(1)?'tomorrow':'on '+dayName(a.date)}, ${nice(a.date)} at ${t12(a.time)} with ${D(a.did).name}. Please reply YES to confirm, or tell us if you need another time. Thank you.`; }
+function dueText(pid){ const p=P(pid); return `${R().greet} ${p.name}, thank you for visiting ${CLINIC}. As per our record, your remaining balance is ${money(bal(pid))}. You can pay at your next visit or by bank transfer. Thank you.`; }
+function recallText(pid){ const p=P(pid); return `${R().greet} ${p.name}, it has been more than 6 months since your last dental checkup at ${CLINIC}. A checkup and cleaning twice a year keeps teeth healthy. Reply to this message and we will book a time that suits you.`; }
+function labText(l){ const p=P(l.pid); return `${R().greet} ${p.name}, good news: your ${l.item.replace(/ #\d+/,'')} is ready at ${CLINIC}. Please reply with a day and time that suits you for the fitting appointment. Thank you.`; }
+
+function reminders(){
+  const out=[];
+  const tom=S.appts.filter(a=>a.date===ahead(1)&&a.st==='booked');
+  if(tom.length) out.push(['info',`${tom.length} appointment${tom.length>1?'s':''} tomorrow. Send WhatsApp reminders so patients do not forget.`,'whatsapp:tomorrow']);
+  const unb=S.plans.filter(pl=>pl.st==='active'&&pl.done>0&&!planNext(pl));
+  if(unb.length) out.push(['warn',`${unb.length} patient${unb.length>1?'s are':' is'} in the middle of a treatment with no next visit booked.`,'plans:']);
+  const ready=S.labs.filter(l=>l.st==='received'&&!planNext(PL(l.plan)||{}));
+  if(ready.length) out.push(['info',`${ready.length} lab item${ready.length>1?'s are':' is'} back from the lab. Call the patient to book the fitting.`,'lab:']);
+  const late=S.labs.filter(l=>l.st==='sent'&&l.due<TODAY);
+  if(late.length) out.push(['bad',`${late.length} lab order${late.length>1?'s are':' is'} late. Call the lab.`,'lab:']);
+  const dues=S.patients.filter(p=>bal(p.id)>0);
+  if(dues.length) out.push(['warn',`${dues.length} patients have unpaid balances, total ${money(sum(dues,p=>bal(p.id)))}.`,'payments:']);
+  return out;
+}
+const remHTML=list=>list.length?list.map(x=>`<a class="rem ${x[0]}" href="#${x[2].split(':')[0]}" ${x[2].startsWith('whatsapp')?'data-act="wafilter" data-g="tomorrow"':''} style="text-decoration:none">${esc(x[1])}</a>`).join(''):'<div class="empty">Nothing needs attention right now.</div>';
+
+/* ---------- views ---------- */
+function vToday(){
+  const list=S.appts.filter(a=>a.date===TODAY).sort((a,b)=>a.time.localeCompare(b.time));
+  const done=list.filter(a=>a.st==='done').length, waiting=list.filter(a=>a.st==='waiting').length, inch=list.filter(a=>a.st==='inchair').length;
+  const coll=sum(S.pays.filter(x=>x.date===TODAY),x=>x.amt);
+  const dues=sum(S.patients,p=>Math.max(0,bal(p.id)));
+  const rows=list.map(a=>{ const pl=PL(a.plan), b=bal(a.pid);
+    const acts=[];
+    if(a.st==='booked') acts.push(`<button type="button" class="btn sm" data-act="setst" data-id="${a.id}" data-st="waiting">Arrived</button>`);
+    if(a.st==='waiting') acts.push(`<button type="button" class="btn sm" data-act="setst" data-id="${a.id}" data-st="inchair">To chair</button>`);
+    if(['booked','waiting','inchair'].includes(a.st)) acts.push(`<button type="button" class="btn sm primary" data-act="done" data-id="${a.id}">Mark done</button>`);
+    if(a.st==='done'&&b>0) acts.push(`<button type="button" class="btn sm primary" data-act="pay" data-id="${a.pid}">Receive ${money(b)}</button>`);
+    if(a.st==='noshow') acts.push(`<button type="button" class="btn sm" data-act="book" data-pid="${a.pid}">Rebook</button>`);
+    acts.push(`<button type="button" class="btn sm" data-act="appt" data-id="${a.id}">Details</button>`);
+    return `<div class="trow"><div class="tm">${t12(a.time)}</div><div class="who"><div>${pLink(a.pid)} ${stChip(a.st)} ${P(a.pid).alert?chip('⚠ '+P(a.pid).alert,'bad'):''}</div><span>${esc(what(a))}</span><span>${dDot(a.did)} · ${esc(a.chair)}</span></div><div class="acts">${acts.join('')}</div></div>`; }).join('');
+  const busy=S.chairs.map(c=>{ const cur=list.find(a=>a.chair===c&&a.st==='inchair'); return `<div class="li"><div><b>${esc(c)}</b><div class="muted">${cur?esc(P(cur.pid).name)+' · '+esc(D(cur.did).name):'Free now'}</div></div>${cur?chip('In use','accent'):chip('Free','good')}</div>`; }).join('');
+  return head('Today', dayName(TODAY)+', '+nice(TODAY)+' · '+esc(CLINIC)+', '+esc(R().city), NEWAPPT+NEWPAT)+
+  `<section class="brief" aria-label="Today in numbers"><div class="top"><h2>Today at the clinic</h2><span>Updates as you mark visits done and take payments</span></div><div class="vals">
+   <div><label>Appointments</label><div class="v num">${list.length}</div></div>
+   <div><label>Done</label><div class="v num">${done}</div></div>
+   <div><label>Waiting / in chair</label><div class="v num">${waiting} / ${inch}</div></div>
+   <div><label>Collected today</label><div class="v num">${money(coll)}</div></div>
+   <div><label>Unpaid balances</label><div class="v num">${money(dues)}</div></div></div></section>
+  <div class="grid split">
+   <section class="card" aria-label="Today's appointments"><h2>Today's appointments</h2><p class="sub">Mark patients as they arrive, go to the chair and finish. The next visit and payment are offered when you mark a visit done.</p><div class="list">${rows||'<div class="empty">No appointments today.</div>'}</div></section>
+   <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+    <section class="card" aria-label="Chairs"><h2>Chairs right now</h2><div class="list">${busy}</div></section>
+    <section class="card" aria-label="Needs attention"><h2>Needs attention</h2><div class="list" style="gap:8px">${remHTML(reminders())}</div></section>
+   </div></div>`;
+}
+
+function vAppointments(){
+  const day=UI.day;
+  const list=S.appts.filter(a=>a.date===day&&(!UI.dfilter||a.did===UI.dfilter)&&a.st!=='cancelled');
+  const cols=S.chairs.length; const past=day<TODAY;
+  let g=`<div class="sched" style="--cols:${cols}"><div class="ch" style="grid-column:1"></div>`+S.chairs.map((c,i)=>`<div class="ch" style="grid-column:${i+2}">${esc(c)}</div>`).join('');
+  SLOTS.forEach((t,i)=>{ const row=i+2; g+=`<div class="tl" style="grid-row:${row}">${t.endsWith(':00')?t12(t).replace(':00',''):t12(t).replace(/ [AP]M/,'')}</div>`;
+    S.chairs.forEach((c,j)=>{ const isPast=past||(day===TODAY&&tmin(t)+SLOT<=NOWMIN); g+=`<button type="button" class="cell${isPast?' past':''}" style="grid-row:${row};grid-column:${j+2}" ${isPast?'tabindex="-1" aria-hidden="true"':`data-act="book" data-date="${day}" data-time="${t}" data-chair="${esc(c)}" aria-label="Book ${esc(c)} at ${t12(t)}"`}>+ Book</button>`; }); });
+  list.forEach(a=>{ const row=2+Math.round((tmin(a.time)-OPEN)/SLOT), span=Math.max(1,Math.round(a.dur/SLOT)); const col=2+S.chairs.indexOf(a.chair); const p=P(a.pid);
+    g+=`<button type="button" class="ap st-${a.st}" style="grid-row:${row} / span ${span};grid-column:${col};--dc:var(--${D(a.did).k})" data-act="appt" data-id="${a.id}"><b>${t12(a.time)} · ${esc(p.name)}</b><span>${esc(what(a))}</span>${span>1?`<span>${esc(D(a.did).name)} · ${ST[a.st][0]}</span>`:''}</button>`; });
+  if(day===TODAY&&NOWMIN>OPEN&&NOWMIN<CLOSE){ const row=2+Math.floor((NOWMIN-OPEN)/SLOT), off=((NOWMIN-OPEN)%SLOT)/SLOT*54; g+=`<div class="nowline" style="grid-row:${row};margin-top:${off}px" title="Now"></div>`; }
+  g+='</div>';
+  const legend=S.dent.map(d=>`<span><i style="background:var(--${d.k})"></i>${esc(d.name)} · ${esc(d.spec)}</span>`).join('');
+  const cnt=list.filter(live).length;
+  return head('Appointments','Booking by chair and dentist. The app stops double booking of a chair, a dentist or a patient.',NEWAPPT)+
+  `<div class="daybar"><button type="button" class="btn" data-act="day" data-n="-1" aria-label="Previous day">‹</button>
+   <label class="field" for="day">Day<input type="date" id="day" value="${day}"></label>
+   <button type="button" class="btn" data-act="day" data-n="1" aria-label="Next day">›</button>
+   <button type="button" class="btn ${day===TODAY?'on':''}" data-act="day" data-n="0">Today</button>
+   <label class="field" for="dfilter">Dentist<select id="dfilter"><option value="">All dentists</option>${S.dent.map(d=>`<option value="${d.id}" ${UI.dfilter===d.id?'selected':''}>${esc(d.name)}</option>`).join('')}</select></label>
+   <span class="chip info" style="margin-bottom:12px">${dayName(day)} · ${cnt} appointment${cnt===1?'':'s'}</span></div>
+  <div class="tlegend">${legend}</div>
+  <div class="sw">${g}</div>
+  <p class="sub" style="color:var(--muted);margin:0;font-size:13.5px">Click an empty slot to book, or click an appointment to change, move or cancel it.</p>`;
+}
+
+function patientRows(){
+  const q=UI.pq.trim().toLowerCase();
+  return S.patients.filter(p=>!q||(p.name+' '+p.phone+' '+p.id).toLowerCase().includes(q)).map(p=>{ const b=bal(p.id), n=nextAppt(p.id), lv=lastVisit(p.id), act=S.plans.filter(x=>x.pid===p.id&&x.st==='active'&&x.done>0);
+    return `<tr><td><a class="plink" href="#patient" data-act="openp" data-id="${p.id}">${esc(p.name)}</a><small>${p.id} · ${p.g==='F'?'Female':'Male'}, ${p.age}</small></td><td class="mono">${esc(p.phone)}</td><td>${lv?short(lv):'—'}<small>${lv?rel(lv):''}</small></td><td>${n?short(n.date)+', '+t12(n.time):chip('None','neutral')}</td><td>${act.map(x=>esc(TXM[x.c].n)).join(', ')||'—'}</td><td class="r ${b>0?'out':''}">${b>0?money(b):b<0?money(b)+' credit':'—'}</td><td>${p.alert?chip(p.alert,'bad'):''}</td></tr>`; }).join('');
+}
+function vPatients(){
+  return head('Patients',S.patients.length+' patients. Each patient has a file with a tooth chart, treatments, visits and payments.',NEWPAT+NEWAPPT)+
+  `<section class="card"><div class="filters"><label class="field" for="pq">Find a patient<input id="pq" type="search" value="${esc(UI.pq)}" placeholder="Name, phone or file number"></label></div>
+  <div class="tw"><table><thead><tr><th>PATIENT</th><th>PHONE</th><th>LAST VISIT</th><th>NEXT APPOINTMENT</th><th>ONGOING TREATMENT</th><th class="r">BALANCE</th><th>ALERT</th></tr></thead><tbody id="ptb">${patientRows()}</tbody></table></div></section>`;
+}
+
+function toothBtn(p,n,lower){ const c=p.chart[n]||'none'; const pl=S.plans.some(x=>x.pid===p.id&&x.tooth===n&&x.st==='active'); const mid=n===21||n===31; return `<button type="button" class="tooth ${lower?'lower':''} c-${c} ${pl?'plan':''} ${mid?'midline':''}" data-act="tooth" data-n="${n}" title="${esc(toothName(n))}: ${COND[c].t}${pl?' · treatment planned':''}" aria-label="Tooth ${esc(toothName(n))}, ${COND[c].t}">${lower?'<i></i>':''}${n}${lower?'':'<i></i>'}</button>`; }
+function ledger(pid){
+  const rows=[];
+  S.appts.filter(a=>a.pid===pid&&a.st==='done'&&a.plan).forEach(a=>{ const pl=PL(a.plan); if(!pl) return; rows.push({d:a.date,k:'c',t:TXM[pl.c].n+(pl.tooth?' #'+pl.tooth:'')+(pl.v>1?' · visit '+a.visit+' of '+pl.v:''),amt:visitCharge(pl,a.visit||1)}); });
+  S.pays.filter(x=>x.pid===pid).forEach(x=>rows.push({d:x.date,k:'p',t:'Payment · '+x.mode+' · receipt '+x.id,amt:x.amt,id:x.id}));
+  rows.sort((a,b)=>a.d.localeCompare(b.d)||(a.k==='c'?-1:1)); let run=0;
+  return rows.map(r=>{ run+=r.k==='c'?r.amt:-r.amt; return {...r,run}; });
+}
+function vPatient(){
+  const p=P(UI.pid); if(!p){ UI.view='patients'; return vPatients(); }
+  const b=bal(p.id), plans=S.plans.filter(x=>x.pid===p.id).sort((a,b)=>(a.st===b.st?0:a.st==='active'?-1:1)||b.start.localeCompare(a.start));
+  const visits=S.appts.filter(a=>a.pid===p.id&&a.st!=='cancelled').sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
+  const led=ledger(p.id);
+  const legend=Object.keys(COND).filter(k=>k!=='none').map(k=>`<span><i style="background:var(--${{decay:'bad',filled:'info',rct:'warn',crown:'accent',implant:'good',missing:'surface2'}[k]});${k==='missing'?'border:2px solid var(--muted)':''}"></i>${COND[k].t}</span>`).join('')+'<span><i style="background:var(--bar-out);border-radius:50%"></i>Treatment planned</span>';
+  const pcards=plans.map(pl=>{ const nx=planNext(pl); const t=TXM[pl.c];
+    return `<div class="pcard"><div class="top"><b>${esc(t.n)}${pl.tooth?' · tooth #'+pl.tooth:''}</b>${pl.st==='done'?chip('Completed','good'):pl.done?chip('In progress','accent'):chip('Not started','info')}</div>
+    ${pl.v>1?prog(pl):''}<div class="meta">${dDot(pl.did)} · Fee ${money(net(pl))}${pl.disc?' (after '+money(pl.disc)+' discount)':''} · Billed so far ${money(billed(pl))}</div>
+    ${pl.st==='active'?`<div class="meta">${nx?'Next: '+short(nx.date)+', '+t12(nx.time)+' · '+esc(visitLabel(pl.c,visitNo(nx))||'Visit'):`<span class="c-bad" style="font-weight:700">Next visit not booked</span>`}</div>
+    ${!nx?`<div><button type="button" class="btn sm primary" data-act="book" data-pid="${p.id}" data-plan="${pl.id}">Book visit ${pl.done+1} of ${pl.v}</button></div>`:''}`:''}</div>`; }).join('');
+  return `<a class="back" href="#patients">← All patients</a>
+  <div class="phead"><div><h1>${esc(p.name)}</h1><div class="info"><span>${p.id}</span><span>${p.g==='F'?'Female':'Male'}, ${p.age} years</span><span class="mono">${esc(p.phone)}</span><span>${esc(p.area)}</span><span>Patient since ${nice(p.since)}</span></div>
+   <div class="chips" style="margin-top:8px">${p.alert?chip('⚠ Medical alert: '+p.alert,'bad'):chip('No medical alert','neutral')}${b>0?chip('Balance due '+money(b),'warn'):b<0?chip('Advance '+money(-b),'good'):chip('No balance','good')}</div></div>
+   <div class="btns"><button type="button" class="btn primary" data-act="book" data-pid="${p.id}">+ Appointment</button><button type="button" class="btn" data-act="addtx" data-pid="${p.id}">+ Treatment</button><button type="button" class="btn" data-act="pay" data-id="${p.id}">Receive payment</button><button type="button" class="btn" data-act="editp" data-id="${p.id}">Edit</button>${b>0?waLink(dueText(p.id),'WhatsApp balance',false):''}</div></div>
+  <section class="card" aria-label="Tooth chart"><h2>Tooth chart</h2><p class="sub">Click a tooth to record its condition or plan a treatment on it. Numbers follow the FDI system that dentists use.</p>
+   <div class="chartwrap"><div class="jaw">UPPER JAW · patient's right ← → patient's left</div><div class="teeth">${UPPER.map(n=>toothBtn(p,n)).join('')}</div>
+   <div class="teeth" style="margin-top:8px">${LOWER.map(n=>toothBtn(p,n,1)).join('')}</div><div class="jaw">LOWER JAW</div></div><div class="tlegend">${legend}</div></section>
+  <div class="grid g2">
+   <section class="card" aria-label="Treatments"><h2>Treatments</h2>${pcards||'<div class="empty">No treatments yet.</div>'}</section>
+   <section class="card" aria-label="Visits"><h2>Visits</h2><div class="list">${visits.slice(0,12).map(a=>`<div class="li"><div><b>${short(a.date)} · ${t12(a.time)}</b><div class="muted">${esc(what(a))}</div><div class="muted">${dDot(a.did)}</div></div>${stChip(a.st)}</div>`).join('')||'<div class="empty">No visits yet.</div>'}</div></section>
+  </div>
+  <section class="card" aria-label="Account"><h2>Account</h2><p class="sub">Charges are added as each visit is done. Payments reduce the balance.</p>
+   <div class="tw"><table style="min-width:600px"><thead><tr><th>DATE</th><th>DETAILS</th><th class="r">CHARGE</th><th class="r">PAID</th><th class="r">BALANCE</th><th></th></tr></thead><tbody>
+   ${led.slice().reverse().map(r=>`<tr><td>${nice(r.d)}</td><td>${esc(r.t)}</td><td class="r">${r.k==='c'?money(r.amt):''}</td><td class="r in">${r.k==='p'?money(r.amt):''}</td><td class="r">${money(r.run)}</td><td>${r.k==='p'?`<button type="button" class="btn sm" data-act="receipt" data-id="${r.id}">Receipt</button>`:''}</td></tr>`).join('')||'<tr><td colspan="6"><div class="empty">No charges or payments yet.</div></td></tr>'}
+   </tbody></table></div></section>`;
+}
+
+function vPlans(){
+  const tab=UI.ptab;
+  const list=S.plans.filter(pl=>tab==='done'?pl.st==='done'&&pl.v>1:pl.st==='active'&&(pl.v>1||pl.done>0)).sort((a,b)=>{ const na=planNext(a), nb=planNext(b); return (na?1:0)-(nb?1:0)||(b.done/b.v)-(a.done/a.v); });
+  const act=S.plans.filter(pl=>pl.st==='active'&&(pl.v>1||pl.done>0)), unb=act.filter(pl=>pl.done>0&&!planNext(pl));
+  const rows=list.map(pl=>{ const nx=planNext(pl), p=P(pl.pid);
+    return `<tr><td>${pLink(pl.pid)}<small class="mono">${esc(p.phone)}</small></td><td>${esc(TXM[pl.c].n)}${pl.tooth?'<small>Tooth #'+pl.tooth+'</small>':''}</td><td>${dDot(pl.did)}</td><td>${prog(pl)}</td><td class="r">${money(net(pl))}<small>billed ${money(billed(pl))}</small></td>
+    <td>${pl.st==='done'?chip('Completed','good'):nx?short(nx.date)+', '+t12(nx.time)+'<small>'+rel(nx.date)+'</small>':chip('Not booked','bad')}</td>
+    <td>${pl.st==='active'&&!nx?`<button type="button" class="btn sm primary" data-act="book" data-pid="${pl.pid}" data-plan="${pl.id}">Book visit ${pl.done+1}</button>`:''}</td></tr>`; }).join('');
+  return head('Treatment Plans','Root canals, crowns, implants, dentures and braces need several visits. The app counts each visit and shows who has no next visit booked.',NEWAPPT)+
+  `<div class="grid g4"><div class="card kpi"><div class="label">ONGOING TREATMENTS</div><div class="big num">${act.length}</div><div class="meta">with visits still to come</div></div>
+   <div class="card kpi"><div class="label">NEXT VISIT NOT BOOKED</div><div class="big num ${unb.length?'c-bad':''}">${unb.length}</div><div class="meta">call these patients first</div></div>
+   <div class="card kpi"><div class="label">BRACES PATIENTS</div><div class="big num">${act.filter(p=>p.c==='BRC').length}</div><div class="meta">monthly adjustments</div></div>
+   <div class="card kpi"><div class="label">STILL TO BILL</div><div class="big num">${money(sum(act,pl=>net(pl)-billed(pl)))}</div><div class="meta">for visits not done yet</div></div></div>
+  <section class="card"><div class="tabs"><button type="button" class="btn sm ${tab==='active'?'on':''}" data-act="ptab" data-t="active">Ongoing</button><button type="button" class="btn sm ${tab==='done'?'on':''}" data-act="ptab" data-t="done">Completed</button></div>
+  <div class="tw"><table><thead><tr><th>PATIENT</th><th>TREATMENT</th><th>DENTIST</th><th>PROGRESS</th><th class="r">FEE</th><th>NEXT VISIT</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="7"><div class="empty">Nothing here yet.</div></td></tr>'}</tbody></table></div></section>`;
+}
+
+function vLab(){
+  const LST={sent:['At the lab','info'],received:['Back at clinic','accent'],fitted:['Fitted','good']};
+  const rows=S.labs.slice().sort((a,b)=>(a.st==='fitted')-(b.st==='fitted')||a.due.localeCompare(b.due)).map(l=>{ const late=l.st==='sent'&&l.due<TODAY; const pl=PL(l.plan); const nx=pl&&planNext(pl);
+    return `<tr><td class="mono">${l.id}</td><td>${pLink(l.pid)}</td><td>${esc(l.item)}</td><td>${esc(l.lab)}</td><td>${short(l.sent)}</td><td>${short(l.due)}${late?'<small class="c-bad">'+(diff(l.due,TODAY))+' days late</small>':l.st==='sent'?'<small>'+rel(l.due)+'</small>':''}</td>
+    <td><select class="status" data-lab="${l.id}" aria-label="Status of ${l.id}">${Object.keys(LST).map(k=>`<option value="${k}" ${l.st===k?'selected':''}>${LST[k][0]}</option>`).join('')}</select></td><td class="r">${money(l.cost)}</td>
+    <td>${l.st==='received'?(nx?'Fitting '+short(nx.date):`<span class="btns">${waLink(labText(l),'WhatsApp')}<button type="button" class="btn sm primary" data-act="book" data-pid="${l.pid}" data-plan="${l.plan}">Book fitting</button></span>`):''}</td></tr>`; }).join('');
+  const open=S.labs.filter(l=>l.st!=='fitted');
+  return head('Lab Work','Crowns, implant crowns and dentures made by the dental lab. Know what is at the lab, what is late and what is ready to fit.','<button type="button" class="btn primary" data-act="newlab">+ Send to Lab</button>')+
+  `<div class="grid g4"><div class="card kpi"><div class="label">AT THE LAB</div><div class="big num">${open.filter(l=>l.st==='sent').length}</div></div>
+   <div class="card kpi"><div class="label">LATE</div><div class="big num ${open.some(l=>l.st==='sent'&&l.due<TODAY)?'c-bad':''}">${open.filter(l=>l.st==='sent'&&l.due<TODAY).length}</div></div>
+   <div class="card kpi"><div class="label">READY TO FIT</div><div class="big num">${open.filter(l=>l.st==='received').length}</div></div>
+   <div class="card kpi"><div class="label">LAB BILLS (OPEN ORDERS)</div><div class="big num">${money(sum(open,l=>l.cost))}</div></div></div>
+  <section class="card"><div class="tw"><table><thead><tr><th>ORDER</th><th>PATIENT</th><th>ITEM</th><th>LAB</th><th>SENT</th><th>DUE</th><th>STATUS</th><th class="r">LAB COST</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="9"><div class="empty">No lab orders.</div></td></tr>'}</tbody></table></div></section>`;
+}
+
+function vPayments(){
+  const m=TODAY.slice(0,7);
+  const dues=S.patients.map(p=>({p,b:bal(p.id)})).filter(x=>x.b>0).sort((a,b)=>b.b-a.b);
+  const pays=S.pays.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
+  const mode=UI.pf;
+  return head('Payments &amp; Dues','Every payment gets a receipt. Unpaid balances are listed so reception can follow up.','')+
+  `<div class="grid g4"><div class="card kpi"><div class="label">COLLECTED TODAY</div><div class="big num">${money(sum(S.pays.filter(x=>x.date===TODAY),x=>x.amt))}</div><div class="meta">${S.pays.filter(x=>x.date===TODAY).length} receipts</div></div>
+   <div class="card kpi"><div class="label">COLLECTED THIS MONTH</div><div class="big num">${money(sum(S.pays.filter(x=>x.date.startsWith(m)),x=>x.amt))}</div><div class="meta">${monthName(m)}</div></div>
+   <div class="card kpi"><div class="label">UNPAID BALANCES</div><div class="big num c-bad">${money(sum(dues,x=>x.b))}</div><div class="meta">${dues.length} patients</div></div>
+   <div class="card kpi"><div class="label">ADVANCE HELD</div><div class="big num">${money(sum(S.patients,p=>Math.max(0,-bal(p.id))))}</div><div class="meta">paid before treatment</div></div></div>
+  <section class="card"><h2>Unpaid balances</h2><div class="tw"><table style="min-width:640px"><thead><tr><th>PATIENT</th><th>PHONE</th><th>LAST VISIT</th><th class="r">BALANCE</th><th></th></tr></thead><tbody>
+   ${dues.map(x=>`<tr><td>${pLink(x.p.id)}</td><td class="mono">${esc(x.p.phone)}</td><td>${lastVisit(x.p.id)?short(lastVisit(x.p.id)):'—'}</td><td class="r out">${money(x.b)}</td><td><span class="btns" style="justify-content:flex-end"><button type="button" class="btn sm primary" data-act="pay" data-id="${x.p.id}">Receive</button>${waLink(dueText(x.p.id),'WhatsApp')}</span></td></tr>`).join('')||'<tr><td colspan="5"><div class="empty">No unpaid balances.</div></td></tr>'}
+  </tbody></table></div></section>
+  <section class="card"><div class="head"><div><h2>Payments received</h2></div><label class="field" for="pf" style="min-width:180px">Payment method<select id="pf"><option value="">All methods</option>${R().modes.map(x=>`<option ${mode===x?'selected':''}>${esc(x)}</option>`).join('')}</select></label></div>
+  <div class="tw"><table style="min-width:640px"><thead><tr><th>DATE</th><th>RECEIPT</th><th>PATIENT</th><th>FOR</th><th>METHOD</th><th class="r">AMOUNT</th><th></th></tr></thead><tbody>
+   ${pays.filter(x=>!mode||x.mode===mode).slice(0,40).map(x=>{ const pl=PL(x.plan); return `<tr><td>${short(x.date)}</td><td class="mono">${x.id}</td><td>${pLink(x.pid)}</td><td>${pl?esc(TXM[pl.c].n):'Account payment'}</td><td>${esc(x.mode)}</td><td class="r in">${money(x.amt)}</td><td><button type="button" class="btn sm" data-act="receipt" data-id="${x.id}">Receipt</button></td></tr>`; }).join('')}
+  </tbody></table></div><p class="sub" style="margin:0">Showing the latest 40 payments.</p></section>`;
+}
+
+function waItems(){
+  const tom=S.appts.filter(a=>a.date===ahead(1)&&a.st==='booked').sort((a,b)=>a.time.localeCompare(b.time)).map(a=>({key:'r'+a.id,pid:a.pid,t:remindText(a),sub:'Tomorrow '+t12(a.time)+' · '+what(a)}));
+  const due=S.patients.filter(p=>bal(p.id)>0).map(p=>({key:'d'+p.id+bal(p.id),pid:p.id,t:dueText(p.id),sub:'Balance '+money(bal(p.id))}));
+  const rec=S.patients.filter(p=>{ const lv=lastVisit(p.id); return lv&&diff(lv,TODAY)>180&&!nextAppt(p.id); }).map(p=>({key:'c'+p.id,pid:p.id,t:recallText(p.id),sub:'Last visit '+nice(lastVisit(p.id))}));
+  const lab=S.labs.filter(l=>l.st==='received'&&!planNext(PL(l.plan)||{})).map(l=>({key:'l'+l.id,pid:l.pid,t:labText(l),sub:l.item+' is back from '+l.lab}));
+  return {tomorrow:['Tomorrow\'s appointments',tom],due:['Payment due',due],recall:['6-month checkup',rec],lab:['Lab work ready',lab]};
+}
+function vWhatsapp(){
+  const G=waItems(); const g=G[UI.wa]?UI.wa:'tomorrow'; const items=G[g][1];
+  return head('WhatsApp Reminders','Messages are written for you. Press the button to open WhatsApp, check the message and press send. Fewer missed appointments and faster payments.','')+
+  `<div class="tabs">${Object.keys(G).map(k=>`<button type="button" class="btn sm ${g===k?'on':''}" data-act="wafilter" data-g="${k}">${esc(G[k][0])} <span class="chip ${G[k][1].length?'accent':'neutral'}">${G[k][1].length}</span></button>`).join('')}</div>
+  <section class="card"><h2>${esc(G[g][0])}</h2><div class="list">${items.map(x=>{ const sent=S.sent[x.key]; return `<div class="wa ${sent?'sent':''}"><div><b>${pLink(x.pid)}</b> <span class="muted mono" style="font-size:12.5px">${esc(P(x.pid).phone)}</span>${sent?' '+chip('Sent','good'):''}<div class="muted" style="font-size:13px">${esc(x.sub)}</div><p>${esc(x.t)}</p></div><div class="btns">${waLink(x.t,'Open WhatsApp')}<button type="button" class="btn sm" data-act="marksent" data-k="${x.key}">${sent?'Undo':'Mark sent'}</button></div></div>`; }).join('')||'<div class="empty">No messages to send in this list.</div>'}</div>
+  <p class="sub" style="margin:0">In this demo WhatsApp opens without a number, so you can pick any chat. In your clinic it opens the patient's own chat.</p></section>`;
+}
+
+function period(){ const y=today.getFullYear(), m=today.getMonth(); const P_={month:[iso(new Date(y,m,1)),TODAY,'This month'],last:[iso(new Date(y,m-1,1)),iso(new Date(y,m,0)),'Last month'],q:[iso(new Date(y,m-2,1)),TODAY,'Last 3 months'],year:[iso(new Date(y,0,1)),TODAY,'This year']}; return P_[UI.per]||P_.month; }
+function vReports(){
+  const [f,t,label]=period();
+  const pays=S.pays.filter(x=>inRange(x.date,f,t)), ap=S.appts.filter(a=>inRange(a.date,f,t)&&a.date<=TODAY);
+  const done=ap.filter(a=>a.st==='done'), ns=ap.filter(a=>a.st==='noshow');
+  const newP=S.patients.filter(p=>inRange(p.since,f,t)).length;
+  const months=[]; for(let i=5;i>=0;i--){ const d=new Date(today.getFullYear(),today.getMonth()-i,1); months.push(iso(d).slice(0,7)); }
+  const inc=months.map(k=>sum(S.pays.filter(x=>x.date.startsWith(k)),x=>x.amt)); const mx=Math.max(1,...inc);
+  const byTx={}; done.forEach(a=>{ const pl=PL(a.plan); if(!pl) return; const k=pl.c; byTx[k]=byTx[k]||{n:0,amt:0}; byTx[k].n++; byTx[k].amt+=visitCharge(pl,a.visit||1); });
+  const txRows=Object.keys(byTx).sort((a,b)=>byTx[b].amt-byTx[a].amt); const txMax=Math.max(1,...txRows.map(k=>byTx[k].amt));
+  const byD=S.dent.map(d=>{ const ds=done.filter(a=>a.did===d.id); return {d,n:ds.length,amt:sum(ds,a=>{const pl=PL(a.plan);return pl?visitCharge(pl,a.visit||1):0;})}; });
+  const R2=[['income','Income report','Every payment received, with receipt number and method.'],['dues','Unpaid balances','Patients who still owe money, highest first.'],['visits','Appointments report','All appointments with status, dentist and treatment.']];
+  return head('Reports','See how the clinic is doing. Download any report as PDF or Excel.','')+
+  `<div class="tabs">${[['month','This month'],['last','Last month'],['q','Last 3 months'],['year','This year']].map(x=>`<button type="button" class="btn sm ${UI.per===x[0]?'on':''}" data-act="per" data-p="${x[0]}">${x[1]}</button>`).join('')}<span class="chip neutral" style="align-self:center">${nice(f)} – ${nice(t)}</span></div>
+  <div class="grid g4"><div class="card kpi"><div class="label">COLLECTED</div><div class="big num">${money(sum(pays,x=>x.amt))}</div><div class="meta">${pays.length} receipts</div></div>
+   <div class="card kpi"><div class="label">VISITS DONE</div><div class="big num">${done.length}</div><div class="meta">${ns.length} no-shows (${ap.length?Math.round(ns.length/ap.length*100):0}%)</div></div>
+   <div class="card kpi"><div class="label">NEW PATIENTS</div><div class="big num">${newP}</div><div class="meta">${label.toLowerCase()}</div></div>
+   <div class="card kpi"><div class="label">AVERAGE PER VISIT</div><div class="big num">${money(done.length?sum(byD,x=>x.amt)/done.length:0)}</div><div class="meta">charged per done visit</div></div></div>
+  <div class="grid g2">
+   <section class="card"><h2>Money collected, last 6 months</h2><div class="chartbars">${months.map((k,i)=>`<div class="g"><b>${compact(inc[i])}</b><div class="col" style="height:${Math.round(inc[i]/mx*160)}px" title="${monthName(k)}: ${money(inc[i])}"></div><span>${monthName(k).split(' ')[0]}</span></div>`).join('')}</div></section>
+   <section class="card"><h2>Treatments done · ${esc(label)}</h2><div class="bars">${txRows.map(k=>`<div class="bar" style="grid-template-columns:150px minmax(0,1fr) 110px"><span>${esc(TXM[k].n)} <small class="muted">×${byTx[k].n}</small></span><div class="track"><div class="fill" style="width:${Math.round(byTx[k].amt/txMax*100)}%;background:var(--accent)"></div></div><b>${money(byTx[k].amt)}</b></div>`).join('')||'<div class="empty">No visits in this period.</div>'}</div></section>
+  </div>
+  <section class="card"><h2>By dentist · ${esc(label)}</h2><div class="tw"><table style="min-width:520px"><thead><tr><th>DENTIST</th><th>SPECIALITY</th><th class="r">VISITS DONE</th><th class="r">CHARGED</th></tr></thead><tbody>${byD.map(x=>`<tr><td>${dDot(x.d.id)}</td><td>${esc(x.d.spec)}</td><td class="r">${x.n}</td><td class="r">${money(x.amt)}</td></tr>`).join('')}</tbody></table></div></section>
+  <div class="rgrid">${R2.map(x=>`<div class="rcard" style="--sec:var(--sec-acc)"><h3>${x[1]}</h3><p>${x[2]}</p><div class="rbtns"><button type="button" class="btn sm" data-act="rview" data-k="${x[0]}">View</button><button type="button" class="btn sm pdf" data-act="rpdf" data-k="${x[0]}">PDF</button><button type="button" class="btn sm xls" data-act="rxls" data-k="${x[0]}">Excel</button></div></div>`).join('')}</div>`;
+}
+
+/* ---------- reports to files ---------- */
+function runReport(k){
+  const [f,t,label]=period();
+  if(k==='income'){ const rows=S.pays.filter(x=>inRange(x.date,f,t)).sort((a,b)=>a.date.localeCompare(b.date)).map(x=>{const pl=PL(x.plan);return [x.date,x.id,P(x.pid).name,pl?TXM[pl.c].n:'Account payment',x.mode,x.amt];}); return {title:'Income report',sub:label+' · '+nice(f)+' to '+nice(t),cols:[{h:'Date',t:'date'},{h:'Receipt',t:'text'},{h:'Patient',t:'text'},{h:'For',t:'text'},{h:'Method',t:'text'},{h:'Amount',t:'money'}],rows,totals:['Total','','','','',sum(rows,r=>r[5])]}; }
+  if(k==='dues'){ const rows=S.patients.map(p=>[p.id,p.name,p.phone,lastVisit(p.id)||'',bal(p.id)]).filter(r=>r[4]>0).sort((a,b)=>b[4]-a[4]); return {title:'Unpaid balances',sub:'As of '+nice(TODAY),cols:[{h:'File',t:'text'},{h:'Patient',t:'text'},{h:'Phone',t:'text'},{h:'Last visit',t:'date'},{h:'Balance',t:'money'}],rows,totals:['Total','','','',sum(rows,r=>r[4])]}; }
+  const rows=S.appts.filter(a=>inRange(a.date,f,t)).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).map(a=>[a.date,t12(a.time),P(a.pid).name,what(a),D(a.did).name,a.chair,ST[a.st][0]]);
+  return {title:'Appointments report',sub:label+' · '+nice(f)+' to '+nice(t),cols:[{h:'Date',t:'date'},{h:'Time',t:'text'},{h:'Patient',t:'text'},{h:'Treatment',t:'text'},{h:'Dentist',t:'text'},{h:'Chair',t:'text'},{h:'Status',t:'text'}],rows};
+}
+const fmtCell=(v,t)=>v==null||v===''?'':t==='date'?nice(v):t==='money'?money(v):String(v);
+function reportTable(rep){ return `<div class="tw"><table><thead><tr>${rep.cols.map(c=>`<th class="${c.t==='money'?'r':''}">${esc(c.h.toUpperCase())}</th>`).join('')}</tr></thead><tbody>${rep.rows.map(r=>`<tr>${r.map((v,i)=>`<td class="${rep.cols[i].t==='money'?'r':''}">${esc(fmtCell(v,rep.cols[i].t))}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${rep.cols.length}"><div class="empty">No records for this period.</div></td></tr>`}</tbody>${rep.totals?`<tfoot><tr>${rep.totals.map((v,i)=>`<td class="${rep.cols[i].t==='money'?'r':''}">${esc(i?fmtCell(v,rep.cols[i].t):v)}</td>`).join('')}</tr></tfoot>`:''}</table></div>`; }
+const PDFS=s=>String(s).replace(/[–—]/g,'-').replace(/·/g,'|').replace(/[^\x20-\x7E]/g,'');
+function makePDF(rep){
+  const J=window.jspdf&&window.jspdf.jsPDF; if(!J) return null;
+  const doc=new J({orientation:rep.cols.length>6?'landscape':'portrait',unit:'pt',format:'a4'});
+  const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), M=32;
+  const wts=rep.cols.map(c=>c.t==='text'?2:1), tw=wts.reduce((a,b)=>a+b,0), ws=wts.map(w=>w/tw*(W-2*M));
+  let y=M;
+  const draw=(cells,o)=>{ o=o||{}; doc.setFont('helvetica',o.bold?'bold':'normal'); doc.setFontSize(8);
+    const lines=cells.map((v,i)=>doc.splitTextToSize(PDFS(v),Math.max(10,ws[i]-6))); const h=Math.max(1,...lines.map(l=>l.length))*9.5+6;
+    if(!o.head&&y+h>H-M-14){ doc.addPage(); y=M; draw(rep.cols.map(c=>c.h),{head:true,bold:true}); doc.setFont('helvetica',o.bold?'bold':'normal'); doc.setFontSize(8); }
+    if(o.head){ doc.setFillColor(11,42,54); doc.rect(M,y,W-2*M,h,'F'); doc.setTextColor(255,255,255); } else { if(o.total){ doc.setFillColor(237,240,245); doc.rect(M,y,W-2*M,h,'F'); } doc.setTextColor(21,26,36); }
+    let x=M; lines.forEach((l,i)=>{ if(rep.cols[i].t==='money') doc.text(l,x+ws[i]-3,y+10.5,{align:'right'}); else doc.text(l,x+3,y+10.5); x+=ws[i]; });
+    y+=h; doc.setDrawColor(221,226,234); doc.line(M,y,W-M,y); };
+  doc.setTextColor(21,26,36); doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.text(CLINIC,M,y+8); doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(85,93,110); doc.text(PDFS('Dental clinic | '+R().city+', '+R().name),M,y+21); y+=44;
+  doc.setTextColor(21,26,36); doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.text(PDFS(rep.title),M,y); y+=15; doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(85,93,110); doc.text(PDFS(rep.sub+' | Amounts in '+cu()),M,y); y+=14;
+  draw(rep.cols.map(c=>c.h),{head:true,bold:true});
+  rep.rows.forEach(r=>draw(r.map((v,i)=>fmtCell(v,rep.cols[i].t))));
+  if(!rep.rows.length){ doc.setTextColor(85,93,110); doc.text('No records for this period.',M,y+14); }
+  if(rep.totals) draw(rep.totals.map((v,i)=>i?fmtCell(v,rep.cols[i].t):v),{bold:true,total:true});
+  const n=doc.getNumberOfPages(); for(let p=1;p<=n;p++){ doc.setPage(p); doc.setFontSize(7.5); doc.setTextColor(120,128,140); doc.text('SkillsTribes Dental demo | generated '+PDFS(nice(TODAY))+' | page '+p+' of '+n,M,H-16); }
+  return doc.output('arraybuffer');
+}
+function makeXLSX(rep){
+  const xv=(v,t)=>v==null||v===''?'':t==='date'?nice(v):t==='money'?Math.round(conv(v)*100)/100:v;
+  const aoa=[[CLINIC],[rep.title],[rep.sub+' · Amounts in '+cu()],[],rep.cols.map(c=>c.h),...rep.rows.map(r=>r.map((v,i)=>xv(v,rep.cols[i].t))),...(rep.totals?[rep.totals.map((v,i)=>i?xv(v,rep.cols[i].t):v)]:[])];
+  if(window.XLSX){ const ws=XLSX.utils.aoa_to_sheet(aoa); ws['!cols']=rep.cols.map(c=>({wch:c.t==='text'?28:15})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Report'); return {ext:'.xlsx',data:XLSX.write(wb,{bookType:'xlsx',type:'array'})}; }
+  return {ext:'.csv',data:aoa.map(r=>r.map(v=>{const s=String(v==null?'':v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(',')).join('\n')};
+}
+function saveFile(name,data){ try{ const url=URL.createObjectURL(new Blob([data])); const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000); toast('Saved: '+name); }catch(e){ toast('The file could not be saved here.'); } }
+const fileBase=rep=>rep.title.replace(/[^A-Za-z0-9]+/g,'_')+'_'+TODAY;
+
+/* ---------- receipt ---------- */
+function receiptHTML(id){
+  const x=S.pays.find(y=>y.id===id); const p=P(x.pid), pl=PL(x.plan);
+  return `<div class="panel" role="dialog" aria-labelledby="rc-h"><div class="docsheet"><div class="dh"><div><b>${esc(CLINIC)}</b><div class="muted" style="color:var(--muted);font-size:13px">Dental clinic · ${esc(R().city)}, ${esc(R().name)}</div></div><div style="text-align:right"><b id="rc-h">Receipt</b><div class="mono">${x.id}</div></div></div>
+  <div class="kv"><div><label>DATE</label><div>${nice(x.date)}</div></div><div><label>PATIENT</label><div>${esc(p.name)} (${p.id})</div></div><div><label>FOR</label><div>${pl?esc(TXM[pl.c].n)+(pl.tooth?' #'+pl.tooth:''):'Account payment'}</div></div><div><label>METHOD</label><div>${esc(x.mode)}</div></div><div><label>AMOUNT RECEIVED</label><div style="font-family:var(--font-display);font-size:24px;font-weight:800">${money(x.amt)}</div></div><div><label>BALANCE NOW</label><div>${money(bal(p.id))}</div></div></div>
+  <div class="muted" style="color:var(--muted);font-size:13px">Thank you for visiting. This is a computer-made receipt from the SkillsTribes Dental demo.</div></div>
+  <div class="actions"><button type="button" class="btn" data-act="close">Close</button>${waLink(`${R().greet} ${p.name}, we have received ${money(x.amt)} on ${nice(x.date)} (receipt ${x.id}). Your balance is now ${money(bal(p.id))}. Thank you, ${CLINIC}.`,'Send on WhatsApp',false)}<button type="button" class="btn primary" data-act="rcpdf" data-id="${x.id}">Download PDF</button></div></div>`;
+}
+function receiptPDF(id){
+  const J=window.jspdf&&window.jspdf.jsPDF; if(!J){ toast('The PDF tool did not load. Check the internet and refresh the page.'); return; }
+  const x=S.pays.find(y=>y.id===id), p=P(x.pid), pl=PL(x.plan); const doc=new J({unit:'pt',format:'a5'}); const M=30; let y=40;
+  doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.text(CLINIC,M,y); doc.setFontSize(12); doc.text('RECEIPT',doc.internal.pageSize.getWidth()-M,y,{align:'right'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(85,93,110); doc.text(PDFS('Dental clinic | '+R().city+', '+R().name),M,y+14); doc.text(x.id,doc.internal.pageSize.getWidth()-M,y+14,{align:'right'});
+  doc.setDrawColor(21,26,36); doc.line(M,y+24,doc.internal.pageSize.getWidth()-M,y+24); y+=50; doc.setTextColor(21,26,36);
+  [['Date',nice(x.date)],['Patient',p.name+' ('+p.id+')'],['For',pl?TXM[pl.c].n+(pl.tooth?' #'+pl.tooth:''):'Account payment'],['Method',x.mode],['Amount received',money(x.amt)],['Balance now',money(bal(p.id))]].forEach(r=>{ doc.setFont('helvetica','bold'); doc.text(PDFS(r[0]),M,y); doc.setFont('helvetica','normal'); doc.text(PDFS(r[1]),M+120,y); y+=20; });
+  doc.setFontSize(8); doc.setTextColor(120,128,140); doc.text('SkillsTribes Dental demo receipt',M,y+20);
+  saveFile('Receipt_'+x.id+'.pdf',doc.output('arraybuffer'));
+}
+
+/* ---------- forms ---------- */
+const opts=(list,sel)=>list.map(o=>{ const v=Array.isArray(o)?o[0]:o, t=Array.isArray(o)?o[1]:o; return `<option value="${esc(v)}" ${String(v)===String(sel)?'selected':''}>${esc(t)}</option>`; }).join('');
+function openModal(html){ const m=$('modal'); m.innerHTML=html; m.hidden=false; const f=m.querySelector('input:not([type=radio]):not([type=hidden]),select,button.primary'); if(f) f.focus(); }
+function closeModal(){ const m=$('modal'); m.hidden=true; m.innerHTML=''; }
+function toast(t){ const el=$('toast'); el.textContent=t; el.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>{el.hidden=true;},2800); }
+
+function whatOpts(pid,planId){
+  const act=S.plans.filter(pl=>pl.pid===pid&&pl.st==='active'&&!planNext(pl)&&(pl.v>1||pl.done===0));
+  const o=act.map(pl=>['plan:'+pl.id,'Next visit: '+TXM[pl.c].n+(pl.tooth?' #'+pl.tooth:'')+' (visit '+(pl.done+1)+' of '+pl.v+')']);
+  return o.concat(TX.map(t=>['new:'+t.c,'New: '+t.n+' · '+money(fee(t.c))]));
+}
+function apptForm(pre){
+  pre=pre||{}; const pid=pre.pid||S.patients[0].id; const W=whatOpts(pid);
+  const sel=pre.plan?'plan:'+pre.plan:(pre.what||W[0][0]);
+  const d0=pre.date||(pre.plan?(()=>{const pl=PL(pre.plan); const last=lastVisit(pl.pid)||TODAY; const s=addD(last,TXM[pl.c].gap||7); return s<TODAY?TODAY:s;})():TODAY);
+  return `<form class="panel" id="af" aria-labelledby="af-h" novalidate ${pre.time||pre.id?'':'data-auto="1"'}>
+  <h2 id="af-h">${pre.id?'Change Appointment':'New Appointment'}</h2>
+  <input type="hidden" id="a-id" value="${pre.id||''}">
+  <div class="fgrid">
+   <label class="field" for="a-pid">Patient<select id="a-pid" ${pre.id?'disabled':''}>${opts(S.patients.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>[p.id,p.name+' · '+p.id]),pid)}</select></label>
+   ${pre.id?'':`<label class="field" for="a-what">Treatment<select id="a-what">${opts(W,sel)}</select></label>`}
+   <label class="field" for="a-tooth" id="a-tooth-w">Tooth<select id="a-tooth">${opts(ALLT.map(n=>[n,toothName(n)]),pre.tooth||36)}</select></label>
+   <label class="field" for="a-did">Dentist<select id="a-did">${opts(S.dent.map(d=>[d.id,d.name+' · '+d.spec]),pre.did||'D1')}</select></label>
+   <label class="field" for="a-date">Date<input type="date" id="a-date" value="${d0}" min="${TODAY}"></label>
+   <label class="field" for="a-time">Time<select id="a-time">${opts(SLOTS.map(t=>[t,t12(t)]),pre.time||firstFree(d0))}</select></label>
+   <label class="field" for="a-chair">Chair<select id="a-chair">${opts(S.chairs,pre.chair||S.chairs[0])}</select></label>
+   <label class="field" for="a-dur">Length<select id="a-dur">${opts([[30,'30 minutes'],[60,'1 hour'],[90,'1 hour 30 minutes']],pre.dur||30)}</select></label>
+  </div>
+  <div class="hint" id="a-hint"></div><div class="err" id="a-err" role="alert"></div>
+  <div class="actions"><button type="button" class="btn" data-act="close">Cancel</button><button type="submit" class="btn primary">${pre.id?'Save changes':'Book appointment'}</button></div></form>`;
+}
+function autoSlot(){ const f=$('af'); if(!f||!f.dataset.auto) return; const o=readAppt(); if(!o.date||o.date<TODAY) o.date=TODAY; for(let k=0;k<21;k++){ const date=addD(o.date,k); for(const t of SLOTS){ if(date===TODAY&&tmin(t)<NOWMIN) continue; for(const c of S.chairs){ if(!clash({...o,date,time:t,chair:c},o.id)){ $('a-date').value=date; $('a-time').value=t; $('a-chair').value=c; return; } } } } }
+function firstFree(date){ for(const t of SLOTS){ if(date===TODAY&&tmin(t)<NOWMIN) continue; if(S.chairs.some(c=>!clash({date,time:t,dur:30,chair:c,did:'__',pid:'__'}))) return t; } return SLOTS[0]; }
+function syncAppt(first){
+  const f=$('af'); if(!f) return; const w=$('a-what'); const isEdit=!!$('a-id').value;
+  let t=null, pl=null;
+  if(w){ const [k,v]=w.value.split(':'); if(k==='plan'){ pl=PL(v); t=TXM[pl.c]; } else t=TXM[v]; }
+  $('a-tooth-w').hidden=isEdit||!t||!t.tooth||!!pl;
+  if(t&&!first){ $('a-did').value=pl?pl.did:'D'+(t.d+1); $('a-dur').value=String(t.dur); if(pl){ const last=lastVisit(pl.pid)||TODAY; let s=addD(last,t.gap||7); if(s<TODAY) s=TODAY; $('a-date').value=s; } }
+  if(t&&first&&!isEdit){ $('a-dur').value=String(t.dur); $('a-did').value=pl?pl.did:'D'+(t.d+1); }
+  const p=P($('a-pid').value);
+  let h='';
+  if(t){ const n=pl?pl.done+1:1; h=`<b>${esc(t.n)}</b> · ${pl?'visit '+n+' of '+pl.v+(visitLabel(t.c,n)?' ('+esc(visitLabel(t.c,n))+')':''):t.v>1?'needs '+t.v+' visits about '+t.gap+' days apart':'one visit'} · fee ${money(pl?net(pl):fee(t.c))}`; }
+  if(p&&p.alert) h+=(h?'<br>':'')+'⚠ Medical alert: '+esc(p.alert);
+  $('a-hint').innerHTML=h; $('a-hint').hidden=!h;
+  autoSlot(); checkAppt();
+}
+function readAppt(){ return {id:$('a-id').value,pid:$('a-pid').value,date:$('a-date').value,time:$('a-time').value,chair:$('a-chair').value,did:$('a-did').value,dur:Number($('a-dur').value)}; }
+function checkAppt(){ const o=readAppt(); let e=''; if(!o.date) e='Choose a date.'; else if(o.date<TODAY) e='This date has passed. Choose today or a later day.'; else if(o.date===TODAY&&tmin(o.time)<NOWMIN-15&&!o.id) e='This time has already passed today.'; else e=clash(o,o.id); $('a-err').textContent=e; return !e; }
+function saveAppt(){
+  if(!checkAppt()) return; const o=readAppt();
+  if(o.id){ const a=S.appts.find(x=>x.id===o.id); Object.assign(a,{date:o.date,time:o.time,chair:o.chair,did:o.did,dur:o.dur}); save(); closeModal(); render(); toast('Appointment moved to '+short(o.date)+', '+t12(o.time)); return; }
+  const [k,v]=$('a-what').value.split(':'); let pl;
+  if(k==='plan') pl=PL(v); else { const t=TXM[v]; pl={id:'TP-'+(++S.seq.pl+300),pid:o.pid,c:v,tooth:t.tooth?Number($('a-tooth').value):null,did:o.did,fee:fee(v),disc:0,v:t.v,done:0,st:'active',start:o.date}; S.plans.push(pl); }
+  const a={id:'A-'+(++S.seq.a+5000),pid:o.pid,plan:pl.id,did:o.did,chair:o.chair,date:o.date,time:o.time,dur:o.dur,st:'booked',visit:null}; S.appts.push(a);
+  save(); closeModal(); UI.day=o.date; render(); toast('Booked: '+P(o.pid).name+', '+short(o.date)+' at '+t12(o.time));
+}
+
+function patientForm(id){
+  const p=id?P(id):{name:'',phone:'+'+R().cc+' ',g:'F',age:'',area:'',alert:''};
+  return `<form class="panel" id="pf-form" aria-labelledby="pf-h" novalidate><h2 id="pf-h">${id?'Edit Patient':'New Patient'}</h2><input type="hidden" id="p-id" value="${id||''}">
+  <div class="fgrid"><label class="field" for="p-name">Full name<input id="p-name" value="${esc(p.name)}" autocomplete="off"></label>
+   <label class="field" for="p-phone">WhatsApp number<input id="p-phone" value="${esc(p.phone)}" inputmode="tel"></label>
+   <label class="field" for="p-g">Gender<select id="p-g">${opts([['F','Female'],['M','Male']],p.g)}</select></label>
+   <label class="field" for="p-age">Age<input id="p-age" type="number" min="1" max="110" value="${esc(p.age)}"></label>
+   <label class="field" for="p-area">Area<input id="p-area" value="${esc(p.area)}"></label>
+   <label class="field" for="p-alert">Medical alert<select id="p-alert">${opts(['','Diabetic','Allergic to penicillin','On blood thinner','Heart patient','High blood pressure','Pregnant'].map(x=>[x,x||'None']),p.alert)}</select></label></div>
+  <div class="hint">A medical alert shows in red on every appointment, so the dentist sees it before treatment.</div><div class="err" id="p-err" role="alert"></div>
+  <div class="actions"><button type="button" class="btn" data-act="close">Cancel</button><button type="submit" class="btn primary">${id?'Save':'Add patient'}</button></div></form>`;
+}
+function savePatient(){
+  const id=$('p-id').value, name=$('p-name').value.trim(), phone=$('p-phone').value.trim(), age=Number($('p-age').value);
+  if(name.length<3){ $('p-err').textContent='Write the patient\'s full name.'; return; }
+  if(phone.replace(/\D/g,'').length<10){ $('p-err').textContent='Write a full WhatsApp number with country code.'; return; }
+  if(!age||age<1||age>110){ $('p-err').textContent='Write the age in years.'; return; }
+  const data={name,phone,g:$('p-g').value,age,area:$('p-area').value.trim()||'—',alert:$('p-alert').value};
+  let p; if(id){ p=P(id); Object.assign(p,data); } else { p={id:'P-'+(++S.seq.p),...data,chart:{},since:TODAY}; S.patients.push(p); }
+  save(); closeModal(); UI.pid=p.id; location.hash='patient'; route(); toast(id?'Patient saved':'Patient added: '+p.id);
+  if(!id) setTimeout(()=>{ openModal(apptForm({pid:p.id,what:'new:CON'})); syncAppt(true); },300);
+}
+function payForm(pid,amt){
+  const b=bal(pid); const pl=S.plans.filter(x=>x.pid===pid&&(x.st==='active'||billed(x)>0)).sort((a,b)=>b.start.localeCompare(a.start));
+  return `<form class="panel" id="yf" aria-labelledby="yf-h" novalidate><h2 id="yf-h">Receive Payment · ${esc(P(pid).name)}</h2><input type="hidden" id="y-pid" value="${pid}">
+  <div class="profitbox"><div><label>Balance now</label><b class="num">${money(b)}</b></div><div><label>Payment</label><b class="num" id="y-show">${money(Math.max(0,amt||b))}</b></div><div><label>Balance after</label><b class="num" id="y-after">${money(b-Math.max(0,amt||b))}</b></div></div>
+  <div class="fgrid"><label class="field" for="y-amt">Amount (${R().cur})<input id="y-amt" type="number" min="1" inputmode="numeric" value="${Math.max(0,amt||b)||''}"></label>
+   <label class="field" for="y-mode">Method<select id="y-mode">${opts(R().modes)}</select></label>
+   <label class="field" for="y-plan">For<select id="y-plan">${opts([['','Account payment']].concat(pl.map(x=>[x.id,TXM[x.c].n+(x.tooth?' #'+x.tooth:'')])),pl[0]?pl[0].id:'')}</select></label>
+   <label class="field" for="y-date">Date<input type="date" id="y-date" value="${TODAY}" max="${TODAY}"></label></div>
+  ${b<=0?'<div class="hint">This patient has no balance. A payment now is kept as an advance for the next treatment.</div>':''}
+  <div class="err" id="y-err" role="alert"></div>
+  <div class="actions"><button type="button" class="btn" data-act="close">Cancel</button><button type="submit" class="btn primary">Save &amp; make receipt</button></div></form>`;
+}
+function syncPay(){ const pid=$('y-pid').value, a=Number($('y-amt').value)||0; $('y-show').textContent=money(a); $('y-after').textContent=money(bal(pid)-a); }
+function savePay(){ const pid=$('y-pid').value, a=Math.round(Number($('y-amt').value)||0); if(a<=0){ $('y-err').textContent='Write the amount received.'; return; } const d=$('y-date').value||TODAY; if(d>TODAY){ $('y-err').textContent='The date cannot be in the future.'; return; }
+  const x={id:'R-'+(++S.seq.py+2000),pid,date:d,amt:a,mode:$('y-mode').value,plan:$('y-plan').value||null}; S.pays.push(x); save(); render(); openModal(receiptHTML(x.id)); toast('Payment saved: '+money(a)); }
+
+function apptModal(id){
+  const a=S.appts.find(x=>x.id===id), p=P(a.pid); const open=['booked','waiting','inchair'].includes(a.st);
+  return `<div class="panel" role="dialog" aria-labelledby="am-h"><div class="head"><div><h2 id="am-h">${esc(p.name)}</h2><p>${dayName(a.date)}, ${nice(a.date)} · ${t12(a.time)} to ${t12(tstr(tmin(a.time)+a.dur))}</p></div>${stChip(a.st)}</div>
+  <div class="kv"><div><label>TREATMENT</label><div>${esc(what(a))}</div></div><div><label>DENTIST</label><div>${dDot(a.did)}</div></div><div><label>CHAIR</label><div>${esc(a.chair)}</div></div><div><label>PHONE</label><div class="mono">${esc(p.phone)}</div></div><div><label>BALANCE</label><div>${money(bal(p.id))}</div></div>${p.alert?`<div><label>MEDICAL ALERT</label><div class="c-bad" style="font-weight:700">⚠ ${esc(p.alert)}</div></div>`:''}</div>
+  <div class="actions" style="justify-content:flex-start">
+   ${open&&a.date<=TODAY?`<button type="button" class="btn primary" data-act="done" data-id="${a.id}">Mark done</button>`:''}
+   ${a.st==='booked'&&a.date===TODAY?`<button type="button" class="btn" data-act="setst" data-id="${a.id}" data-st="waiting">Arrived</button>`:''}
+   ${a.st==='waiting'?`<button type="button" class="btn" data-act="setst" data-id="${a.id}" data-st="inchair">To chair</button>`:''}
+   ${open&&a.date>=TODAY?`<button type="button" class="btn" data-act="move" data-id="${a.id}">Move</button>`:''}
+   ${open&&a.date>=TODAY?waLink(remindText(a),'WhatsApp reminder',false):''}
+   ${open&&a.date<=TODAY?`<button type="button" class="btn" data-act="setst" data-id="${a.id}" data-st="noshow">No-show</button>`:''}
+   ${open?`<button type="button" class="btn" data-act="setst" data-id="${a.id}" data-st="cancelled">Cancel appointment</button>`:''}
+   <button type="button" class="btn" data-act="openp" data-id="${p.id}">Patient file</button>
+   <button type="button" class="btn" data-act="close">Close</button></div></div>`;
+}
+function markDone(id){
+  const a=S.appts.find(x=>x.id===id); const pl=PL(a.plan); a.st='done'; let more='';
+  if(pl){ a.visit=++pl.done; if(pl.done>=pl.v){ pl.st='done'; const p=P(pl.pid); if(DONE_COND[pl.c]&&pl.tooth) p.chart[pl.tooth]=DONE_COND[pl.c]; } }
+  save(); render();
+  const p=P(a.pid), b=bal(a.pid), ch=pl?visitCharge(pl,a.visit):0;
+  if(pl&&pl.st==='active'&&!planNext(pl)) more=`<button type="button" class="btn" data-act="book" data-pid="${p.id}" data-plan="${pl.id}">Book visit ${pl.done+1} of ${pl.v}</button>`;
+  const lab=pl&&TXM[pl.c].lab&&a.visit===1&&!S.labs.some(l=>l.plan===pl.id);
+  openModal(`<div class="panel" role="dialog" aria-labelledby="dn-h"><h2 id="dn-h">Visit done · ${esc(p.name)}</h2>
+  <div class="profitbox"><div><label>Charged for this visit</label><b class="num">${money(ch)}</b></div><div><label>Balance now</label><b class="num">${money(b)}</b></div><div><label>Treatment</label><b style="font-size:15px">${pl?(pl.st==='done'?'Completed':'Visit '+pl.done+' of '+pl.v):'—'}</b></div></div>
+  ${pl&&pl.st==='done'&&DONE_COND[pl.c]&&pl.tooth?`<div class="hint">Tooth #${pl.tooth} is now marked as "${COND[DONE_COND[pl.c]].t}" on the tooth chart.</div>`:''}
+  ${lab?`<div class="hint">This treatment needs the dental lab. Send the impression to the lab so the ${pl.c==='DEN'?'denture':'crown'} is ready for the next visit.</div>`:''}
+  <div class="actions">${lab?`<button type="button" class="btn" data-act="newlab" data-plan="${pl.id}">Send to lab</button>`:''}${more}${b>0?`<button type="button" class="btn primary" data-act="pay" data-id="${p.id}">Receive ${money(b)}</button>`:''}<button type="button" class="btn" data-act="close">Close</button></div></div>`);
+  toast('Visit marked as done');
+}
+function toothModal(n){
+  const p=P(UI.pid), c=p.chart[n]||'none'; const plans=S.plans.filter(x=>x.pid===p.id&&x.tooth===n);
+  const txs=TX.filter(t=>t.tooth);
+  return `<div class="panel" role="dialog" aria-labelledby="tm-h"><h2 id="tm-h">Tooth ${esc(toothName(n))}</h2>
+  <fieldset class="seg"><legend>Condition of this tooth</legend>${Object.keys(COND).map(k=>`<label><input type="radio" name="cond" value="${k}" ${c===k?'checked':''}> ${COND[k].t}</label>`).join('')}</fieldset>
+  ${plans.length?`<div class="list">${plans.map(pl=>`<div class="li"><div><b>${esc(TXM[pl.c].n)}</b><div class="muted">${start2(pl)}</div></div>${pl.st==='done'?chip('Completed','good'):chip('Visit '+pl.done+' of '+pl.v,'accent')}</div>`).join('')}</div>`:''}
+  <label class="field" for="tm-tx">Plan a treatment on this tooth<select id="tm-tx"><option value="">Choose a treatment</option>${txs.map(t=>`<option value="${t.c}">${esc(t.n)} · ${money(fee(t.c))}${t.v>1?' · '+t.v+' visits':''}</option>`).join('')}</select></label>
+  <div class="actions"><button type="button" class="btn" data-act="close">Close</button><button type="button" class="btn" data-act="savecond" data-n="${n}">Save condition</button><button type="button" class="btn primary" data-act="plantooth" data-n="${n}">Book this treatment</button></div></div>`;
+}
+const start2=pl=>'Started '+short(pl.start)+' · '+D(pl.did).name;
+function addTxModal(pid){
+  return `<div class="panel" role="dialog" aria-labelledby="tx-h"><h2 id="tx-h">Add Treatment · ${esc(P(pid).name)}</h2><p class="sub" style="color:var(--muted);margin:0">Pick a treatment, then choose the day and time for the first visit.</p>
+  <div class="list">${TX.map(t=>`<div class="li"><div><b>${esc(t.n)}</b><div class="muted">${money(fee(t.c))}${t.v>1?' · '+t.v+' visits, about '+t.gap+' days apart':' · one visit'}${t.lab?' · uses dental lab':''}</div></div><button type="button" class="btn sm primary" data-act="booktx" data-pid="${pid}" data-c="${t.c}">Book</button></div>`).join('')}</div>
+  <div class="actions"><button type="button" class="btn" data-act="close">Close</button></div></div>`;
+}
+function labForm(planId){
+  const cand=S.plans.filter(pl=>TXM[pl.c].lab&&pl.st==='active'&&!S.labs.some(l=>l.plan===pl.id&&l.st!=='fitted'));
+  if(!cand.length) return `<div class="panel" role="dialog"><h2>Send to Lab</h2><div class="empty">Every crown, implant and denture in progress is already at the lab. Start a new crown, implant or denture from a patient's file first.</div><div class="actions"><button type="button" class="btn" data-act="close">Close</button></div></div>`;
+  const sel=planId||cand[0].id;
+  return `<form class="panel" id="lf" aria-labelledby="lf-h" novalidate><h2 id="lf-h">Send to Lab</h2>
+  <div class="fgrid"><label class="field" for="l-plan">Patient &amp; treatment<select id="l-plan">${opts(cand.map(pl=>[pl.id,P(pl.pid).name+' · '+TXM[pl.c].n+(pl.tooth?' #'+pl.tooth:'')]),sel)}</select></label>
+   <label class="field" for="l-lab">Lab<select id="l-lab">${opts(NAMES[REG].labs)}</select></label>
+   <label class="field" for="l-due">Ready by<input type="date" id="l-due" value="${ahead(7)}" min="${TODAY}"></label>
+   <label class="field" for="l-cost">Lab cost (${R().cur})<input type="number" id="l-cost" min="0" value="${Math.round(fee(PL(sel).c)*0.3/R().round)*R().round}"></label></div>
+  <div class="actions"><button type="button" class="btn" data-act="close">Cancel</button><button type="submit" class="btn primary">Save lab order</button></div></form>`;
+}
+function saveLab(){ const pl=PL($('l-plan').value); const l={id:'LB-'+(++S.seq.lb+100),pid:pl.pid,plan:pl.id,item:pl.c==='DEN'?'Full denture, upper & lower':(pl.c==='IMP'?'Implant crown #':'Porcelain crown #')+pl.tooth,lab:$('l-lab').value,sent:TODAY,due:$('l-due').value||ahead(7),st:'sent',cost:Number($('l-cost').value)||0}; S.labs.push(l); save(); closeModal(); location.hash='lab'; route(); toast('Lab order '+l.id+' saved'); }
+
+/* ---------- search, routing, events ---------- */
+function drawSearch(){ const q=$('gq').value.trim().toLowerCase(), box=$('gres'); if(q.length<2){ box.hidden=true; return; }
+  const hits=S.patients.filter(p=>(p.name+' '+p.phone.replace(/\s/g,'')+' '+p.phone+' '+p.id).toLowerCase().includes(q)).slice(0,8);
+  box.innerHTML=hits.length?hits.map(p=>`<button type="button" data-act="openp" data-id="${p.id}"><span><b>${esc(p.name)}</b> <small>${p.id} · ${esc(p.phone)}</small></span><small>${bal(p.id)>0?'Due '+money(bal(p.id)):'Patient'}</small></button>`).join(''):'<div class="empty">No patient found.</div>'; box.hidden=false; }
+const VIEWS={today:vToday,appointments:vAppointments,patients:vPatients,patient:vPatient,plans:vPlans,lab:vLab,payments:vPayments,whatsapp:vWhatsapp,reports:vReports};
+function updateChrome(){ $('today-chip').textContent=dayName(TODAY).slice(0,3)+', '+nice(TODAY); $('region').value=REG; $('usd').checked=USD; $('clinic-name').textContent=CLINIC+' · '+R().city; }
+function render(){ updateChrome(); $('main').innerHTML=VIEWS[UI.view](); const nv=UI.view==='patient'?'patients':UI.view; document.querySelectorAll('#nav a').forEach(a=>{ const on=a.dataset.v===nv; a.classList.toggle('on',on); if(on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); }); }
+function route(){ const h=location.hash.slice(1); UI.view=VIEWS[h]?h:'today'; if(UI.view==='patient'&&!UI.pid) UI.view='patients'; render(); window.scrollTo(0,0); }
+window.addEventListener('hashchange',route);
+function openPatient(id){ UI.pid=id; $('gq').value=''; $('gres').hidden=true; closeModal(); if(location.hash==='#patient') route(); else location.hash='patient'; }
+
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.search')) $('gres').hidden=true;
+  const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act, id=b.dataset.id;
+  if(b.tagName==='A'&&!b.href.includes('wa.me')) e.preventDefault();
+  if(a==='close') closeModal();
+  else if(a==='book'){ const pre={pid:b.dataset.pid,plan:b.dataset.plan,date:b.dataset.date,time:b.dataset.time,chair:b.dataset.chair}; if(!pre.pid){ const pl=pre.plan&&PL(pre.plan); pre.pid=pl?pl.pid:S.patients[(S.seq.a*7)%S.patients.length].id; } openModal(apptForm(pre)); syncAppt(true); }
+  else if(a==='booktx'){ openModal(apptForm({pid:b.dataset.pid,what:'new:'+b.dataset.c})); syncAppt(true); }
+  else if(a==='move'){ const x=S.appts.find(y=>y.id===id); openModal(apptForm({id:x.id,pid:x.pid,date:x.date<TODAY?TODAY:x.date,time:x.time,chair:x.chair,did:x.did,dur:x.dur})); syncAppt(true); }
+  else if(a==='newp') openModal(patientForm());
+  else if(a==='editp') openModal(patientForm(id));
+  else if(a==='openp') openPatient(id);
+  else if(a==='appt') openModal(apptModal(id));
+  else if(a==='done') markDone(id);
+  else if(a==='setst'){ const x=S.appts.find(y=>y.id===id); x.st=b.dataset.st; save(); closeModal(); render(); toast(P(x.pid).name+': '+ST[x.st][0]); }
+  else if(a==='pay'){ openModal(payForm(id)); }
+  else if(a==='receipt') openModal(receiptHTML(id));
+  else if(a==='rcpdf') receiptPDF(id);
+  else if(a==='addtx') openModal(addTxModal(b.dataset.pid));
+  else if(a==='tooth') openModal(toothModal(Number(b.dataset.n)));
+  else if(a==='savecond'){ const v=(document.querySelector('input[name=cond]:checked')||{}).value; const p=P(UI.pid); if(v==='none') delete p.chart[b.dataset.n]; else p.chart[b.dataset.n]=v; save(); closeModal(); render(); toast('Tooth #'+b.dataset.n+': '+COND[v||'none'].t); }
+  else if(a==='plantooth'){ const c=$('tm-tx').value; if(!c){ toast('Choose a treatment first'); $('tm-tx').focus(); return; } const n=Number(b.dataset.n); openModal(apptForm({pid:UI.pid,what:'new:'+c,tooth:n})); syncAppt(true); }
+  else if(a==='newlab'){ openModal(labForm(b.dataset.plan)); }
+  else if(a==='day'){ const n=Number(b.dataset.n); UI.day=n===0?TODAY:addD(UI.day,n); render(); }
+  else if(a==='ptab'){ UI.ptab=b.dataset.t; render(); }
+  else if(a==='wafilter'){ UI.wa=b.dataset.g; if(location.hash!=='#whatsapp') location.hash='whatsapp'; else render(); }
+  else if(a==='marksent'){ const k=b.dataset.k; if(S.sent[k]) delete S.sent[k]; else S.sent[k]=1; save(); render(); }
+  else if(a==='per'){ UI.per=b.dataset.p; render(); }
+  else if(a==='rview'){ const rep=runReport(b.dataset.k); openModal(`<div class="panel wide" role="dialog" aria-labelledby="rv-h"><div class="head"><div><h2 id="rv-h">${esc(rep.title)}</h2><p>${esc(CLINIC)} · ${esc(rep.sub)} · Amounts in ${cu()}</p></div><div class="btns"><button type="button" class="btn sm pdf" style="--sec:var(--sec-acc)" data-act="rpdf" data-k="${b.dataset.k}">PDF</button><button type="button" class="btn sm xls" data-act="rxls" data-k="${b.dataset.k}">Excel</button><button type="button" class="btn sm" data-act="close">Close</button></div></div>${reportTable(rep)}</div>`); }
+  else if(a==='rpdf'){ const rep=runReport(b.dataset.k); const buf=makePDF(rep); if(!buf){ toast('The PDF tool did not load. Check the internet and refresh the page.'); return; } saveFile(fileBase(rep)+'.pdf',buf); }
+  else if(a==='rxls'){ const rep=runReport(b.dataset.k); const x=makeXLSX(rep); saveFile(fileBase(rep)+x.ext,x.data); }
+  else if(a==='reset'){ if(b.dataset.sure){ S=seed(REG); DB.data[REG]=S; save(); delete b.dataset.sure; b.textContent='Reset demo data'; UI.pid=null; route(); toast('Demo data has been reset'); } else { b.dataset.sure='1'; b.textContent='Sure? Click again'; } }
+});
+document.addEventListener('submit',e=>{ e.preventDefault(); const f=e.target.id; if(f==='af') saveAppt(); else if(f==='pf-form') savePatient(); else if(f==='yf') savePay(); else if(f==='lf') saveLab(); });
+$('modal').addEventListener('click',e=>{ if(e.target.id==='modal') closeModal(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(!$('modal').hidden) closeModal(); $('gres').hidden=true; } });
+document.addEventListener('input',e=>{ const id=e.target.id;
+  if(id==='gq') drawSearch();
+  if(id==='pq'){ UI.pq=e.target.value; const tb=$('ptb'); if(tb) tb.innerHTML=patientRows(); }
+  if(id==='y-amt') syncPay();
+});
+document.addEventListener('change',e=>{ const t=e.target, id=t.id, v=t.value;
+  if(id==='region'){ switchRegion(v); return; }
+  if(id==='usd'){ USD=t.checked; save(); render(); toast('Amounts in '+cu()); return; }
+  if(id==='a-pid'){ const w=$('a-what'); if(w){ w.innerHTML=opts(whatOpts(v),whatOpts(v)[0][0]); } syncAppt(false); return; }
+  if(id==='a-what'){ syncAppt(false); return; }
+  if(t.closest&&t.closest('#af')){ if(id==='a-time'||id==='a-chair') delete $('af').dataset.auto; else autoSlot(); checkAppt(); return; }
+  if(id==='day'&&v){ UI.day=v; render(); }
+  if(id==='dfilter'){ UI.dfilter=v; render(); }
+  if(id==='pf'){ UI.pf=v; render(); }
+  if(t.dataset.lab){ const l=S.labs.find(x=>x.id===t.dataset.lab); l.st=v; save(); render(); toast(l.id+': '+t.options[t.selectedIndex].text); }
+});
+route();
+})();
+</script>
+</body>
+</html>
