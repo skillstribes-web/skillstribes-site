@@ -7,43 +7,12 @@
 <meta name="description" content="SkillsTribes Dental demo: dental clinic software with appointments by chair, tooth chart, treatment plans with several visits, payments, lab work and WhatsApp reminders.">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://skillstribes.com/dental/demo/">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230F766E'/%3E%3Cpath d='M10 7c-3 0-4.5 3-3.5 7 .6 2.5 1.6 4 2 7 .3 2.4 1 4 2.2 4 1.4 0 1.6-2.3 2.3-5 .4-1.5 1.8-1.5 2.2 0 .7 2.7.9 5 2.3 5 1.2 0 1.9-1.6 2.2-4 .4-3 1.4-4.5 2-7 1-4-.5-7-3.5-7-2 0-3 1-4.5 1S12 7 10 7z' fill='white'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a1020'/%3E%3Ccircle cx='16' cy='8' r='4.2' fill='%235b8cff'/%3E%3Ccircle cx='8' cy='23' r='4.2' fill='%23a58bff'/%3E%3Ccircle cx='24' cy='23' r='4.2' fill='%238fb0ff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Hanken+Grotesk:wght@400..700&family=IBM+Plex+Mono:wght@400;500&family=Unbounded:wght@500..700&display=swap">
 <style>
 /* Layout: navy side rail (menu) beside a scrolling work area with a global search bar; rail turns into a top bar on phones. */
-:root{
-  --bg:#F2F4F8; --surface:#FFFFFF; --surface2:#EDF0F5; --ink:#151A24; --muted:#555D6E; --line:#DDE2EA;
-  --rail:#14213D; --rail2:#22325C; --on-rail:#ECEFF6; --on-rail-muted:#AEB7CC;
-  --accent:#C2410C; --accent-ink:#FFFFFF; --accent-soft:#FFEDD5; --accent-text:#9A3412;
-  --good:#166534; --good-soft:#DCFCE7; --warn:#8A4B06; --warn-soft:#FEF3C7;
-  --bad:#B42318; --bad-soft:#FEE2E2; --info:#1E40AF; --info-soft:#DBEAFE;
-  --neutral-soft:#E9ECF2; --neutral-text:#3F4654; --overlay:rgba(12,16,26,.55);
-  --bar-in:#1E40AF; --bar-out:#C2410C;
-  --sec-acc:#1E3A8A; --sec-ops:#B4530E; --sec-inv:#166534; --sec-hr:#334155; --sec-doc:#6D28D9; --xls:#15803D;
-  --font-display:'Archivo', 'Helvetica Neue', Arial, sans-serif;
-  --font-body:'Source Sans 3', 'Segoe UI', Roboto, Arial, sans-serif;
-  --font-mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
-}
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#0E121A; --surface:#161B26; --surface2:#1E2432; --ink:#E8EBF2; --muted:#A4ABBB; --line:#2A3142;
-  --rail:#0A0F1C; --rail2:#1B2645; --on-rail:#ECEFF6; --on-rail-muted:#A3ADC4;
-  --accent:#C2410C; --accent-ink:#FFFFFF; --accent-soft:#3A1E10; --accent-text:#FDBA8C;
-  --good:#6EE7A8; --good-soft:#12321F; --warn:#FCD34D; --warn-soft:#3A2E0E;
-  --bad:#FCA5A5; --bad-soft:#3B1515; --info:#93C5FD; --info-soft:#15264A;
-  --neutral-soft:#262D3D; --neutral-text:#C9CFDB; --overlay:rgba(0,0,0,.65);
-  --bar-in:#6B9BF5; --bar-out:#F08A4B; color-scheme:dark;
-}}
-:root[data-theme="dark"]{
-  --bg:#0E121A; --surface:#161B26; --surface2:#1E2432; --ink:#E8EBF2; --muted:#A4ABBB; --line:#2A3142;
-  --rail:#0A0F1C; --rail2:#1B2645; --on-rail:#ECEFF6; --on-rail-muted:#A3ADC4;
-  --accent:#C2410C; --accent-ink:#FFFFFF; --accent-soft:#3A1E10; --accent-text:#FDBA8C;
-  --good:#6EE7A8; --good-soft:#12321F; --warn:#FCD34D; --warn-soft:#3A2E0E;
-  --bad:#FCA5A5; --bad-soft:#3B1515; --info:#93C5FD; --info-soft:#15264A;
-  --neutral-soft:#262D3D; --neutral-text:#C9CFDB; --overlay:rgba(0,0,0,.65);
-  --bar-in:#6B9BF5; --bar-out:#F08A4B; color-scheme:dark;
-}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:15px; line-height:1.45}
@@ -249,24 +218,54 @@ select.status{height:34px; border-radius:7px; border:1px solid var(--line); back
 }
 @media (prefers-reduced-motion: reduce){*{transition:none!important; animation:none!important}}
 
-/* ---- Dental colours: teal accent on a deep sea-blue rail ---- */
+/* ---- Clinic look: same navy, blue and fonts as the SkillsTribes clinic app ---- */
 :root{
-  --rail:#0B2A36; --rail2:#16414F; --on-rail:#ECF3F5; --on-rail-muted:#A9BEC6;
-  --accent:#0F766E; --accent-ink:#FFFFFF; --accent-soft:#CCFBF1; --accent-text:#115E59;
-  --bar-in:#0F766E; --bar-out:#B45309;
-  --d1:#0F766E; --d2:#7C3AED; --d3:#B45309;
-  --sec-acc:#0F766E; --sec-ops:#1E40AF; --sec-inv:#B45309;
+  color-scheme:dark;
+  --bg:#0a1020; --surface:#131f3b; --surface2:#0f1830; --ink:#eef2fb; --muted:#a0acc6; --line:#243357;
+  --rail:#0f1830; --rail2:#1a2a52; --on-rail:#eef2fb; --on-rail-muted:#a0acc6;
+  --accent:#5b8cff; --accent-ink:#07122e; --accent-soft:rgba(91,140,255,.16); --accent-text:#8fb0ff;
+  --good:#62c295; --good-soft:rgba(98,194,149,.14); --warn:#e6b062; --warn-soft:rgba(230,176,98,.13);
+  --bad:#ec8579; --bad-soft:rgba(236,133,121,.14); --info:#8fb0ff; --info-soft:rgba(91,140,255,.14);
+  --neutral-soft:#1a2747; --neutral-text:#c3cce0; --overlay:rgba(3,7,18,.72);
+  --bar-in:#5b8cff; --bar-out:#e6b062; --d1:#5b8cff; --d2:#a58bff; --d3:#e6b062;
+  --sec-acc:#2750d6; --xls:#1d7a52; --glow:rgba(91,140,255,.16);
+  --font-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --font-body:"Hanken Grotesk","Segoe UI",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --font-brand:"Unbounded","Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --rail:#071A22; --rail2:#123642; --on-rail:#ECF3F5; --on-rail-muted:#9FB4BC;
-  --accent:#0F766E; --accent-ink:#FFFFFF; --accent-soft:#0E2F2C; --accent-text:#5EEAD4;
-  --bar-in:#2DD4BF; --bar-out:#F59E0B; --d1:#2DD4BF; --d2:#A78BFA; --d3:#F59E0B;
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){
+  color-scheme:light;
+  --bg:#f6f8fd; --surface:#FFFFFF; --surface2:#e9eef9; --ink:#101a33; --muted:#4a5878; --line:#d5ddef;
+  --rail:#FFFFFF; --rail2:#e9eef9; --on-rail:#101a33; --on-rail-muted:#4a5878;
+  --accent:#2750d6; --accent-ink:#FFFFFF; --accent-soft:#e3eafc; --accent-text:#1b3aa8;
+  --good:#1d7a52; --good-soft:#e1f3ea; --warn:#8a5a0c; --warn-soft:#fbf0dc; --bad:#b23a2d; --bad-soft:#fbe5e2; --info:#1b3aa8; --info-soft:#e3eafc;
+  --neutral-soft:#e9eef9; --neutral-text:#4a5878; --overlay:rgba(16,26,51,.55);
+  --bar-in:#2750d6; --bar-out:#b7791f; --d1:#2750d6; --d2:#6a3df0; --d3:#b7791f; --glow:rgba(39,80,214,.10);
 }}
-:root[data-theme="dark"]{
-  --rail:#071A22; --rail2:#123642; --on-rail:#ECF3F5; --on-rail-muted:#9FB4BC;
-  --accent:#0F766E; --accent-ink:#FFFFFF; --accent-soft:#0E2F2C; --accent-text:#5EEAD4;
-  --bar-in:#2DD4BF; --bar-out:#F59E0B; --d1:#2DD4BF; --d2:#A78BFA; --d3:#F59E0B;
-}
+body{-webkit-font-smoothing:antialiased}
+h1,h2,h3{letter-spacing:-.02em}
+.rail{border-right:1px solid var(--line)}
+.brand{gap:10px}
+.brand .logo{background:none; width:40px; height:40px}
+.logo .orbit path{fill:none; stroke:var(--line); stroke-width:1.6}
+.logo .c1{fill:var(--accent)} .logo .c2{fill:var(--d2)} .logo .c3{fill:var(--accent-text)}
+.brand b{font-family:var(--font-brand); font-weight:600; font-size:17px; letter-spacing:-.01em}
+.brand b em{font-style:normal; color:var(--accent-text)}
+.navlabel{font-family:var(--font-mono); font-weight:500; letter-spacing:.12em}
+.nav a.on{background:var(--accent-soft); box-shadow:inset 3px 0 0 var(--accent); color:var(--on-rail)}
+.btn{border-radius:6px}
+.card,.sw,.panel{border-radius:12px}
+.brief{background:radial-gradient(600px 220px at 10% 0%, var(--glow), transparent 70%), var(--surface); color:var(--ink); border:1px solid var(--line)}
+.brief .top span,.brief label{color:var(--muted)}
+.brief label{font-family:var(--font-mono); font-size:11.5px; letter-spacing:.08em; text-transform:uppercase}
+.chip{background:transparent!important; border:1px solid currentColor; font:500 11.5px var(--font-mono); letter-spacing:.04em; padding:2px 9px}
+.chip.neutral{color:var(--muted)}
+.kpi .label,th{font-family:var(--font-mono); font-weight:500; letter-spacing:.1em}
+.trow .tm,.sched .tl,.ap b{font-family:var(--font-mono)}
+.ap b{font-size:12.5px; font-weight:600}
+.demo-note{border:1px solid var(--line)}
+.sched .ch{font-family:var(--font-mono); font-weight:500; letter-spacing:.06em; text-transform:uppercase; font-size:12px}
 a.plink{color:inherit; font-weight:700; text-decoration:none; border-bottom:1px dotted var(--muted)}
 a.plink:hover{color:var(--accent-text)}
 .dot{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0}
@@ -309,7 +308,7 @@ a.plink:hover{color:var(--accent-text)}
 .tooth:hover{border-color:var(--accent)}
 .tooth i{width:18px; height:18px; border-radius:6px; background:var(--surface2); display:block}
 .tooth.c-decay i{background:var(--bad)}
-.tooth.c-filled i{background:var(--info)}
+.tooth.c-filled i{background:var(--d2)}
 .tooth.c-rct i{background:var(--warn)}
 .tooth.c-crown i{background:var(--accent)}
 .tooth.c-implant i{background:var(--good)}
@@ -353,8 +352,8 @@ a.plink:hover{color:var(--accent-text)}
 <div class="app">
   <aside class="rail">
     <div class="brand">
-      <div class="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 3.5c-2.6 0-3.8 2.4-3 5.6.5 1.9 1.3 3.1 1.6 5.4.3 2.3.9 6 2.2 6 1.2 0 1.4-2.4 2-4.6.4-1.3 2-1.3 2.4 0 .6 2.2.8 4.6 2 4.6 1.3 0 1.9-3.7 2.2-6 .3-2.3 1.1-3.5 1.6-5.4.8-3.2-.4-5.6-3-5.6-1.8 0-2.7.9-4 .9s-2.2-.9-4-.9z"/></svg></div>
-      <div><b>SkillsTribes Dental</b><small id="clinic-name">Demo Dental Care</small></div>
+      <div class="logo"><svg viewBox="0 0 32 32" width="40" height="40" aria-hidden="true"><g class="orbit"><path d="M16 6 L6.5 23 L25.5 23 Z"/><circle class="c1" cx="16" cy="6" r="4.2"/><circle class="c2" cx="6.5" cy="23" r="4.2"/><circle class="c3" cx="25.5" cy="23" r="4.2"/></g></svg></div>
+      <div><b>Skills<em>Tribes</em> Dental</b><small id="clinic-name">Demo Dental Care</small></div>
     </div>
     <nav class="nav" aria-label="Main menu" id="nav">
       <div class="navgroup"><div class="navlabel">DAILY</div>
@@ -715,11 +714,11 @@ function vPatient(){
   const b=bal(p.id), plans=S.plans.filter(x=>x.pid===p.id).sort((a,b)=>(a.st===b.st?0:a.st==='active'?-1:1)||b.start.localeCompare(a.start));
   const visits=S.appts.filter(a=>a.pid===p.id&&a.st!=='cancelled').sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
   const led=ledger(p.id);
-  const legend=Object.keys(COND).filter(k=>k!=='none').map(k=>`<span><i style="background:var(--${{decay:'bad',filled:'info',rct:'warn',crown:'accent',implant:'good',missing:'surface2'}[k]});${k==='missing'?'border:2px solid var(--muted)':''}"></i>${COND[k].t}</span>`).join('')+'<span><i style="background:var(--bar-out);border-radius:50%"></i>Treatment planned</span>';
+  const legend=Object.keys(COND).filter(k=>k!=='none').map(k=>`<span><i style="background:var(--${{decay:'bad',filled:'d2',rct:'warn',crown:'accent',implant:'good',missing:'surface2'}[k]});${k==='missing'?'border:2px solid var(--muted)':''}"></i>${COND[k].t}</span>`).join('')+'<span><i style="background:var(--bar-out);border-radius:50%"></i>Treatment planned</span>';
   const pcards=plans.map(pl=>{ const nx=planNext(pl); const t=TXM[pl.c];
     return `<div class="pcard"><div class="top"><b>${esc(t.n)}${pl.tooth?' · tooth #'+pl.tooth:''}</b>${pl.st==='done'?chip('Completed','good'):pl.done?chip('In progress','accent'):chip('Not started','info')}</div>
     ${pl.v>1?prog(pl):''}<div class="meta">${dDot(pl.did)} · Fee ${money(net(pl))}${pl.disc?' (after '+money(pl.disc)+' discount)':''} · Billed so far ${money(billed(pl))}</div>
-    ${pl.st==='active'?`<div class="meta">${nx?'Next: '+short(nx.date)+', '+t12(nx.time)+' · '+esc(visitLabel(pl.c,visitNo(nx))||'Visit'):`<span class="c-bad" style="font-weight:700">Next visit not booked</span>`}</div>
+    ${pl.st==='active'?`<div class="meta">${nx?'Next: '+short(nx.date)+', '+t12(nx.time)+(pl.v>1?' · '+esc(visitLabel(pl.c,visitNo(nx))):''):`<span class="c-bad" style="font-weight:700">Next visit not booked</span>`}</div>
     ${!nx?`<div><button type="button" class="btn sm primary" data-act="book" data-pid="${p.id}" data-plan="${pl.id}">Book visit ${pl.done+1} of ${pl.v}</button></div>`:''}`:''}</div>`; }).join('');
   return `<a class="back" href="#patients">← All patients</a>
   <div class="phead"><div><h1>${esc(p.name)}</h1><div class="info"><span>${p.id}</span><span>${p.g==='F'?'Female':'Male'}, ${p.age} years</span><span class="mono">${esc(p.phone)}</span><span>${esc(p.area)}</span><span>Patient since ${nice(p.since)}</span></div>
