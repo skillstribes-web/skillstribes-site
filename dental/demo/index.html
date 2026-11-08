@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>SkillsTribes Dental Demo</title>
-<meta name="description" content="SkillsTribes Dental demo: dental clinic software with appointments by chair, tooth chart, treatment plans with several visits, payments, lab work and WhatsApp reminders.">
+<title>Dental Clinic Appointment Demo</title>
+<meta name="description" content="Dental Clinic Appointment demo: dental clinic software with appointments by chair, tooth chart, treatment plans with several visits, payments, lab work and WhatsApp reminders.">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://skillstribes.com/dental/demo/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231673C8'/%3E%3Cpath d='M10 7c-3 0-4.5 3-3.5 7 .6 2.5 1.6 4 2 7 .3 2.4 1 4 2.2 4 1.4 0 1.6-2.3 2.3-5 .4-1.5 1.8-1.5 2.2 0 .7 2.7.9 5 2.3 5 1.2 0 1.9-1.6 2.2-4 .4-3 1.4-4.5 2-7 1-4-.5-7-3.5-7-2 0-3 1-4.5 1S12 7 10 7z' fill='white'/%3E%3C/svg%3E">
@@ -391,7 +391,7 @@ a.plink:hover{color:var(--accent-text)}
 <body>
 <div class="app">
   <header class="top">
-    <div class="ttl"><div><h1>Demo Dental Care</h1><small id="clinic-name">SkillsTribes Dental · Lahore</small></div><div class="usr">reception <button class="lo" type="button" data-act="logout">Log out</button></div></div>
+    <div class="ttl"><div><h1>Demo Dental Care</h1><small id="clinic-name">Dental Clinic Appointment · Lahore</small></div><div class="usr">reception <button class="lo" type="button" data-act="logout">Log out</button></div></div>
     <nav class="nav" aria-label="Main menu" id="nav"><a href="#today" data-v="today">Today</a> <span class="sep">|</span> <a href="#appointments" data-v="appointments">Appointments</a> <span class="sep">|</span> <a href="#patients" data-v="patients">Patients</a> <span class="sep">|</span> <a href="#plans" data-v="plans">Treatment plans</a> <span class="sep">|</span> <a href="#lab" data-v="lab">Lab work</a> <span class="sep">|</span> <a href="#payments" data-v="payments">Payments</a> <span class="sep">|</span> <a href="#reports" data-v="reports">Earnings &amp; reports</a> <span class="sep">|</span> <a href="#whatsapp" data-v="whatsapp">WhatsApp</a></nav>
   </header>
   <main class="main">
@@ -408,7 +408,7 @@ a.plink:hover{color:var(--accent-text)}
         <label class="usdtog" for="usd"><input type="checkbox" id="usd"> Show in USD</label>
       </div>
     </div>
-    <div class="demo-note"><a href="https://skillstribes.com/clinics/#services">← Back to skillstribes.com</a> · This is a demo of SkillsTribes Dental. All patients, phone numbers and amounts are made up. Try booking an appointment, marking a visit as done, opening a patient's tooth chart or receiving a payment.</div>
+    <div class="demo-note"><a href="https://skillstribes.com/clinics/#services">← Back to skillstribes.com</a> · This is a demo of Dental Clinic Appointment. All patients, phone numbers and amounts are made up. Try booking an appointment, marking a visit as done, opening a patient's tooth chart or receiving a payment.</div>
     <div class="view" id="main"></div>
     <div class="foot"><span>✓ Automatic backup ON · last backup today, 3:00 AM</span><span>·</span><button type="button" data-act="reset">Reset demo data</button></div>
   </main>
@@ -876,7 +876,7 @@ function makePDF(rep){
   rep.rows.forEach(r=>draw(r.map((v,i)=>fmtCell(v,rep.cols[i].t))));
   if(!rep.rows.length){ doc.setTextColor(85,93,110); doc.text('No records for this period.',M,y+14); }
   if(rep.totals) draw(rep.totals.map((v,i)=>i?fmtCell(v,rep.cols[i].t):v),{bold:true,total:true});
-  const n=doc.getNumberOfPages(); for(let p=1;p<=n;p++){ doc.setPage(p); doc.setFontSize(7.5); doc.setTextColor(120,128,140); doc.text('SkillsTribes Dental demo | generated '+PDFS(nice(TODAY))+' | page '+p+' of '+n,M,H-16); }
+  const n=doc.getNumberOfPages(); for(let p=1;p<=n;p++){ doc.setPage(p); doc.setFontSize(7.5); doc.setTextColor(120,128,140); doc.text('Dental Clinic Appointment demo | generated '+PDFS(nice(TODAY))+' | page '+p+' of '+n,M,H-16); }
   return doc.output('arraybuffer');
 }
 function makeXLSX(rep){
@@ -893,7 +893,7 @@ function receiptHTML(id){
   const x=S.pays.find(y=>y.id===id); const p=P(x.pid), pl=PL(x.plan);
   return `<div class="panel" role="dialog" aria-labelledby="rc-h"><div class="docsheet"><div class="dh"><div><b>${esc(CLINIC)}</b><div class="muted" style="color:var(--muted);font-size:13px">Dental clinic · ${esc(R().city)}, ${esc(R().name)}</div></div><div style="text-align:right"><b id="rc-h">Receipt</b><div class="mono">${x.id}</div></div></div>
   <div class="kv"><div><label>DATE</label><div>${nice(x.date)}</div></div><div><label>PATIENT</label><div>${esc(p.name)} (${p.id})</div></div><div><label>FOR</label><div>${pl?esc(TXM[pl.c].n)+(pl.tooth?' #'+pl.tooth:''):'Account payment'}</div></div><div><label>METHOD</label><div>${esc(x.mode)}</div></div><div><label>AMOUNT RECEIVED</label><div style="font-family:var(--font-display);font-size:24px;font-weight:800">${money(x.amt)}</div></div><div><label>BALANCE NOW</label><div>${money(bal(p.id))}</div></div></div>
-  <div class="muted" style="color:var(--muted);font-size:13px">Thank you for visiting. This is a computer-made receipt from the SkillsTribes Dental demo.</div></div>
+  <div class="muted" style="color:var(--muted);font-size:13px">Thank you for visiting. This is a computer-made receipt from the Dental Clinic Appointment demo.</div></div>
   <div class="actions"><button type="button" class="btn" data-act="close">Close</button>${waLink(`${R().greet} ${p.name}, we have received ${money(x.amt)} on ${nice(x.date)} (receipt ${x.id}). Your balance is now ${money(bal(p.id))}. Thank you, ${CLINIC}.`,'Send on WhatsApp',false)}<button type="button" class="btn primary" data-act="rcpdf" data-id="${x.id}">Download PDF</button></div></div>`;
 }
 function receiptPDF(id){
@@ -903,7 +903,7 @@ function receiptPDF(id){
   doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(85,93,110); doc.text(PDFS('Dental clinic | '+R().city+', '+R().name),M,y+14); doc.text(x.id,doc.internal.pageSize.getWidth()-M,y+14,{align:'right'});
   doc.setDrawColor(21,26,36); doc.line(M,y+24,doc.internal.pageSize.getWidth()-M,y+24); y+=50; doc.setTextColor(21,26,36);
   [['Date',nice(x.date)],['Patient',p.name+' ('+p.id+')'],['For',pl?TXM[pl.c].n+(pl.tooth?' #'+pl.tooth:''):'Account payment'],['Method',x.mode],['Amount received',money(x.amt)],['Balance now',money(bal(p.id))]].forEach(r=>{ doc.setFont('helvetica','bold'); doc.text(PDFS(r[0]),M,y); doc.setFont('helvetica','normal'); doc.text(PDFS(r[1]),M+120,y); y+=20; });
-  doc.setFontSize(8); doc.setTextColor(120,128,140); doc.text('SkillsTribes Dental demo receipt',M,y+20);
+  doc.setFontSize(8); doc.setTextColor(120,128,140); doc.text('Dental Clinic Appointment demo receipt',M,y+20);
   saveFile('Receipt_'+x.id+'.pdf',doc.output('arraybuffer'));
 }
 
@@ -1065,7 +1065,7 @@ function drawSearch(){ const q=$('gq').value.trim().toLowerCase(), box=$('gres')
   const hits=S.patients.filter(p=>(p.name+' '+p.phone.replace(/\s/g,'')+' '+p.phone+' '+p.id).toLowerCase().includes(q)).slice(0,8);
   box.innerHTML=hits.length?hits.map(p=>`<button type="button" data-act="openp" data-id="${p.id}"><span><b>${esc(p.name)}</b> <small>${p.id} · ${esc(p.phone)}</small></span><small>${bal(p.id)>0?'Due '+money(bal(p.id)):'Patient'}</small></button>`).join(''):'<div class="empty">No patient found.</div>'; box.hidden=false; }
 const VIEWS={today:vToday,appointments:vAppointments,patients:vPatients,patient:vPatient,plans:vPlans,lab:vLab,payments:vPayments,whatsapp:vWhatsapp,reports:vReports};
-function updateChrome(){ $('today-chip').textContent=dayName(TODAY).slice(0,3)+', '+nice(TODAY); $('region').value=REG; $('usd').checked=USD; $('clinic-name').textContent='SkillsTribes Dental · '+R().city+', '+R().name; }
+function updateChrome(){ $('today-chip').textContent=dayName(TODAY).slice(0,3)+', '+nice(TODAY); $('region').value=REG; $('usd').checked=USD; $('clinic-name').textContent='Dental Clinic Appointment · '+R().city+', '+R().name; }
 function render(){ updateChrome(); $('main').innerHTML=VIEWS[UI.view](); const nv=UI.view==='patient'?'patients':UI.view; document.querySelectorAll('#nav a').forEach(a=>{ const on=a.dataset.v===nv; a.classList.toggle('on',on); if(on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); }); }
 function route(){ const h=location.hash.slice(1); UI.view=VIEWS[h]?h:'today'; if(UI.view==='patient'&&!UI.pid) UI.view='patients'; render(); window.scrollTo(0,0); }
 window.addEventListener('hashchange',route);
