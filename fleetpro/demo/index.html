@@ -1,0 +1,679 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fleet Pro Demo · Skills Tribes</title>
+<meta name="description" content="Live demo of Fleet Pro: trips with builty, trip expenses and profit, party ledger, by SkillsTribes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one working column — top bar with screen tabs, then the active screen (Trips or Trip expenses) */
+:root {
+  --bg: #f3f5f4;
+  --surface: #ffffff;
+  --ink: #18201d;
+  --muted: #5d6a65;
+  --line: #d8dfdc;
+  --accent: #d97a06;
+  --accent-ink: #ffffff;
+  --accent-soft: #fdf0dc;
+  --good: #1f7a4d;
+  --good-soft: #e1f2e8;
+  --warn: #8a5a00;
+  --warn-soft: #fff3d6;
+  --bad: #b3261e;
+  --c1: #d97a06; --c2: #2f6f8f; --c3: #7a8b3a; --c4: #a14d6b; --c5: #6b6f76;
+  --f-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121715; --surface: #1b221f; --ink: #e8eeeb; --muted: #9aa8a2; --line: #2e3833;
+    --accent: #f0a23a; --accent-ink: #1b1306; --accent-soft: #3a2a12;
+    --good: #6fd19c; --good-soft: #17352a; --warn: #f2c66b; --warn-soft: #3a2f14; --bad: #ff8a80;
+    --c1: #f0a23a; --c2: #6fb3d6; --c3: #b5c96a; --c4: #e08aa8; --c5: #a3a8b0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121715; --surface: #1b221f; --ink: #e8eeeb; --muted: #9aa8a2; --line: #2e3833;
+  --accent: #f0a23a; --accent-ink: #1b1306; --accent-soft: #3a2a12;
+  --good: #6fd19c; --good-soft: #17352a; --warn: #f2c66b; --warn-soft: #3a2f14; --bad: #ff8a80;
+  --c1: #f0a23a; --c2: #6fb3d6; --c3: #b5c96a; --c4: #e08aa8; --c5: #a3a8b0;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px;
+}
+.wrap { max-width: 980px; margin: 0 auto; display: grid; gap: 20px; }
+header.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.brand { font-family: var(--f-display); font-weight: 700; font-size: 26px; letter-spacing: .01em; margin: 0; }
+.brand span { color: var(--accent); }
+.sample { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--warn); background: var(--warn-soft); padding: 3px 8px; border-radius: 4px; }
+nav.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+nav.tabs a { text-decoration: none; color: var(--muted); font-weight: 600; padding: 8px 14px; border-bottom: 3px solid transparent; margin-bottom: -1px; }
+nav.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--accent); }
+nav.tabs a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.view { display: grid; gap: 20px; }
+h2 { font-family: var(--f-display); font-weight: 700; font-size: 20px; margin: 0; text-wrap: balance; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; min-width: 0; }
+.card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.builty { font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+.builty b { color: var(--ink); font-weight: 500; }
+form.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.field { display: grid; gap: 5px; min-width: 0; align-content: start; }
+label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+input, select {
+  font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+  padding: 9px 10px; width: 100%; min-width: 0;
+}
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+input.num { font-family: var(--f-mono); font-size: 14px; }
+input[readonly] { background: transparent; border-style: dashed; }
+.field.err input, .field.err select { border-color: var(--bad); }
+.msg { font-size: 12px; color: var(--bad); }
+.route { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: end; }
+.route .arrow { padding-bottom: 10px; color: var(--accent); font-weight: 700; }
+.balance-row { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px dashed var(--line); padding-top: 14px; }
+.balance { font-size: 14px; color: var(--muted); }
+.balance strong { font-family: var(--f-mono); font-weight: 500; font-size: 18px; color: var(--ink); margin-left: 6px; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+button { font: inherit; font-weight: 600; border-radius: 6px; padding: 10px 18px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button.link { border: 0; background: none; padding: 0; color: inherit; font-family: var(--f-mono); font-weight: 500; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+button.x { padding: 4px 10px; font-size: 13px; color: var(--muted); }
+button:hover { filter: brightness(.96); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 2px; }
+.stat .k { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.stat .v { font-family: var(--f-mono); font-size: 20px; font-variant-numeric: tabular-nums; }
+.stat.hl .v { color: var(--accent); }
+.stat.pos .v { color: var(--good); }
+.stat.neg .v { color: var(--bad); }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+#tripTable { min-width: 780px; }
+#expTable { min-width: 480px; }
+th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+td.n, th.n { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+td.mono { font-family: var(--f-mono); font-size: 13px; }
+tr.new td { background: var(--accent-soft); }
+tfoot td { font-weight: 600; border-bottom: 0; }
+.pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; border: 0; cursor: pointer; }
+.pill.route-on { background: var(--warn-soft); color: var(--warn); }
+.pill.done { background: var(--good-soft); color: var(--good); }
+.sub { color: var(--muted); font-size: 13px; }
+.pos { color: var(--good); }
+.neg { color: var(--bad); }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 8px; font-weight: 600; }
+.hint { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+.trip-pick { display: grid; gap: 14px; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); align-items: end; }
+.trip-info { font-size: 14px; color: var(--muted); }
+.trip-info strong { color: var(--ink); font-size: 16px; display: block; }
+.two { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+.mix { display: flex; height: 14px; border-radius: 4px; overflow: hidden; background: var(--line); margin: 4px 0 12px; }
+.mix span { display: block; height: 100%; }
+.legend { display: grid; gap: 6px; font-size: 14px; }
+.legend div { display: grid; grid-template-columns: 12px 1fr auto auto; gap: 10px; align-items: center; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; }
+.legend .amt { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.legend .pct { font-family: var(--f-mono); color: var(--muted); font-size: 13px; width: 3.5em; text-align: right; }
+.empty { color: var(--muted); padding: 16px 0; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 8px; }
+#partyTable { min-width: 460px; }
+#ledgerTable { min-width: 600px; }
+#partyRows tr { cursor: pointer; }
+#partyRows tr:hover td { background: var(--bg); }
+#partyRows tr.sel td { background: var(--accent-soft); }
+#partyRows tr.sel td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; padding: 2px 7px; border-radius: 4px; }
+.tag.trip { background: var(--warn-soft); color: var(--warn); }
+.tag.pay { background: var(--good-soft); color: var(--good); }
+.owed { color: var(--accent); font-weight: 600; }
+.ledger-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: baseline; margin-bottom: 14px; }
+.ledger-head .bal { font-family: var(--f-mono); font-size: 22px; }
+.ledger-head .bal small { display: block; font-family: var(--f-body); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); text-align: right; }
+.dash-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px; }
+.greet h1 { font-family: var(--f-display); font-weight: 700; font-size: 28px; margin: 0; text-wrap: balance; }
+.greet p { margin: 2px 0 0; color: var(--muted); }
+a.btn { text-decoration: none; font-weight: 600; border-radius: 6px; padding: 10px 16px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+a.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+a.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.stat .d { font-size: 13px; color: var(--muted); }
+.bars { display: grid; gap: 12px; }
+.bars .b { display: grid; grid-template-columns: minmax(84px, 120px) 1fr auto; gap: 12px; align-items: center; font-size: 14px; }
+.bars .b .nm { font-family: var(--f-mono); font-size: 13px; }
+.bars .b .nm small { display: block; font-family: var(--f-body); color: var(--muted); font-size: 12px; }
+.bars .track { height: 12px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+.bars .fill { height: 100%; background: var(--accent); border-radius: 3px; }
+.bars .fill.neg { background: var(--bad); }
+.bars .val { font-family: var(--f-mono); font-variant-numeric: tabular-nums; min-width: 6.5em; text-align: right; }
+.alist { display: grid; gap: 0; }
+.alist .a { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.alist .a:last-child { border-bottom: 0; }
+.alist .a .r { font-family: var(--f-mono); font-variant-numeric: tabular-nums; text-align: right; }
+.sev { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.sev.bad { background: var(--bad); color: var(--surface); }
+.sev.warn { background: var(--warn-soft); color: var(--warn); }
+.sev.ok { background: var(--good-soft); color: var(--good); }
+@media (max-width: 720px) { .two, .trip-pick { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .route { grid-template-columns: 1fr; } .route .arrow { display: none; } }
+@media (prefers-reduced-motion: no-preference) { tr.new td { transition: background 1.2s; } .mix span { transition: width .3s; } }
+</style>
+</head><body>
+
+<div class="wrap">
+  <header class="bar">
+    <p class="brand">Fleet<span>Pro</span></p>
+    <span class="actions"><a class="sample" href="https://skillstribes.com/#transport" style="text-decoration:none">← skillstribes.com</a><span class="sample">Prototype · sample data</span></span>
+  </header>
+  <nav class="tabs" aria-label="Screens">
+    <a href="#dashboard" data-view="dashboard">Dashboard</a>
+    <a href="#trips" data-view="trips">Trips</a>
+    <a href="#expenses" data-view="expenses">Trip expenses</a>
+    <a href="#ledger" data-view="ledger">Party ledger</a>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <div class="view" id="view-dashboard" hidden>
+    <div class="dash-top">
+      <div class="greet"><h1 id="dHead">This month</h1><p id="dSub"></p></div>
+      <div class="actions"><a class="btn primary" href="#trips">New trip</a><a class="btn" href="#ledger">Receive payment</a></div>
+    </div>
+    <section class="stats" aria-label="This month in numbers">
+      <div class="stat"><span class="k">Freight earned</span><span class="v" id="dFreight">0</span><span class="d" id="dTrips"></span></div>
+      <div class="stat"><span class="k">Trip expenses</span><span class="v" id="dExp">0</span><span class="d" id="dDiesel"></span></div>
+      <div class="stat pos"><span class="k">Trip profit</span><span class="v" id="dProfit">0</span><span class="d" id="dMargin"></span></div>
+      <div class="stat hl"><span class="k">To collect</span><span class="v" id="dOut">0</span><span class="d" id="dOwing"></span></div>
+    </section>
+    <div class="two">
+      <section class="card" aria-labelledby="veh-title">
+        <div class="card-head"><h2 id="veh-title">Profit by vehicle</h2><span class="sub">This month</span></div>
+        <div class="bars" id="vehBars"></div>
+      </section>
+      <section class="card" aria-labelledby="coll-title">
+        <div class="card-head"><h2 id="coll-title">Money to collect</h2><a class="sub" href="#ledger">Open ledger</a></div>
+        <div class="alist" id="collList"></div>
+      </section>
+    </div>
+    <div class="two">
+      <section class="card" aria-labelledby="docs-title">
+        <div class="card-head"><h2 id="docs-title">Vehicle documents</h2><span class="sub">Due in 30 days</span></div>
+        <div class="alist" id="docList"></div>
+      </section>
+      <section class="card" aria-labelledby="road-title">
+        <div class="card-head"><h2 id="road-title">On the road now</h2><a class="sub" href="#trips">All trips</a></div>
+        <div class="alist" id="roadList"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- TRIPS -->
+  <div class="view" id="view-trips" hidden>
+    <section class="card" aria-labelledby="form-title">
+      <div class="card-head">
+        <h2 id="form-title">New trip</h2>
+        <div class="builty">Builty no. <b id="builtyNo">—</b></div>
+      </div>
+      <form id="tripForm" class="grid" novalidate>
+        <div class="field"><label for="date">Date</label><input id="date" type="date"></div>
+        <div class="field"><label for="vehicle">Vehicle</label>
+          <select id="vehicle">
+            <option value="">Choose vehicle</option>
+            <option>LES-4521 · Hino 22-wheeler</option>
+            <option>TLA-889 · Isuzu 10-wheeler</option>
+            <option>KHI-7310 · Hino 6-wheeler</option>
+            <option>FDM-2047 · Mazda Titan</option>
+          </select><div class="msg"></div></div>
+        <div class="field"><label for="driver">Driver</label>
+          <select id="driver">
+            <option value="">Choose driver</option>
+            <option>Ghulam Rasool</option>
+            <option>Muhammad Aslam</option>
+            <option>Shahid Iqbal</option>
+            <option>Akbar Khan</option>
+          </select><div class="msg"></div></div>
+        <div class="field"><label for="party">Party (customer)</label>
+          <select id="party">
+            <option value="">Choose party</option>
+            <option>Al-Noor Textile Mills</option>
+            <option>Punjab Cement Traders</option>
+            <option>Indus Rice Exporters</option>
+            <option>Karachi Fruit Mandi Agents</option>
+          </select><div class="msg"></div></div>
+        <div class="route">
+          <div class="field"><label for="from">From</label><input id="from" list="cities" placeholder="e.g. Karachi"><div class="msg"></div></div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="field"><label for="to">To</label><input id="to" list="cities" placeholder="e.g. Lahore"><div class="msg"></div></div>
+        </div>
+        <datalist id="cities"><option>Karachi</option><option>Lahore</option><option>Faisalabad</option><option>Multan</option><option>Islamabad</option><option>Peshawar</option><option>Quetta</option><option>Hyderabad</option><option>Sialkot</option></datalist>
+        <div class="field"><label for="goods">Goods</label><input id="goods" placeholder="e.g. Cotton bales"></div>
+        <div class="field"><label for="freight">Freight (PKR)</label><input id="freight" class="num" inputmode="numeric" placeholder="0"><div class="msg"></div></div>
+        <div class="field"><label for="advance">Advance received (PKR)</label><input id="advance" class="num" inputmode="numeric" placeholder="0"><div class="msg"></div></div>
+        <div class="balance-row">
+          <div class="balance">Balance receivable <strong id="balance">PKR 0</strong></div>
+          <div class="actions">
+            <button type="reset">Clear</button>
+            <button type="submit" class="primary">Save trip</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section class="stats" aria-label="This month">
+      <div class="stat"><span class="k">Trips this month</span><span class="v" id="sTrips">0</span></div>
+      <div class="stat"><span class="k">Total freight</span><span class="v" id="sFreight">0</span></div>
+      <div class="stat pos"><span class="k">Trip profit</span><span class="v" id="sProfit">0</span></div>
+      <div class="stat hl"><span class="k">Receivable</span><span class="v" id="sRecv">0</span></div>
+    </section>
+
+    <section class="card" aria-labelledby="list-title">
+      <div class="card-head"><h2 id="list-title">Trip register</h2><span class="sub">Newest first · tap a profit figure to see its expenses</span></div>
+      <div class="table-wrap">
+        <table id="tripTable">
+          <thead><tr><th>Builty</th><th>Date</th><th>Vehicle</th><th>Route</th><th>Party</th><th class="n">Freight</th><th class="n">Profit</th><th class="n">Advance</th><th>Status</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <p class="hint">Saved in this browser only. In the real software trips go to the database and sync to the cloud.</p>
+    </section>
+  </div>
+
+  <!-- EXPENSES -->
+  <div class="view" id="view-expenses" hidden>
+    <section class="card" aria-labelledby="exp-title">
+      <div class="card-head"><h2 id="exp-title">Trip expenses</h2></div>
+      <div class="trip-pick">
+        <div class="field"><label for="expTrip">Trip</label><select id="expTrip"></select></div>
+        <div class="trip-info" id="tripInfo"></div>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="Trip profit">
+      <div class="stat"><span class="k">Freight</span><span class="v" id="pFreight">0</span></div>
+      <div class="stat"><span class="k">Expenses</span><span class="v" id="pExp">0</span></div>
+      <div class="stat" id="pProfitBox"><span class="k">Trip profit</span><span class="v" id="pProfit">0</span></div>
+      <div class="stat"><span class="k">Margin</span><span class="v" id="pMargin">0%</span></div>
+    </section>
+
+    <div class="two">
+      <section class="card" aria-labelledby="add-title">
+        <div class="card-head"><h2 id="add-title">Add expense</h2></div>
+        <form id="expForm" class="grid" novalidate>
+          <div class="field"><label for="eType">Expense type</label>
+            <select id="eType">
+              <option>Diesel</option>
+              <option>Toll tax</option>
+              <option>Loading / unloading</option>
+              <option>Driver food &amp; allowance</option>
+              <option>Police / challan</option>
+              <option>Repair / tyre</option>
+              <option>Other</option>
+            </select></div>
+          <div class="field" id="fLitres"><label for="eLitres">Litres</label><input id="eLitres" class="num" inputmode="decimal" placeholder="0"><div class="msg"></div></div>
+          <div class="field" id="fRate"><label for="eRate">Rate per litre (PKR)</label><input id="eRate" class="num" inputmode="decimal" value="268"><div class="msg"></div></div>
+          <div class="field"><label for="eAmount">Amount (PKR)</label><input id="eAmount" class="num" inputmode="numeric" placeholder="0"><div class="msg"></div></div>
+          <div class="field" style="grid-column:1/-1"><label for="eNote">Note</label><input id="eNote" placeholder="e.g. Pump at Sukkur bypass"></div>
+          <div class="balance-row">
+            <div class="balance">Profit after this <strong id="afterProfit">PKR 0</strong></div>
+            <button type="submit" class="primary">Add expense</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card" aria-labelledby="mix-title">
+        <div class="card-head"><h2 id="mix-title">Where the money went</h2></div>
+        <div class="mix" id="mixBar" aria-hidden="true"></div>
+        <div class="legend" id="mixLegend"></div>
+      </section>
+    </div>
+
+    <section class="card" aria-labelledby="elist-title">
+      <div class="card-head"><h2 id="elist-title">Expenses on this trip</h2><span class="sub" id="fuelNote"></span></div>
+      <div class="table-wrap">
+        <table id="expTable">
+          <thead><tr><th>Type</th><th>Detail</th><th class="n">Amount</th><th></th></tr></thead>
+          <tbody id="expRows"></tbody>
+          <tfoot><tr><td colspan="2">Total</td><td class="n" id="expTotal">0</td><td></td></tr></tfoot>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- PARTY LEDGER -->
+  <div class="view" id="view-ledger" hidden>
+    <section class="stats" aria-label="All parties">
+      <div class="stat"><span class="k">Total billed</span><span class="v" id="lBilled">0</span></div>
+      <div class="stat pos"><span class="k">Total received</span><span class="v" id="lRecv">0</span></div>
+      <div class="stat hl"><span class="k">Outstanding</span><span class="v" id="lOut">0</span></div>
+      <div class="stat"><span class="k">Parties owing</span><span class="v" id="lOwing">0</span></div>
+    </section>
+
+    <div class="two">
+      <section class="card" aria-labelledby="parties-title">
+        <div class="card-head"><h2 id="parties-title">Parties</h2><span class="sub">Highest balance first</span></div>
+        <div class="table-wrap">
+          <table id="partyTable">
+            <thead><tr><th>Party</th><th class="n">Trips</th><th class="n">Balance</th></tr></thead>
+            <tbody id="partyRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="pay-title">
+        <div class="card-head"><h2 id="pay-title">Receive payment</h2></div>
+        <form id="payForm" class="grid" novalidate>
+          <div class="field" style="grid-column:1/-1"><label for="payParty">Party</label><select id="payParty"></select></div>
+          <div class="field"><label for="payDate">Date</label><input id="payDate" type="date"></div>
+          <div class="field"><label for="payMode">Mode</label>
+            <select id="payMode"><option>Cash</option><option>Bank transfer</option><option>Cheque</option><option>JazzCash / Easypaisa</option></select></div>
+          <div class="field"><label for="payAmount">Amount (PKR)</label><input id="payAmount" class="num" inputmode="numeric" placeholder="0"><div class="msg"></div></div>
+          <div class="field"><label for="payRef">Reference</label><input id="payRef" placeholder="e.g. Cheque no. 448120"></div>
+          <div class="balance-row">
+            <div class="balance">Balance after <strong id="payAfter">PKR 0</strong></div>
+            <button type="submit" class="primary">Save payment</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <section class="card" aria-labelledby="stmt-title">
+      <div class="ledger-head">
+        <div><h2 id="stmt-title">Statement</h2><div class="sub" id="stmtParty"></div></div>
+        <div class="bal"><small>Balance due</small><span id="stmtBal">0</span></div>
+      </div>
+      <div class="table-wrap">
+        <table id="ledgerTable">
+          <thead><tr><th>Date</th><th>Entry</th><th>Detail</th><th class="n">Billed</th><th class="n">Received</th><th class="n">Balance</th></tr></thead>
+          <tbody id="ledgerRows"></tbody>
+        </table>
+      </div>
+      <p class="hint">Advances taken at loading are counted as payments on the trip date.</p>
+    </section>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+const KEY = 'fleetpro-data-v3';
+const PARTIES = ['Al-Noor Textile Mills', 'Punjab Cement Traders', 'Indus Rice Exporters', 'Karachi Fruit Mandi Agents'];
+const samplePayments = [
+  { id: 'P-2', date: '2026-11-07', party: 'Indus Rice Exporters', amount: 28000, mode: 'Bank transfer', ref: 'Meezan Bank IBFT' },
+  { id: 'P-1', date: '2026-11-07', party: 'Karachi Fruit Mandi Agents', amount: 40000, mode: 'Cheque', ref: 'Cheque no. 448120' }
+];
+const TYPES = ['Diesel', 'Toll tax', 'Loading / unloading', 'Driver food & allowance', 'Police / challan', 'Repair / tyre', 'Other'];
+const COLORS = { 'Diesel': 'var(--c1)', 'Toll tax': 'var(--c2)', 'Loading / unloading': 'var(--c3)', 'Driver food & allowance': 'var(--c4)', 'Police / challan': 'var(--bad)', 'Repair / tyre': 'var(--c5)', 'Other': 'var(--muted)' };
+const D = (l, r, note) => ({ type: 'Diesel', litres: l, rate: r, amount: Math.round(l * r), note });
+const E = (type, amount, note = '') => ({ type, amount, note });
+const sample = [
+  { no: 'FP-1043', date: '2026-11-08', vehicle: 'LES-4521 · Hino 22-wheeler', driver: 'Ghulam Rasool', party: 'Al-Noor Textile Mills', from: 'Faisalabad', to: 'Karachi', goods: 'Cotton yarn', freight: 185000, advance: 50000, status: 'route',
+    exp: [D(380, 268, 'Faisalabad + Sukkur pumps'), E('Toll tax', 9500, 'Motorway M-4, M-5, M-9'), E('Loading / unloading', 4000), E('Driver food & allowance', 3000)] },
+  { no: 'FP-1042', date: '2026-11-06', vehicle: 'TLA-889 · Isuzu 10-wheeler', driver: 'Muhammad Aslam', party: 'Punjab Cement Traders', from: 'Lahore', to: 'Multan', goods: 'Cement bags', freight: 62000, advance: 62000, status: 'done',
+    exp: [D(120, 268, 'Lahore pump'), E('Toll tax', 2800), E('Loading / unloading', 2500, 'Unloading at Multan'), E('Driver food & allowance', 1200)] },
+  { no: 'FP-1041', date: '2026-11-04', vehicle: 'KHI-7310 · Hino 6-wheeler', driver: 'Shahid Iqbal', party: 'Indus Rice Exporters', from: 'Hyderabad', to: 'Karachi', goods: 'Rice', freight: 38000, advance: 10000, status: 'done',
+    exp: [D(60, 268, 'Hyderabad pump'), E('Toll tax', 900), E('Loading / unloading', 1500)] },
+  { no: 'FP-1040', date: '2026-11-02', vehicle: 'FDM-2047 · Mazda Titan', driver: 'Akbar Khan', party: 'Karachi Fruit Mandi Agents', from: 'Quetta', to: 'Karachi', goods: 'Apples', freight: 95000, advance: 30000, status: 'done',
+    exp: [D(230, 268, 'Quetta + Khuzdar'), E('Toll tax', 3200), E('Police / challan', 2000, 'Overload challan'), E('Driver food & allowance', 2500), E('Repair / tyre', 1500, 'Puncture near Bela')] }
+];
+
+const $ = id => document.getElementById(id);
+const state = load();
+let trips = state.trips, payments = state.payments;
+let fresh = null;
+let selected = null;
+let selParty = null;
+
+function load() {
+  try { const s = localStorage.getItem(KEY); if (s) { const d = JSON.parse(s); if (d && d.trips && d.payments) return d; } } catch (e) {}
+  return { trips: JSON.parse(JSON.stringify(sample)), payments: JSON.parse(JSON.stringify(samplePayments)) };
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify({ trips, payments })); } catch (e) {} }
+function partyBal(p) {
+  const billed = trips.filter(t => t.party === p).reduce((s, t) => s + t.freight, 0);
+  const recv = trips.filter(t => t.party === p).reduce((s, t) => s + t.advance, 0) + payments.filter(x => x.party === p).reduce((s, x) => s + x.amount, 0);
+  return { billed, recv, bal: billed - recv, trips: trips.filter(t => t.party === p).length };
+}
+const pkr = n => Math.round(n).toLocaleString('en-PK');
+const num = v => Number(String(v).replace(/[^\d]/g, '')) || 0;
+const dec = v => Number(String(v).replace(/[^\d.]/g, '')) || 0;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const expTotal = t => (t.exp || []).reduce((s, e) => s + e.amount, 0);
+const profit = t => t.freight - expTotal(t);
+function today() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+function fmtDate(d) { const [, m, day] = d.split('-'); return `${Number(day)} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].at(Number(m) - 1)}`; }
+function nextNo() { return 'FP-' + (trips.reduce((m, t) => Math.max(m, Number(t.no.split('-')[1]) || 0), 1000) + 1); }
+const sortedTrips = () => [...trips].sort((a, b) => b.date.localeCompare(a.date) || b.no.localeCompare(a.no));
+
+/* ---------- Trips screen ---------- */
+function renderTrips() {
+  $('builtyNo').textContent = nextNo();
+  $('rows').innerHTML = sortedTrips().map(t => {
+    const bal = t.freight - t.advance, p = profit(t);
+    return `<tr class="${t.no === fresh ? 'new' : ''}">
+      <td class="mono">${esc(t.no)}</td><td>${fmtDate(t.date)}</td>
+      <td>${esc(t.vehicle.split(' · ')[0])}<div class="sub">${esc(t.driver)}</div></td>
+      <td>${esc(t.from)} → ${esc(t.to)}${t.goods ? `<div class="sub">${esc(t.goods)}</div>` : ''}</td>
+      <td>${esc(t.party)}</td>
+      <td class="n">${pkr(t.freight)}</td>
+      <td class="n"><button class="link ${p < 0 ? 'neg' : 'pos'}" data-open="${esc(t.no)}">${pkr(p)}</button>${(t.exp || []).length ? '' : '<div class="sub">no expenses yet</div>'}</td>
+      <td class="n">${t.advance ? pkr(t.advance) : '<span class="sub">—</span>'}${bal > 0 ? '' : '<div class="sub">full</div>'}</td>
+      <td><button class="pill ${t.status === 'done' ? 'done' : 'route-on'}" data-no="${esc(t.no)}">${t.status === 'done' ? 'Delivered' : 'On route'}</button></td>
+    </tr>`;
+  }).join('');
+  const d = new Date(), ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  const month = trips.filter(t => t.date.startsWith(ym));
+  $('sTrips').textContent = month.length;
+  $('sFreight').textContent = 'PKR ' + pkr(month.reduce((s, t) => s + t.freight, 0));
+  $('sProfit').textContent = 'PKR ' + pkr(month.reduce((s, t) => s + profit(t), 0));
+  $('sRecv').textContent = 'PKR ' + pkr(PARTIES.reduce((s, p) => s + Math.max(0, partyBal(p).bal), 0));
+}
+function updateBalance() { $('balance').textContent = 'PKR ' + pkr(Math.max(0, num($('freight').value) - num($('advance').value))); }
+function money(input, after) { input.addEventListener('input', () => { const v = num(input.value); input.value = v ? pkr(v) : ''; after(); }); }
+money($('freight'), updateBalance); money($('advance'), updateBalance);
+function setErr(id, text) { const f = $(id).closest('.field'); f.classList.toggle('err', !!text); const m = f.querySelector('.msg'); if (m) m.textContent = text || ''; }
+function clearErrs(form) { form.querySelectorAll('.field.err').forEach(f => f.classList.remove('err')); form.querySelectorAll('.msg').forEach(m => m.textContent = ''); }
+
+$('tripForm').addEventListener('submit', e => {
+  e.preventDefault();
+  let ok = true;
+  const req = { vehicle: 'Choose a vehicle', driver: 'Choose a driver', party: 'Choose the party', from: 'Enter the loading city', to: 'Enter the destination city' };
+  for (const [id, text] of Object.entries(req)) { const bad = !$(id).value.trim(); setErr(id, bad ? text : ''); if (bad) ok = false; }
+  const freight = num($('freight').value), advance = num($('advance').value);
+  setErr('freight', freight ? '' : 'Enter the freight amount'); if (!freight) ok = false;
+  setErr('advance', advance > freight ? 'Advance cannot be more than freight' : ''); if (advance > freight) ok = false;
+  if (!ok) return;
+  const t = { no: nextNo(), date: $('date').value || today(), vehicle: $('vehicle').value, driver: $('driver').value, party: $('party').value,
+    from: $('from').value.trim(), to: $('to').value.trim(), goods: $('goods').value.trim(), freight, advance, status: 'route', exp: [] };
+  trips.push(t); fresh = t.no; save(); renderTrips();
+  $('tripForm').reset();
+  toast(`Trip ${t.no} saved. Tap its profit to add expenses.`);
+});
+$('tripForm').addEventListener('reset', () => setTimeout(() => { $('date').value = today(); updateBalance(); clearErrs($('tripForm')); }));
+$('rows').addEventListener('click', e => {
+  const open = e.target.closest('[data-open]');
+  if (open) { selected = open.dataset.open; location.hash = 'expenses'; return; }
+  const b = e.target.closest('.pill'); if (!b) return;
+  const t = trips.find(x => x.no === b.dataset.no); t.status = t.status === 'done' ? 'route' : 'done';
+  save(); renderTrips(); toast(t.status === 'done' ? `${t.no} marked delivered` : `${t.no} back on route`);
+});
+
+/* ---------- Expenses screen ---------- */
+const cur = () => trips.find(t => t.no === selected) || sortedTrips()[0];
+function renderExpenses() {
+  const list = sortedTrips();
+  if (!list.length) return;
+  if (!trips.some(t => t.no === selected)) selected = list[0].no;
+  $('expTrip').innerHTML = list.map(t => `<option value="${esc(t.no)}"${t.no === selected ? ' selected' : ''}>${esc(t.no)} · ${esc(t.from)} → ${esc(t.to)} · ${fmtDate(t.date)}</option>`).join('');
+  const t = cur(), total = expTotal(t), p = t.freight - total;
+  $('tripInfo').innerHTML = `<strong>${esc(t.from)} → ${esc(t.to)}</strong>${esc(t.vehicle.split(' · ')[0])} · ${esc(t.driver)} · ${esc(t.party)}${t.goods ? ' · ' + esc(t.goods) : ''}`;
+  $('pFreight').textContent = 'PKR ' + pkr(t.freight);
+  $('pExp').textContent = 'PKR ' + pkr(total);
+  $('pProfit').textContent = 'PKR ' + pkr(p);
+  $('pProfitBox').className = 'stat ' + (p < 0 ? 'neg' : 'pos');
+  $('pMargin').textContent = t.freight ? Math.round(p / t.freight * 100) + '%' : '0%';
+
+  const by = TYPES.map(type => ({ type, amt: t.exp.filter(e => e.type === type).reduce((s, e) => s + e.amount, 0) })).filter(x => x.amt > 0).sort((a, b) => b.amt - a.amt);
+  $('mixBar').innerHTML = by.map(x => `<span style="width:${x.amt / (total || 1) * 100}%;background:${COLORS[x.type]}"></span>`).join('');
+  $('mixLegend').innerHTML = by.length ? by.map(x => `<div><i style="background:${COLORS[x.type]}"></i><span>${esc(x.type)}</span><span class="amt">${pkr(x.amt)}</span><span class="pct">${Math.round(x.amt / total * 100)}%</span></div>`).join('')
+    : '<p class="empty">No expenses yet. Add diesel and toll first; they are usually the biggest costs.</p>';
+
+  $('expRows').innerHTML = t.exp.length ? t.exp.map((e, i) => `<tr>
+      <td><span class="dot" style="background:${COLORS[e.type]}"></span>${esc(e.type)}</td>
+      <td>${e.type === 'Diesel' ? `${e.litres} L × ${e.rate}` : ''}${e.note ? `<div class="sub">${esc(e.note)}</div>` : ''}</td>
+      <td class="n">${pkr(e.amount)}</td>
+      <td class="n"><button class="x" data-del="${i}" aria-label="Remove ${esc(e.type)} expense">Remove</button></td></tr>`).join('')
+    : '<tr><td colspan="4" class="empty">Nothing added for this trip yet.</td></tr>';
+  $('expTotal').textContent = pkr(total);
+  const litres = t.exp.filter(e => e.type === 'Diesel').reduce((s, e) => s + e.litres, 0);
+  $('fuelNote').textContent = litres ? `Diesel used: ${litres} litres` : '';
+  updateAfter();
+}
+function toggleFuel() {
+  const fuel = $('eType').value === 'Diesel';
+  $('fLitres').hidden = !fuel; $('fRate').hidden = !fuel;
+  $('eAmount').readOnly = fuel;
+  if (fuel) calcFuel();
+}
+function calcFuel() { const a = Math.round(dec($('eLitres').value) * dec($('eRate').value)); $('eAmount').value = a ? pkr(a) : ''; updateAfter(); }
+function updateAfter() { const t = cur(); if (!t) return; $('afterProfit').textContent = 'PKR ' + pkr(profit(t) - num($('eAmount').value)); }
+$('eType').addEventListener('change', () => { $('eAmount').value = ''; toggleFuel(); updateAfter(); });
+$('eLitres').addEventListener('input', calcFuel);
+$('eRate').addEventListener('input', calcFuel);
+money($('eAmount'), updateAfter);
+$('expTrip').addEventListener('change', e => { selected = e.target.value; renderExpenses(); });
+$('expForm').addEventListener('submit', e => {
+  e.preventDefault(); clearErrs($('expForm'));
+  const t = cur(), type = $('eType').value, amount = num($('eAmount').value);
+  const ex = { type, amount, note: $('eNote').value.trim() };
+  if (type === 'Diesel') {
+    ex.litres = dec($('eLitres').value); ex.rate = dec($('eRate').value);
+    if (!ex.litres) { setErr('eLitres', 'Enter litres filled'); return; }
+    if (!ex.rate) { setErr('eRate', 'Enter the rate per litre'); return; }
+  }
+  if (!amount) { setErr('eAmount', 'Enter the amount'); return; }
+  t.exp.push(ex); save();
+  $('eLitres').value = ''; $('eNote').value = ''; $('eAmount').value = '';
+  renderExpenses(); renderTrips();
+  toast(`${type} added to ${t.no}`);
+});
+$('expRows').addEventListener('click', e => {
+  const b = e.target.closest('[data-del]'); if (!b) return;
+  const t = cur(), [gone] = t.exp.splice(Number(b.dataset.del), 1); save();
+  renderExpenses(); renderTrips(); toast(`${gone.type} removed`);
+});
+
+/* ---------- Party ledger ---------- */
+function renderLedger() {
+  const rows = PARTIES.map(p => ({ p, ...partyBal(p) })).sort((a, b) => b.bal - a.bal);
+  if (!selParty) selParty = rows[0].p;
+  const sum = k => rows.reduce((s, r) => s + r[k], 0);
+  $('lBilled').textContent = 'PKR ' + pkr(sum('billed'));
+  $('lRecv').textContent = 'PKR ' + pkr(sum('recv'));
+  $('lOut').textContent = 'PKR ' + pkr(rows.reduce((s, r) => s + Math.max(0, r.bal), 0));
+  $('lOwing').textContent = rows.filter(r => r.bal > 0).length;
+  $('partyRows').innerHTML = rows.map(r => `<tr class="${r.p === selParty ? 'sel' : ''}" data-party="${esc(r.p)}" tabindex="0">
+      <td>${esc(r.p)}</td><td class="n">${r.trips}</td>
+      <td class="n ${r.bal > 0 ? 'owed' : ''}">${r.bal > 0 ? pkr(r.bal) : '<span class="sub">Clear</span>'}</td></tr>`).join('');
+  $('payParty').innerHTML = PARTIES.map(p => `<option${p === selParty ? ' selected' : ''}>${esc(p)}</option>`).join('');
+
+  const entries = [];
+  trips.filter(t => t.party === selParty).forEach(t => {
+    entries.push({ date: t.date, kind: 'trip', label: t.no, detail: `${t.from} → ${t.to}${t.goods ? ', ' + t.goods : ''}`, dr: t.freight, cr: 0, ord: 0 });
+    if (t.advance) entries.push({ date: t.date, kind: 'pay', label: 'Advance', detail: `With ${t.no}`, dr: 0, cr: t.advance, ord: 1 });
+  });
+  payments.filter(x => x.party === selParty).forEach(x => entries.push({ date: x.date, kind: 'pay', label: 'Payment', detail: `${x.mode}${x.ref ? ' · ' + x.ref : ''}`, dr: 0, cr: x.amount, ord: 2 }));
+  entries.sort((a, b) => a.date.localeCompare(b.date) || a.ord - b.ord);
+  let run = 0;
+  $('ledgerRows').innerHTML = entries.length ? entries.map(e => { run += e.dr - e.cr; return `<tr>
+      <td>${fmtDate(e.date)}</td>
+      <td><span class="tag ${e.kind}">${e.kind === 'trip' ? 'Trip' : 'Received'}</span> <span class="mono" style="font-family:var(--f-mono);font-size:13px">${esc(e.label)}</span></td>
+      <td>${esc(e.detail)}</td>
+      <td class="n">${e.dr ? pkr(e.dr) : ''}</td><td class="n pos">${e.cr ? pkr(e.cr) : ''}</td>
+      <td class="n">${pkr(run)}</td></tr>`; }).join('')
+    : '<tr><td colspan="6" class="empty">No trips or payments for this party yet.</td></tr>';
+  const b = partyBal(selParty).bal;
+  $('stmtParty').textContent = selParty;
+  $('stmtBal').textContent = 'PKR ' + pkr(b);
+  $('stmtBal').className = b > 0 ? 'owed' : 'pos';
+  updatePayAfter();
+}
+function updatePayAfter() { $('payAfter').textContent = 'PKR ' + pkr(partyBal($('payParty').value || selParty).bal - num($('payAmount').value)); }
+money($('payAmount'), updatePayAfter);
+$('payParty').addEventListener('change', e => { selParty = e.target.value; renderLedger(); });
+function pickParty(row) { if (!row) return; selParty = row.dataset.party; renderLedger(); }
+$('partyRows').addEventListener('click', e => pickParty(e.target.closest('tr[data-party]')));
+$('partyRows').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickParty(e.target.closest('tr[data-party]')); } });
+$('payForm').addEventListener('submit', e => {
+  e.preventDefault(); clearErrs($('payForm'));
+  const party = $('payParty').value, amount = num($('payAmount').value), due = partyBal(party).bal;
+  if (!amount) { setErr('payAmount', 'Enter the amount received'); return; }
+  if (amount > due) { setErr('payAmount', `More than the balance due (PKR ${pkr(due)})`); return; }
+  payments.push({ id: 'P-' + (payments.length + 1) + '-' + Date.now(), date: $('payDate').value || today(), party, amount, mode: $('payMode').value, ref: $('payRef').value.trim() });
+  save(); selParty = party;
+  $('payAmount').value = ''; $('payRef').value = '';
+  renderLedger(); renderTrips();
+  toast(`PKR ${pkr(amount)} received from ${party}`);
+});
+
+/* ---------- Dashboard ---------- */
+const DOCS = [
+  { v: 'FDM-2047', doc: 'Fitness certificate', due: '2026-11-05' },
+  { v: 'TLA-889', doc: 'Token tax', due: '2026-11-15' },
+  { v: 'LES-4521', doc: 'Route permit', due: '2026-11-20' },
+  { v: 'KHI-7310', doc: 'Insurance', due: '2026-12-28' }
+];
+const daysTo = d => Math.round((Date.parse(d) - Date.parse(today())) / 864e5);
+function renderDashboard() {
+  const d = new Date(), ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  const month = trips.filter(t => t.date.startsWith(ym));
+  const freight = month.reduce((s, t) => s + t.freight, 0), exp = month.reduce((s, t) => s + expTotal(t), 0), prof = freight - exp;
+  const diesel = month.reduce((s, t) => s + t.exp.filter(e => e.type === 'Diesel').reduce((a, e) => a + e.amount, 0), 0);
+  $('dHead').textContent = d.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
+  $('dSub').textContent = `${month.length} trips · ${trips.filter(t => t.status !== 'done').length} on the road`;
+  $('dFreight').textContent = 'PKR ' + pkr(freight); $('dTrips').textContent = `${month.length} trips`;
+  $('dExp').textContent = 'PKR ' + pkr(exp); $('dDiesel').textContent = exp ? `Diesel ${Math.round(diesel / exp * 100)}% of costs` : '';
+  $('dProfit').textContent = 'PKR ' + pkr(prof); $('dMargin').textContent = freight ? `${Math.round(prof / freight * 100)}% margin` : '';
+  const owing = PARTIES.map(p => ({ p, ...partyBal(p) })).filter(r => r.bal > 0).sort((a, b) => b.bal - a.bal);
+  $('dOut').textContent = 'PKR ' + pkr(owing.reduce((s, r) => s + r.bal, 0)); $('dOwing').textContent = `${owing.length} parties`;
+
+  const veh = {};
+  month.forEach(t => { const k = t.vehicle.split(' · ')[0]; veh[k] = veh[k] || { k, model: t.vehicle.split(' · ')[1] || '', p: 0, n: 0 }; veh[k].p += profit(t); veh[k].n++; });
+  const vs = Object.values(veh).sort((a, b) => b.p - a.p), max = Math.max(1, ...vs.map(v => Math.abs(v.p)));
+  $('vehBars').innerHTML = vs.length ? vs.map(v => `<div class="b"><span class="nm">${esc(v.k)}<small>${v.n} trip${v.n > 1 ? 's' : ''}</small></span>
+      <div class="track"><div class="fill ${v.p < 0 ? 'neg' : ''}" style="width:${Math.abs(v.p) / max * 100}%"></div></div>
+      <span class="val ${v.p < 0 ? 'neg' : ''}">${pkr(v.p)}</span></div>`).join('') : '<p class="empty">No trips this month yet.</p>';
+
+  $('collList').innerHTML = owing.length ? owing.map(r => `<div class="a"><span>${esc(r.p)}<div class="sub">${r.trips} trip${r.trips > 1 ? 's' : ''}</div></span><span class="r owed">${pkr(r.bal)}</span></div>`).join('')
+    : '<p class="empty">Every party is clear.</p>';
+
+  const docs = DOCS.map(x => ({ ...x, n: daysTo(x.due) })).filter(x => x.n <= 30).sort((a, b) => a.n - b.n);
+  $('docList').innerHTML = docs.length ? docs.map(x => `<div class="a"><span><span style="font-family:var(--f-mono);font-size:13px">${esc(x.v)}</span> · ${esc(x.doc)}<div class="sub">Due ${fmtDate(x.due)}</div></span>
+      <span class="sev ${x.n < 0 ? 'bad' : x.n <= 14 ? 'warn' : 'ok'}">${x.n < 0 ? `Expired ${-x.n} days ago` : x.n === 0 ? 'Due today' : `${x.n} days left`}</span></div>`).join('')
+    : '<p class="empty">Nothing due in the next 30 days.</p>';
+
+  const road = sortedTrips().filter(t => t.status !== 'done');
+  $('roadList').innerHTML = road.length ? road.map(t => `<div class="a"><span>${esc(t.from)} → ${esc(t.to)}<div class="sub">${esc(t.vehicle.split(' · ')[0])} · ${esc(t.driver)} · left ${fmtDate(t.date)}</div></span><span class="sev warn">On route</span></div>`).join('')
+    : '<p class="empty">All vehicles are back.</p>';
+}
+
+/* ---------- Screens ---------- */
+function route() {
+  const h = location.hash.slice(1), v = ['trips', 'expenses', 'ledger'].includes(h) ? h : 'dashboard';
+  $('view-dashboard').hidden = v !== 'dashboard'; $('view-trips').hidden = v !== 'trips'; $('view-expenses').hidden = v !== 'expenses'; $('view-ledger').hidden = v !== 'ledger';
+  if (v === 'dashboard') renderDashboard();
+  if (v === 'ledger') renderLedger();
+  document.querySelectorAll('nav.tabs a').forEach(a => { if (a.dataset.view === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  if (v === 'expenses') renderExpenses();
+}
+window.addEventListener('hashchange', route);
+
+let tt;
+function toast(text) { const el = $('toast'); el.textContent = text; el.hidden = false; clearTimeout(tt); tt = setTimeout(() => el.hidden = true, 2400); }
+
+$('date').value = today(); $('payDate').value = today();
+renderTrips(); toggleFuel(); route();
+</script>
+</body></html>
