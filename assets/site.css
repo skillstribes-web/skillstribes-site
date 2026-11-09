@@ -288,7 +288,11 @@
   }
 
 /* ---------- shared additions for the home and HVAC pages ---------- */
-nav a.nav-link.on { color: var(--fg); }
+nav a.nav-link { position: relative; border-radius: 999px; padding: 6px 12px; transition: color 0.2s ease, background 0.2s ease; }
+nav a.nav-link.on { color: var(--fg); font-weight: 600; background: color-mix(in srgb, var(--gold) 16%, transparent); }
+nav a.nav-link.on::after { content: ""; position: absolute; left: 50%; bottom: -3px; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: var(--gold); animation: navpulse 2.4s ease-in-out infinite; }
+@keyframes navpulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.7); } }
+@media (prefers-reduced-motion: reduce) { nav a.nav-link.on::after { animation: none; } }
 .divisions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .division { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: clamp(22px, 3vw, 32px); display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .division h3 { font-size: clamp(1.5rem, 2.6vw, 2rem); font-weight: 750; }

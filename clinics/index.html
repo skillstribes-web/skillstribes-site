@@ -139,6 +139,11 @@
   nav { display: flex; align-items: center; gap: 22px; }
   nav a.nav-link { color: var(--muted); text-decoration: none; font-size: 0.95rem; }
   nav a.nav-link:hover { color: var(--fg); }
+  nav a.nav-link { position: relative; border-radius: 999px; padding: 6px 12px; }
+  nav a.nav-link.on { color: var(--fg); font-weight: 600; background: color-mix(in srgb, var(--gold) 16%, transparent); }
+  nav a.nav-link.on::after { content: ""; position: absolute; left: 50%; bottom: -3px; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: var(--gold); animation: navpulse 2.4s ease-in-out infinite; }
+  @keyframes navpulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.7); } }
+  @media (prefers-reduced-motion: reduce) { nav a.nav-link.on::after { animation: none; } }
 
   /* hero */
   .hero { border-top: 0; padding-block: clamp(32px, 6vw, 72px) clamp(48px, 7vw, 88px); background: radial-gradient(900px 420px at 85% 0%, var(--glow), transparent 70%); }
@@ -331,11 +336,11 @@
     <a class="brand" href="/" aria-label="SkillsTribes home"><svg class="logo" viewBox="0 0 32 32" width="44" height="44" aria-hidden="true"><g class="orbit"><path d="M16 6 L6.5 23 L25.5 23 Z"/><circle class="c1" cx="16" cy="6" r="4.2"/><circle class="c2" cx="6.5" cy="23" r="4.2"/><circle class="c3" cx="25.5" cy="23" r="4.2"/></g></svg><span>Skills<b>Tribes</b></span></a>
     <nav aria-label="Main">
       <a class="nav-link" href="/">Home</a>
-      <a class="nav-link" href="#services">Services</a>
-      <a class="nav-link" href="#features">Features</a>
-      <a class="nav-link" href="#how">How it works</a>
-      <a class="nav-link" href="#faq">Questions</a>
-      <a class="btn btn-gold" href="#contact">Book a demo</a>
+      <a class="nav-link" href="/#services">Services</a>
+      <a class="nav-link" href="/hvac/">Technical</a>
+      <a class="nav-link on" href="/clinics/" aria-current="page">Healthcare</a>
+      <a class="nav-link" href="/#transport">Transport</a>
+      <a class="btn btn-gold" href="#contact">Contact us</a>
     </nav>
   </div>
 </header>
@@ -736,5 +741,6 @@
   at(3500, play);
 })();
 </script>
+<script>(function(){var a=document.querySelector('nav a.nav-link.on'),n=a&&a.parentNode;if(n&&n.scrollWidth>n.clientWidth){n.scrollLeft=a.offsetLeft-(n.clientWidth-a.offsetWidth)/2;}})();</script>
 </body>
 </html>

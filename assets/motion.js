@@ -9,6 +9,27 @@
     window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
   }
 
+  /* On phones the menu scrolls sideways: bring the active item into view */
+  (function(){var a=document.querySelector('nav a.nav-link.on'),n=a&&a.parentNode;if(n&&n.scrollWidth>n.clientWidth){n.scrollLeft=a.offsetLeft-(n.clientWidth-a.offsetWidth)/2;}})();
+
+  /* Homepage menu: highlight the section in view, or the link just clicked */
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav a.nav-link'));
+  var spy = links.filter(function (a) { var h = a.getAttribute('href'); return h === '/' || h.charAt(0) === '#'; });
+  if (spy.length > 1 && location.pathname === '/') {
+    var setOn = function (a) { links.forEach(function (l) { var on = l === a; l.classList.toggle('on', on); if (on) l.setAttribute('aria-current', 'page'); else l.removeAttribute('aria-current'); }); };
+    var lock = 0;
+    spy.forEach(function (a) { a.addEventListener('click', function () { setOn(a); lock = Date.now(); }); });
+    var pick = function () {
+      if (Date.now() - lock < 900) return;
+      var cur = null, first = null;
+      spy.forEach(function (a) { var h = a.getAttribute('href'); if (h.charAt(0) !== '#') return; var s = document.querySelector(h); if (!s) return; var r = s.getBoundingClientRect(); if (!first || r.top < first) first = r.top; if (r.top <= 140 && r.bottom > 140) cur = a; });
+      if (!cur && first !== null && first > 140) cur = spy[0];
+      setOn(cur);
+      var nv = cur && cur.parentNode; if (nv && nv.scrollWidth > nv.clientWidth) nv.scrollLeft = cur.offsetLeft - (nv.clientWidth - cur.offsetWidth) / 2;
+    };
+    window.addEventListener('scroll', pick, { passive: true }); pick();
+  }
+
   /* Fade-up on scroll for sections and cards */
   if ('IntersectionObserver' in window) {
     root.classList.add('js');
