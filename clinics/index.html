@@ -139,6 +139,10 @@
   nav { display: flex; align-items: center; gap: 22px; }
   nav a.nav-link { color: var(--muted); text-decoration: none; font-size: 0.95rem; }
   nav a.nav-link:hover { color: var(--fg); }
+  header { position: sticky; top: 0; z-index: 30; transition: background 0.3s ease, box-shadow 0.3s ease; }
+  header.scrolled { background: color-mix(in srgb, var(--bg) 84%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 1px 0 var(--line), 0 10px 30px rgb(0 0 0 / 0.12); }
+  header .wrap { transition: padding 0.3s ease; }
+  header.scrolled .wrap { padding-block: 12px; }
   nav a.nav-link { position: relative; border-radius: 999px; padding: 6px 12px; }
   nav a.nav-link.on { color: var(--fg); font-weight: 600; background: color-mix(in srgb, var(--gold) 16%, transparent); }
   nav a.nav-link.on::after { content: ""; position: absolute; left: 50%; bottom: -3px; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: var(--gold); animation: navpulse 2.4s ease-in-out infinite; }
@@ -742,5 +746,6 @@
 })();
 </script>
 <script>(function(){var a=document.querySelector('nav a.nav-link.on'),n=a&&a.parentNode;if(n&&n.scrollWidth>n.clientWidth){n.scrollLeft=a.offsetLeft-(n.clientWidth-a.offsetWidth)/2;}})();</script>
+<script>(function(){var h=document.querySelector("header");if(!h)return;var f=function(){h.classList.toggle("scrolled",window.scrollY>12)};window.addEventListener("scroll",f,{passive:true});f();})();</script>
 </body>
 </html>
