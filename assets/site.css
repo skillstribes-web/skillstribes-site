@@ -424,3 +424,4 @@ header .wrap { transition: padding 0.3s ease; }
   .hero-art .ha-dots .d1 { fill: var(--gold); }
 }
 .hero-grid .hero-copy h1 { font-size: clamp(1.9rem, 3.3vw, 2.6rem); }
+.hero-photo img { display: block; width: 100%; height: auto; border-radius: 22px; border: 1px solid var(--line); box-shadow: 0 30px 60px -28px rgba(16, 26, 51, 0.35), 0 0 0 8px var(--glow); }
