@@ -425,3 +425,8 @@ header .wrap { transition: padding 0.3s ease; }
 }
 .hero-grid .hero-copy h1 { font-size: clamp(1.9rem, 3.3vw, 2.6rem); }
 .hero-photo img { display: block; width: 100%; height: auto; border-radius: 22px; border: 1px solid var(--line); box-shadow: 0 30px 60px -28px rgba(16, 26, 51, 0.35), 0 0 0 8px var(--glow); }
+/* Hero photo sizing (20 Nov): ~55% of the row on desktop, bleeds slightly past the column on wide screens */
+@media (min-width: 901px) { .hero .hero-grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(32px, 4vw, 56px); } }
+@media (min-width: 1200px) { .hero-photo { margin-right: -56px; } }
+.hero-photo img { border-radius: 20px; box-shadow: 0 34px 70px -30px rgba(16, 26, 51, 0.4), 0 0 0 6px var(--glow); }
+@media (max-width: 900px) { .hero-photo { max-width: 640px; margin: 12px auto 0; } }
