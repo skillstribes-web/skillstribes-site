@@ -385,3 +385,42 @@ header .wrap { transition: padding 0.3s ease; }
 .tour video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 14px; border: 1px solid var(--line); background: #0a1020; box-shadow: 0 18px 44px rgb(0 0 0 / 0.18); }
 .tour-cap { margin: 0; text-align: center; color: var(--muted); font-size: 0.95rem; }
 .division .go { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Hero illustration: team meeting with a presenter (added 2026-11-20) */
+.hero-art { margin: 0; }
+.hero-art svg { display: block; width: 100%; height: auto; }
+.hero-art .ha-frame { fill: #1a2445; }
+.hero-art .ha-tag { font: 600 13px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; fill: #8fb0ff; }
+.hero-art .ha-shadow { fill: var(--gold); opacity: 0.08; }
+.hero-art .ha-tbl-a { stop-color: var(--surface); }
+.hero-art .ha-tbl-b { stop-color: var(--bg-2); }
+.hero-art .ha-tbl-edge { fill: var(--line); }
+.hero-art .ha-laptop { fill: #9aa6c2; }
+.hero-art .ha-skin1 { fill: #c68e64; }
+.hero-art .ha-skin2 { fill: #e0b48f; }
+.hero-art .ha-skin3 { fill: #8d5a3b; }
+.hero-art .ha-hair { fill: #1f1a17; }
+.hero-art .ha-hair2 { fill: #4a3426; }
+.hero-art .ha-shirt { fill: var(--gold); }
+.hero-art .ha-arm { stroke: var(--gold); }
+.hero-art .ha-shirt2 { fill: var(--accent2); }
+.hero-art .ha-shirt3 { fill: #3f9b72; }
+.hero-art .ha-shirt4 { fill: #33415f; }
+.hero-art .ha-pants { fill: #263252; }
+.hero-art .ha-shoe { fill: #111827; }
+.hero-art .ha-slide { opacity: 0; animation: ha-show 16s linear infinite both; }
+.hero-art .s2 { animation-delay: 4s; } .hero-art .s3 { animation-delay: 8s; } .hero-art .s4 { animation-delay: 12s; }
+@keyframes ha-show { 0% { opacity: 0; } 3% { opacity: 1; } 23% { opacity: 1; } 26% { opacity: 0; } 100% { opacity: 0; } }
+.hero-art .ha-dots circle { fill: var(--line); animation: ha-dot 16s linear infinite both; }
+.hero-art .ha-dots .d2 { animation-delay: 4s; } .hero-art .ha-dots .d3 { animation-delay: 8s; } .hero-art .ha-dots .d4 { animation-delay: 12s; }
+@keyframes ha-dot { 0%, 24% { fill: var(--gold); } 25%, 100% { fill: var(--line); } }
+.hero-art .ha-typing circle { animation: ha-blink 1.2s ease-in-out infinite; }
+.hero-art .ha-typing circle:nth-child(2) { animation-delay: 0.2s; } .hero-art .ha-typing circle:nth-child(3) { animation-delay: 0.4s; }
+@keyframes ha-blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+@media (max-width: 900px) { .hero-art { max-width: 460px; margin: 8px auto 0; width: 100%; } }
+@media (prefers-reduced-motion: reduce) {
+  .hero-art .ha-slide, .hero-art .ha-dots circle, .hero-art .ha-typing circle { animation: none; }
+  .hero-art .s1 { opacity: 1; }
+  .hero-art .ha-dots .d1 { fill: var(--gold); }
+}
+.hero-grid .hero-copy h1 { font-size: clamp(1.9rem, 3.3vw, 2.6rem); }
