@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WhatsApp COD Order Confirmation for Online Stores in Pakistan | SkillsTribes</title>
+<meta name="description" content="Every cash-on-delivery order gets a WhatsApp message with Confirm and Cancel buttons, in Urdu or English. The answer goes straight into your order list. Free 30-day trial.">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a1020">
+<link rel="canonical" href="https://skillstribes.com/cod/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a1020'/%3E%3Ccircle cx='16' cy='8' r='4.2' fill='%235b8cff'/%3E%3Ccircle cx='8' cy='23' r='4.2' fill='%23a58bff'/%3E%3Ccircle cx='24' cy='23' r='4.2' fill='%238fb0ff'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SkillsTribes">
+<meta property="og:title" content="WhatsApp COD order confirmation for online stores | SkillsTribes">
+<meta property="og:description" content="Every COD order gets a WhatsApp message with Confirm and Cancel buttons. Try the demo.">
+<meta property="og:url" content="https://skillstribes.com/cod/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Hanken+Grotesk:wght@400..700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Nastaliq+Urdu:wght@400;600&family=Unbounded:wght@500..700&display=swap">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0a1020; --bg-2: #0f1830; --surface: #131f3b; --line: #243357;
+    --fg: #eef2fb; --muted: #a0acc6; --gold: #5b8cff; --gold-ink: #8fb0ff; --on-gold: #07122e;
+    --ok: #62c295; --warn: #e6b062; --bad: #ec8579; --accent2: #a58bff;
+    --wa-bg: #0b141a; --wa-in: #202c33; --wa-out: #005c4b; --wa-ink: #e9edef; --wa-btn: #53bdeb;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --brand: "Unbounded", "Bricolage Grotesque", system-ui, sans-serif;
+    --urdu: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 1.0625rem; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+  a { color: var(--gold-ink); }
+  h1, h2, h3 { font-family: var(--display); line-height: 1.08; letter-spacing: -0.02em; text-wrap: balance; margin: 0; }
+  p { margin: 0; }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding-inline: max(16px, env(safe-area-inset-left, 0px)); }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold-ink); }
+  section { padding-block: clamp(48px, 8vw, 96px); border-top: 1px solid var(--line); }
+  .sec-head { display: grid; gap: 12px; max-width: 660px; margin-bottom: clamp(28px, 4vw, 44px); }
+  .sec-head h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); font-weight: 700; }
+  .sec-head p { color: var(--muted); }
+
+  header { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 68px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--fg); font: 600 1.05rem var(--brand); }
+  .brand b { color: var(--gold-ink); font-weight: 600; }
+  .logo path { fill: none; stroke: var(--line); stroke-width: 1.4; }
+  .logo .c1 { fill: var(--gold); } .logo .c2 { fill: var(--accent2); } .logo .c3 { fill: var(--gold-ink); }
+  nav { display: flex; align-items: center; gap: 18px; }
+  nav a.nav-link { color: var(--muted); text-decoration: none; font-size: 0.95rem; }
+  nav a.nav-link:hover { color: var(--fg); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 20px; border-radius: 999px; font: 600 0.98rem var(--body); text-decoration: none; cursor: pointer; border: 1px solid transparent; }
+  .btn-gold { background: var(--gold); color: var(--on-gold); }
+  .btn-line { border-color: var(--line); color: var(--fg); background: transparent; }
+  @media (max-width: 760px) { nav a.nav-link:not(.keep) { display: none; } }
+
+  .hero { border-top: 0; padding-top: clamp(40px, 7vw, 80px); }
+  .hero-grid { display: grid; gap: clamp(32px, 5vw, 56px); align-items: center; }
+  @media (min-width: 920px) { .hero-grid { grid-template-columns: 1fr 1fr; } }
+  .hero h1 { font-size: clamp(2rem, 4.4vw, 3.1rem); font-weight: 800; margin-top: 14px; }
+  .grad { background: linear-gradient(90deg, var(--gold-ink), var(--accent2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { color: var(--muted); font-size: 1.12rem; margin-top: 18px; max-width: 34rem; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+  .facts { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 22px; font: 500 0.85rem var(--mono); color: var(--muted); }
+  .facts span::before { content: "✓ "; color: var(--ok); }
+
+  /* ---- Demo ---- */
+  .demo { display: grid; gap: 16px; }
+  @media (min-width: 720px) { .demo { grid-template-columns: 1.1fr 0.9fr; align-items: start; } }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+  .panel-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--line); font: 500 0.8rem var(--mono); color: var(--muted); }
+  .tag { font: 500 0.7rem var(--mono); padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--warn); }
+  .orders { list-style: none; margin: 0; padding: 0; }
+  .orders li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 11px 14px; border-bottom: 1px solid var(--line); font-size: 0.92rem; transition: background .4s; }
+  .orders li:last-child { border-bottom: 0; }
+  .orders li.flash { background: color-mix(in srgb, var(--gold) 14%, transparent); }
+  .orders .id { font: 500 0.8rem var(--mono); color: var(--muted); }
+  .orders .who b { display: block; font-weight: 600; }
+  .orders .who span { color: var(--muted); font-size: 0.82rem; }
+  .chip { font: 500 0.72rem var(--mono); padding: 3px 9px; border-radius: 999px; white-space: nowrap; border: 1px solid currentColor; }
+  .chip.wait { color: var(--warn); } .chip.ok { color: var(--ok); } .chip.bad { color: var(--bad); } .chip.new { color: var(--gold-ink); } .chip.addr { color: var(--accent2); }
+  .panel-foot { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--line); }
+  .panel-foot .btn { min-height: 40px; font-size: 0.9rem; padding: 0 16px; }
+  .counts { display: flex; gap: 14px; padding: 10px 14px; font: 500 0.78rem var(--mono); color: var(--muted); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .counts b { color: var(--fg); }
+
+  .phone { background: var(--wa-bg); border-radius: 22px; border: 1px solid var(--line); overflow: hidden; color: var(--wa-ink); }
+  .phone-top { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #202c33; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--accent2)); display: grid; place-items: center; font: 700 0.8rem var(--body); color: #fff; }
+  .phone-top small { display: block; color: #8696a0; font-size: 0.75rem; }
+  .chat { min-height: 330px; padding: 14px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .msg { max-width: 88%; padding: 8px 10px 6px; border-radius: 10px; font-size: 0.9rem; line-height: 1.5; white-space: pre-line; }
+  .msg.in { background: var(--wa-in); align-self: flex-start; border-top-left-radius: 2px; }
+  .msg.out { background: var(--wa-out); align-self: flex-end; border-top-right-radius: 2px; }
+  .msg.ur { font-family: var(--urdu); direction: rtl; text-align: right; line-height: 2.1; font-size: 0.95rem; }
+  .msg time { display: block; text-align: right; font-size: 0.68rem; color: #8696a0; margin-top: 2px; direction: ltr; }
+  .qr { display: grid; gap: 4px; align-self: flex-start; width: min(88%, 300px); }
+  .qr button { background: var(--wa-in); color: var(--wa-btn); border: 0; border-radius: 8px; padding: 9px; font: 600 0.9rem var(--body); cursor: pointer; }
+  .qr.ur button { font-family: var(--urdu); font-weight: 600; }
+  .qr button:disabled { opacity: .45; cursor: default; }
+  .qr-hint { font: 500 0.72rem var(--mono); color: #8696a0; align-self: flex-start; }
+  .empty { margin: auto; text-align: center; color: #8696a0; font-size: 0.88rem; max-width: 240px; }
+  .lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .lang button { background: transparent; color: var(--muted); border: 0; padding: 4px 12px; font: 500 0.75rem var(--mono); cursor: pointer; }
+  .lang button[aria-pressed="true"] { background: var(--gold); color: var(--on-gold); }
+  .demo-note { color: var(--muted); font-size: 0.85rem; margin-top: 12px; }
+
+  /* ---- Content ---- */
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: s; }
+  @media (min-width: 760px) { .steps { grid-template-columns: repeat(4, 1fr); } }
+  .steps li { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; counter-increment: s; }
+  .steps li::before { content: "0" counter(s); font: 500 0.8rem var(--mono); color: var(--gold-ink); display: block; margin-bottom: 10px; }
+  .steps h3 { font-size: 1.08rem; margin-bottom: 6px; }
+  .steps p { color: var(--muted); font-size: 0.95rem; }
+  .grid2 { display: grid; gap: 14px; }
+  @media (min-width: 760px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+  .card h3 { font-size: 1.12rem; margin-bottom: 10px; }
+  .card ul { margin: 0; padding-left: 1.1em; color: var(--muted); }
+  .card li + li { margin-top: 6px; }
+  .card.honest { border-color: color-mix(in srgb, var(--warn) 45%, var(--line)); }
+  details { border-bottom: 1px solid var(--line); padding: 16px 0; }
+  details summary { cursor: pointer; font-weight: 600; list-style: none; }
+  details summary::after { content: "+"; float: right; color: var(--gold-ink); }
+  details[open] summary::after { content: "–"; }
+  details p { color: var(--muted); margin-top: 8px; }
+  .contact-box { background: linear-gradient(135deg, color-mix(in srgb, var(--gold) 18%, var(--surface)), var(--surface)); border: 1px solid var(--line); border-radius: 22px; padding: clamp(24px, 4vw, 44px); display: grid; gap: 16px; }
+  .contact-box h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+  .contact-box p { color: var(--muted); max-width: 40rem; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: 0.88rem; }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="SkillsTribes home"><svg class="logo" viewBox="0 0 32 32" width="40" height="40" aria-hidden="true"><path d="M16 6 L6.5 23 L25.5 23 Z"/><circle class="c1" cx="16" cy="6" r="4.2"/><circle class="c2" cx="6.5" cy="23" r="4.2"/><circle class="c3" cx="25.5" cy="23" r="4.2"/></svg><span>Skills<b>Tribes</b></span></a>
+    <nav aria-label="Main">
+      <a class="nav-link" href="/">Home</a>
+      <a class="nav-link" href="/#services">Services</a>
+      <a class="nav-link keep" href="#demo">Demo</a>
+      <a class="btn btn-gold" href="#contact">Free trial</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">For online stores in Pakistan that sell on COD</p>
+        <h1>Confirm every COD order on WhatsApp <span class="grad">before the parcel leaves.</span></h1>
+        <p class="lead">As soon as an order comes in, the customer gets a WhatsApp message with the order details and three buttons: Confirm, Cancel, Change address. Their answer goes straight into your order list, so your team ships only the orders that were confirmed.</p>
+        <div class="cta-row">
+          <a class="btn btn-gold" href="#demo">Try the demo</a>
+          <a class="btn btn-line" href="#contact">Start a free trial</a>
+        </div>
+        <div class="facts"><span>Urdu or English</span><span>Shopify, WooCommerce or a Google Sheet</span><span>No calling customers one by one</span></div>
+      </div>
+      <div class="phone" aria-hidden="true">
+        <div class="phone-top"><div class="avatar">YS</div><div>Your Store<small>WhatsApp Business</small></div></div>
+        <div class="chat">
+          <div class="msg in">Assalam o Alaikum Ayesha! We received your order #1042.
+2 items · Total Rs 3,450 (Cash on Delivery)
+Address: Gulshan-e-Iqbal, Karachi
+Please confirm your order.<time>11:42</time></div>
+          <div class="qr"><button disabled>✅ Confirm order</button><button disabled>❌ Cancel</button><button disabled>📍 Change address</button></div>
+          <div class="msg out">✅ Confirm order<time>11:43</time></div>
+          <div class="msg in">Thank you! Your order is confirmed and will be dispatched today.<time>11:43</time></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="demo">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Live demo · sample data</p>
+        <h2>Play the customer. Watch the order list update.</h2>
+        <p>Press "+ New order", answer on the customer's phone, and see the status change in your order list. Everything here is sample data and nothing is sent to anyone.</p>
+      </div>
+      <div class="demo">
+        <div class="panel">
+          <div class="panel-top"><span>Orders · today</span><span class="tag">DEMO</span></div>
+          <div class="counts" id="counts"></div>
+          <ul class="orders" id="orders"></ul>
+          <div class="panel-foot">
+            <button class="btn btn-gold" id="new-order" type="button">+ New order</button>
+            <button class="btn btn-line" id="reset" type="button">Reset</button>
+          </div>
+        </div>
+        <div>
+          <div class="phone">
+            <div class="phone-top"><div class="avatar" id="cust-av">…</div><div><span id="cust-name">Customer's phone</span><small>Messages from Your Store</small></div>
+              <div class="lang" style="margin-left:auto" role="group" aria-label="Message language">
+                <button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="ur" aria-pressed="false">اردو</button>
+              </div>
+            </div>
+            <div class="chat" id="chat"><p class="empty">Press "+ New order" to see the message a customer receives.</p></div>
+          </div>
+          <p class="demo-note">In the real setup the message comes from your store's own WhatsApp Business number, with your store name.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">How it works</p>
+        <h2>Four steps, no extra work for your team.</h2>
+      </div>
+      <ol class="steps">
+        <li><h3>Order comes in</h3><p>From your Shopify or WooCommerce store, or a row in your Google Sheet if you take orders on Instagram and WhatsApp.</p></li>
+        <li><h3>Customer gets WhatsApp</h3><p>Order number, items, total, address, and buttons to confirm, cancel or change the address. In Urdu or English.</p></li>
+        <li><h3>The answer is saved</h3><p>The order is marked Confirmed, Cancelled or "Address change" on its own. No one has to read chats and copy answers.</p></li>
+        <li><h3>No reply? Follow up</h3><p>If the customer does not answer in the time you choose, a reminder goes out, and the order waits in a separate list for your team to call.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap grid2">
+      <div class="card">
+        <h3>What you get</h3>
+        <ul>
+          <li>Setup on your store and your WhatsApp Business number, done by us</li>
+          <li>Message text in your words, in Urdu, English or both</li>
+          <li>A simple list of today's orders: confirmed, cancelled, waiting</li>
+          <li>Changes you ask for during the trial, for example a different reminder time or a new message</li>
+        </ul>
+      </div>
+      <div class="card honest">
+        <h3>Good to know before you start</h3>
+        <ul>
+          <li>Automatic WhatsApp messages need the official WhatsApp Business Platform. We help you set it up on your number.</li>
+          <li>Meta (WhatsApp) charges a small fee per message, about USD 0.015 per order-update message in Pakistan at today's rates. This is paid by the store directly to Meta, not to us.</li>
+          <li>It cannot stop every return. It does tell you which orders the customer confirmed before you pay the courier.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Questions</p><h2>Common questions</h2></div>
+      <details><summary>Do I need Shopify?</summary><p>No. It works with Shopify, WooCommerce, or a Google Sheet where your team writes the orders.</p></details>
+      <details><summary>Will the message come from my number?</summary><p>Yes. It comes from your store's WhatsApp Business number, with your store's name.</p></details>
+      <details><summary>Can customers reply in their own words?</summary><p>Yes. Button answers are saved on their own. Any other reply stays in your WhatsApp for your team to read.</p></details>
+      <details><summary>What does it cost?</summary><p>The first 30 days are a free trial, and nothing is charged by us. After that there is a monthly fee, which we agree with you in writing before the trial ends. WhatsApp's own per-message fee is paid by the store to Meta.</p></details>
+      <details><summary>Can we stop at any time?</summary><p>Yes. You keep your orders and your WhatsApp number.</p></details>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <div class="contact-box">
+        <p class="eyebrow">Free 30-day trial</p>
+        <h2>Want to try it on your store?</h2>
+        <p>Send us your store name and roughly how many COD orders you get a day. We will set it up, and you can see it working on your own orders.</p>
+        <div class="cta-row" style="margin-top:0">
+          <a class="btn btn-gold" id="wa-go" href="https://wa.me/923338318082?text=Hello%20SkillsTribes%2C%20I%20would%20like%20a%20free%20trial%20of%20WhatsApp%20COD%20order%20confirmation.%0AStore%3A%20%0ACOD%20orders%20per%20day%3A%20" target="_blank" rel="noopener">Message us on WhatsApp</a>
+          <a class="btn btn-line" href="mailto:info@skillstribes.com?subject=COD%20order%20confirmation%20trial">info@skillstribes.com</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>&copy; 2026 SkillsTribes</span>
+    <span><a href="/">Home</a> · <a href="/#services">Services</a> · <a href="/clinics/">Healthcare</a> · <a href="/hvac/">Technical</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // Sample data only. Nothing is sent anywhere.
+  var PEOPLE = [
+    { n: "Ayesha", city: "Gulshan-e-Iqbal, Karachi", cityUr: "گلشن اقبال، کراچی", items: 2, total: 3450 },
+    { n: "Bilal", city: "Johar Town, Lahore", cityUr: "جوہر ٹاؤن، لاہور", items: 1, total: 1890 },
+    { n: "Sana", city: "G-11, Islamabad", cityUr: "جی الیون، اسلام آباد", items: 3, total: 5200 },
+    { n: "Usman", city: "Satellite Town, Rawalpindi", cityUr: "سیٹلائٹ ٹاؤن، راولپنڈی", items: 1, total: 2499 },
+    { n: "Hira", city: "Madina Town, Faisalabad", cityUr: "مدینہ ٹاؤن، فیصل آباد", items: 2, total: 4150 },
+    { n: "Kamran", city: "Hayatabad, Peshawar", cityUr: "حیات آباد، پشاور", items: 4, total: 6780 }
+  ];
+  var NAMES_UR = { Ayesha: "عائشہ", Bilal: "بلال", Sana: "ثنا", Usman: "عثمان", Hira: "حرا", Kamran: "کامران" };
+  var START = [
+    { id: 1031, n: "Fatima", city: "Multan", total: 2750, s: "ok" },
+    { id: 1032, n: "Ahmed", city: "Hyderabad", total: 1450, s: "bad" },
+    { id: 1033, n: "Zainab", city: "Sialkot", total: 3900, s: "wait" }
+  ];
+  var LABEL = { ok: "Confirmed", bad: "Cancelled", wait: "No reply yet", new: "Message sent", addr: "Address change" };
+  var orders, nextId, pi, lang = "en", current = null;
+  var list = document.getElementById("orders"), chat = document.getElementById("chat"), counts = document.getElementById("counts");
+
+  function rs(n) { return "Rs " + n.toLocaleString("en-PK"); }
+  function now() { var d = new Date(); return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); }
+
+  function render(flashId) {
+    list.innerHTML = "";
+    orders.slice().reverse().forEach(function (o) {
+      var li = document.createElement("li");
+      if (o.id === flashId) { li.className = "flash"; setTimeout(function () { li.className = ""; }, 900); }
+      var id = document.createElement("span"); id.className = "id"; id.textContent = "#" + o.id;
+      var who = document.createElement("span"); who.className = "who";
+      var b = document.createElement("b"); b.textContent = o.n + " · " + rs(o.total);
+      var c = document.createElement("span"); c.textContent = o.city + " · COD";
+      who.appendChild(b); who.appendChild(c);
+      var chip = document.createElement("span"); chip.className = "chip " + o.s; chip.textContent = LABEL[o.s];
+      li.appendChild(id); li.appendChild(who); li.appendChild(chip);
+      list.appendChild(li);
+    });
+    var t = { ok: 0, bad: 0, wait: 0 };
+    orders.forEach(function (o) { if (o.s === "ok") t.ok++; else if (o.s === "bad") t.bad++; else t.wait++; });
+    counts.innerHTML = "";
+    [["Confirmed", t.ok], ["Cancelled", t.bad], ["Waiting", t.wait]].forEach(function (p) {
+      var s = document.createElement("span"); s.innerHTML = p[0] + ": <b></b>"; s.querySelector("b").textContent = p[1]; counts.appendChild(s);
+    });
+  }
+
+  function bubble(text, side, ur) {
+    var d = document.createElement("div"); d.className = "msg " + side + (ur ? " ur" : "");
+    d.textContent = text; var tm = document.createElement("time"); tm.textContent = now(); d.appendChild(tm);
+    chat.appendChild(d); return d;
+  }
+
+  function orderText(o, p) {
+    if (lang === "ur") {
+      return "السلام علیکم " + NAMES_UR[p.n] + "!\nآپ کا آرڈر #" + o.id + " ہمیں مل گیا ہے۔\n" + p.items + " اشیاء · کل رقم: " + rs(o.total) + " (کیش آن ڈیلیوری)\nپتہ: " + p.cityUr + "\nبراہِ کرم اپنے آرڈر کی تصدیق کریں۔";
+    }
+    return "Assalam o Alaikum " + p.n + "! We received your order #" + o.id + ".\n" + p.items + (p.items > 1 ? " items" : " item") + " · Total " + rs(o.total) + " (Cash on Delivery)\nAddress: " + p.city + "\nPlease confirm your order.";
+  }
+  var BTN = { en: ["✅ Confirm order", "❌ Cancel", "📍 Change address"], ur: ["✅ آرڈر کی تصدیق", "❌ منسوخ کریں", "📍 پتہ تبدیل کریں"] };
+  var REPLY = {
+    en: { ok: "Thank you! Your order is confirmed and will be dispatched soon.", bad: "Your order has been cancelled. We hope to see you again.", addr: "Please send your full new address here. Our team will update the order." },
+    ur: { ok: "شکریہ! آپ کا آرڈر کنفرم ہو گیا ہے اور جلد روانہ کر دیا جائے گا۔", bad: "آپ کا آرڈر منسوخ کر دیا گیا ہے۔", addr: "براہِ کرم اپنا نیا مکمل پتہ یہاں بھیجیں۔ ہماری ٹیم آرڈر اپ ڈیٹ کر دے گی۔" }
+  };
+
+  function newOrder() {
+    var p = PEOPLE[pi % PEOPLE.length]; pi++;
+    var o = { id: nextId++, n: p.n, city: p.city.split(", ").pop(), total: p.total, s: "new" };
+    orders.push(o); render(o.id);
+    current = { o: o, p: p };
+    showChat();
+    if (window.innerWidth < 720) { chat.parentNode.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  }
+
+  function showChat() {
+    var o = current.o, p = current.p;
+    document.getElementById("cust-name").textContent = p.n + " (customer)";
+    document.getElementById("cust-av").textContent = p.n.charAt(0);
+    chat.innerHTML = "";
+    var ur = lang === "ur";
+    bubble(orderText(o, p), "in", ur);
+    var qr = document.createElement("div"); qr.className = "qr" + (ur ? " ur" : "");
+    ["ok", "bad", "addr"].forEach(function (k, i) {
+      var b = document.createElement("button"); b.type = "button"; b.textContent = BTN[lang][i];
+      b.addEventListener("click", function () { answer(k, b.textContent, qr, ur); });
+      qr.appendChild(b);
+    });
+    chat.appendChild(qr);
+    var hint = document.createElement("span"); hint.className = "qr-hint"; hint.textContent = "Tap a button as the customer ↑"; chat.appendChild(hint);
+  }
+
+  function answer(k, label, qr, ur) {
+    Array.prototype.forEach.call(qr.querySelectorAll("button"), function (b) { b.disabled = true; });
+    var h = chat.querySelector(".qr-hint"); if (h) h.remove();
+    bubble(label, "out", ur);
+    setTimeout(function () {
+      bubble(REPLY[ur ? "ur" : "en"][k], "in", ur);
+      current.o.s = k; render(current.o.id);
+    }, 600);
+  }
+
+  function reset() {
+    orders = START.map(function (o) { return Object.assign({}, o); }); nextId = 1042; pi = 0; current = null;
+    chat.innerHTML = '<p class="empty">Press "+ New order" to see the message a customer receives.</p>';
+    document.getElementById("cust-name").textContent = "Customer's phone";
+    document.getElementById("cust-av").textContent = "…";
+    render();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll(".lang button"), function (b) {
+    b.addEventListener("click", function () {
+      lang = b.getAttribute("data-lang");
+      Array.prototype.forEach.call(document.querySelectorAll(".lang button"), function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+      if (current && current.o.s === "new") { showChat(); }
+    });
+  });
+  document.getElementById("new-order").addEventListener("click", newOrder);
+  document.getElementById("reset").addEventListener("click", reset);
+  reset();
+})();
+</script>
+</body>
+</html>
