@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /assets/portfolio/
 
 Sitemap: https://skillstribes.com/sitemap.xml
-User-agent: *
-Disallow: /assets/portfolio/
