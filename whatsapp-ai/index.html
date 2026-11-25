@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WhatsApp AI Assistant for Your Business | SkillsTribes</title>
+<meta name="description" content="An AI assistant on your business WhatsApp that answers customers from your approved information, takes bookings and enquiries, and hands over to your team. Try the demo. Free trial.">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0a1020">
+<link rel="canonical" href="https://skillstribes.com/whatsapp-ai/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a1020'/%3E%3Ccircle cx='16' cy='8' r='4.2' fill='%235b8cff'/%3E%3Ccircle cx='8' cy='23' r='4.2' fill='%23a58bff'/%3E%3Ccircle cx='24' cy='23' r='4.2' fill='%238fb0ff'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SkillsTribes">
+<meta property="og:title" content="WhatsApp AI assistant for your business | SkillsTribes">
+<meta property="og:description" content="Answers customers day and night from your information, takes bookings, hands over to your team. Try the demo.">
+<meta property="og:url" content="https://skillstribes.com/whatsapp-ai/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Hanken+Grotesk:wght@400..700&family=IBM+Plex+Mono:wght@400;500&family=Unbounded:wght@500..700&display=swap">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0a1020; --bg-2: #0f1830; --surface: #131f3b; --line: #243357;
+    --fg: #eef2fb; --muted: #a0acc6; --gold: #5b8cff; --gold-ink: #8fb0ff; --on-gold: #07122e;
+    --ok: #62c295; --warn: #e6b062; --bad: #ec8579; --accent2: #a58bff;
+    --wa-bg: #0b141a; --wa-in: #202c33; --wa-out: #005c4b; --wa-ink: #e9edef; --wa-btn: #53bdeb;
+    --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --body: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    --brand: "Unbounded", "Bricolage Grotesque", system-ui, sans-serif;
+    --urdu: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 1.0625rem; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+  a { color: var(--gold-ink); }
+  h1, h2, h3 { font-family: var(--display); line-height: 1.08; letter-spacing: -0.02em; text-wrap: balance; margin: 0; }
+  p { margin: 0; }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding-inline: max(16px, env(safe-area-inset-left, 0px)); }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold-ink); }
+  section { padding-block: clamp(48px, 8vw, 96px); border-top: 1px solid var(--line); }
+  .sec-head { display: grid; gap: 12px; max-width: 660px; margin-bottom: clamp(28px, 4vw, 44px); }
+  .sec-head h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); font-weight: 700; }
+  .sec-head p { color: var(--muted); }
+
+  header { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 68px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--fg); font: 600 1.05rem var(--brand); }
+  .brand b { color: var(--gold-ink); font-weight: 600; }
+  .logo path { fill: none; stroke: var(--line); stroke-width: 1.4; }
+  .logo .c1 { fill: var(--gold); } .logo .c2 { fill: var(--accent2); } .logo .c3 { fill: var(--gold-ink); }
+  nav { display: flex; align-items: center; gap: 18px; }
+  nav a.nav-link { color: var(--muted); text-decoration: none; font-size: 0.95rem; }
+  nav a.nav-link:hover { color: var(--fg); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 20px; border-radius: 999px; font: 600 0.98rem var(--body); text-decoration: none; cursor: pointer; border: 1px solid transparent; }
+  .btn-gold { background: var(--gold); color: var(--on-gold); }
+  .btn-line { border-color: var(--line); color: var(--fg); background: transparent; }
+  @media (max-width: 760px) { nav a.nav-link:not(.keep) { display: none; } }
+
+  .hero { border-top: 0; padding-top: clamp(40px, 7vw, 80px); }
+  .hero-grid { display: grid; gap: clamp(32px, 5vw, 56px); align-items: center; }
+  @media (min-width: 920px) { .hero-grid { grid-template-columns: 1fr 1fr; } }
+  .hero h1 { font-size: clamp(2rem, 4.4vw, 3.1rem); font-weight: 800; margin-top: 14px; }
+  .grad { background: linear-gradient(90deg, var(--gold-ink), var(--accent2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { color: var(--muted); font-size: 1.12rem; margin-top: 18px; max-width: 34rem; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+  .facts { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 22px; font: 500 0.85rem var(--mono); color: var(--muted); }
+  .facts span::before { content: "✓ "; color: var(--ok); }
+
+  /* ---- Demo ---- */
+  .demo { display: grid; gap: 16px; }
+  @media (min-width: 720px) { .demo { grid-template-columns: 1.1fr 0.9fr; align-items: start; } }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+  .panel-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--line); font: 500 0.8rem var(--mono); color: var(--muted); }
+  .tag { font: 500 0.7rem var(--mono); padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--warn); }
+  .orders { list-style: none; margin: 0; padding: 0; }
+  .orders li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 11px 14px; border-bottom: 1px solid var(--line); font-size: 0.92rem; transition: background .4s; }
+  .orders li:last-child { border-bottom: 0; }
+  .orders li.flash { background: color-mix(in srgb, var(--gold) 14%, transparent); }
+  .orders .id { font: 500 0.8rem var(--mono); color: var(--muted); }
+  .orders .who b { display: block; font-weight: 600; }
+  .orders .who span { color: var(--muted); font-size: 0.82rem; }
+  .chip { font: 500 0.72rem var(--mono); padding: 3px 9px; border-radius: 999px; white-space: nowrap; border: 1px solid currentColor; }
+  .chip.wait { color: var(--warn); } .chip.ok { color: var(--ok); } .chip.bad { color: var(--bad); } .chip.new { color: var(--gold-ink); } .chip.addr { color: var(--accent2); }
+  .panel-foot { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--line); }
+  .panel-foot .btn { min-height: 40px; font-size: 0.9rem; padding: 0 16px; }
+  .counts { display: flex; gap: 14px; padding: 10px 14px; font: 500 0.78rem var(--mono); color: var(--muted); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .counts b { color: var(--fg); }
+
+  .phone { background: var(--wa-bg); border-radius: 22px; border: 1px solid var(--line); overflow: hidden; color: var(--wa-ink); }
+  .phone-top { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #202c33; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--accent2)); display: grid; place-items: center; font: 700 0.8rem var(--body); color: #fff; }
+  .phone-top small { display: block; color: #8696a0; font-size: 0.75rem; }
+  .chat { min-height: 330px; padding: 14px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .msg { max-width: 88%; padding: 8px 10px 6px; border-radius: 10px; font-size: 0.9rem; line-height: 1.5; white-space: pre-line; }
+  .msg.in { background: var(--wa-in); align-self: flex-start; border-top-left-radius: 2px; }
+  .msg.out { background: var(--wa-out); align-self: flex-end; border-top-right-radius: 2px; }
+  .msg.ur { font-family: var(--urdu); direction: rtl; text-align: right; line-height: 2.1; font-size: 0.95rem; }
+  .msg time { display: block; text-align: right; font-size: 0.68rem; color: #8696a0; margin-top: 2px; direction: ltr; }
+  .qr { display: grid; gap: 4px; align-self: flex-start; width: min(88%, 300px); }
+  .qr button { background: var(--wa-in); color: var(--wa-btn); border: 0; border-radius: 8px; padding: 9px; font: 600 0.9rem var(--body); cursor: pointer; }
+  .qr.ur button { font-family: var(--urdu); font-weight: 600; }
+  .qr button:disabled { opacity: .45; cursor: default; }
+  .qr-hint { font: 500 0.72rem var(--mono); color: #8696a0; align-self: flex-start; }
+  .empty { margin: auto; text-align: center; color: #8696a0; font-size: 0.88rem; max-width: 240px; }
+  .lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .lang button { background: transparent; color: var(--muted); border: 0; padding: 4px 12px; font: 500 0.75rem var(--mono); cursor: pointer; }
+  .lang button[aria-pressed="true"] { background: var(--gold); color: var(--on-gold); }
+  .demo-note { color: var(--muted); font-size: 0.85rem; margin-top: 12px; }
+
+  /* ---- Content ---- */
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: s; }
+  @media (min-width: 760px) { .steps { grid-template-columns: repeat(4, 1fr); } }
+  .steps li { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; counter-increment: s; }
+  .steps li::before { content: "0" counter(s); font: 500 0.8rem var(--mono); color: var(--gold-ink); display: block; margin-bottom: 10px; }
+  .steps h3 { font-size: 1.08rem; margin-bottom: 6px; }
+  .steps p { color: var(--muted); font-size: 0.95rem; }
+  .grid2 { display: grid; gap: 14px; }
+  @media (min-width: 760px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+  .card h3 { font-size: 1.12rem; margin-bottom: 10px; }
+  .card ul { margin: 0; padding-left: 1.1em; color: var(--muted); }
+  .card li + li { margin-top: 6px; }
+  .card.honest { border-color: color-mix(in srgb, var(--warn) 45%, var(--line)); }
+  details { border-bottom: 1px solid var(--line); padding: 16px 0; }
+  details summary { cursor: pointer; font-weight: 600; list-style: none; }
+  details summary::after { content: "+"; float: right; color: var(--gold-ink); }
+  details[open] summary::after { content: "–"; }
+  details p { color: var(--muted); margin-top: 8px; }
+  .contact-box { background: linear-gradient(135deg, color-mix(in srgb, var(--gold) 18%, var(--surface)), var(--surface)); border: 1px solid var(--line); border-radius: 22px; padding: clamp(24px, 4vw, 44px); display: grid; gap: 16px; }
+  .contact-box h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+  .contact-box p { color: var(--muted); max-width: 40rem; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: 0.88rem; }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+  footer a { color: var(--muted); }
+
+  .biz-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .biz-tabs button { background: transparent; border: 1px solid var(--line); color: var(--muted); border-radius: 999px; padding: 8px 16px; font: 600 0.92rem var(--body); cursor: pointer; }
+  .biz-tabs button[aria-selected="true"] { background: var(--gold); color: var(--on-gold); border-color: var(--gold); }
+  #chat { height: 400px; overflow-y: auto; min-height: 0; }
+  .msg.typing { color: #8696a0; font-style: italic; }
+  .composer { display: flex; gap: 8px; padding: 10px; background: #202c33; }
+  .composer input { flex: 1; min-width: 0; background: #2a3942; border: 0; border-radius: 999px; padding: 10px 14px; color: var(--wa-ink); font: 400 0.95rem var(--body); }
+  .composer button { width: 42px; height: 42px; border-radius: 50%; border: 0; background: #00a884; color: #fff; font-size: 1rem; cursor: pointer; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; }
+  .chips button { background: var(--bg-2); border: 1px solid var(--line); color: var(--fg); border-radius: 999px; padding: 7px 13px; font: 500 0.88rem var(--body); cursor: pointer; text-align: left; }
+  .chips button:hover { border-color: var(--gold); }
+  .empty-row { display: block !important; color: var(--muted); font-size: 0.88rem; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="SkillsTribes home"><svg class="logo" viewBox="0 0 32 32" width="40" height="40" aria-hidden="true"><path d="M16 6 L6.5 23 L25.5 23 Z"/><circle class="c1" cx="16" cy="6" r="4.2"/><circle class="c2" cx="6.5" cy="23" r="4.2"/><circle class="c3" cx="25.5" cy="23" r="4.2"/></svg><span>Skills<b>Tribes</b></span></a>
+    <nav aria-label="Main">
+      <a class="nav-link" href="/">Home</a>
+      <a class="nav-link" href="/#services">Services</a>
+      <a class="nav-link keep" href="#demo">Demo</a>
+      <a class="btn btn-gold" href="#contact">Free trial</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">WhatsApp AI assistant · for any business</p>
+        <h1>Your WhatsApp, answered <span class="grad">day and night.</span></h1>
+        <p class="lead">An AI assistant on your business WhatsApp that answers customers from the information you approve, takes booking and enquiry details, and hands the chat to your team when a person is needed.</p>
+        <div class="cta-row">
+          <a class="btn btn-gold" href="#demo">Try the demo</a>
+          <a class="btn btn-line" href="#contact">Start a free trial</a>
+        </div>
+        <div class="facts"><span>English, Arabic or Urdu</span><span>Answers only from your information</span><span>Hands over to your staff</span></div>
+      </div>
+      <div class="phone" aria-hidden="true">
+        <div class="phone-top"><div class="avatar">AI</div><div>Your Business<small>WhatsApp Business</small></div></div>
+        <div class="chat">
+          <div class="msg out">Hi, are you open on Friday?<time>22:41</time></div>
+          <div class="msg in">Hello! Yes, we are open on Friday from 2 PM to 10 PM. Would you like to book a time?<time>22:41</time></div>
+          <div class="msg out">Yes, around 6 PM<time>22:42</time></div>
+          <div class="msg in">Sure. May I have your name, please? I will pass your request for Friday 6 PM to our team, and they will confirm it on this chat.<time>22:42</time></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="demo">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Live demo · sample business</p>
+        <h2>Pick a business. Ask it something.</h2>
+        <p>Tap a suggested question or type your own. This demo runs on a fixed sample script for three made-up businesses, so it only understands common questions. The real assistant uses AI and is set up with your own services, prices and timings.</p>
+      </div>
+      <div class="biz-tabs" role="tablist" aria-label="Sample business">
+        <button type="button" role="tab" data-biz="clinic" aria-selected="true">Clinic</button>
+        <button type="button" role="tab" data-biz="transport" aria-selected="false">Transport company</button>
+        <button type="button" role="tab" data-biz="ac" aria-selected="false">AC maintenance</button>
+      </div>
+      <div class="demo">
+        <div>
+          <div class="phone">
+            <div class="phone-top"><div class="avatar" id="biz-av">C</div><div><span id="biz-name">Sample Clinic</span><small id="biz-sub">AI assistant · demo</small></div></div>
+            <div class="chat" id="chat" aria-live="polite"></div>
+            <form class="composer" id="composer" autocomplete="off">
+              <input id="msg" type="text" placeholder="Type a message" aria-label="Type a message" maxlength="200">
+              <button type="submit" aria-label="Send">➤</button>
+            </form>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-top"><span>Try asking</span><span class="tag">DEMO</span></div>
+          <div class="chips" id="chips"></div>
+          <div class="panel-top" style="border-top:1px solid var(--line)"><span>Sent to your team</span></div>
+          <ul class="orders" id="inbox"><li class="empty-row">Booking and enquiry requests from the chat appear here.</li></ul>
+          <div class="panel-foot"><button class="btn btn-line" id="reset" type="button">Restart chat</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">How it works</p>
+        <h2>Set up around your business, not a template.</h2>
+      </div>
+      <ol class="steps">
+        <li><h3>You share your information</h3><p>Services, prices, timings, locations and the questions customers usually ask. We write it up and you approve it.</p></li>
+        <li><h3>We connect your WhatsApp</h3><p>Your WhatsApp Business number is set up on the official WhatsApp Business Platform, with your business name.</p></li>
+        <li><h3>The assistant answers</h3><p>It replies at any hour from your approved information and collects booking or enquiry details.</p></li>
+        <li><h3>Your team takes over</h3><p>Requests come to your team, and any chat can be handed to a person when the customer asks or the assistant is not sure.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap grid2">
+      <div class="card">
+        <h3>What it can do</h3>
+        <ul>
+          <li>Answer questions about your services, prices, timings and location</li>
+          <li>Take appointment, booking, quote or complaint details and pass them to your team</li>
+          <li>Reply in English, Arabic or Urdu</li>
+          <li>Hand the chat to a person whenever it should</li>
+        </ul>
+      </div>
+      <div class="card honest">
+        <h3>Good to know before you start</h3>
+        <ul>
+          <li>It answers only from the information you approve, and does not give medical, legal or financial advice.</li>
+          <li>It needs the official WhatsApp Business Platform. We help you set it up. Meta (WhatsApp) charges its own fee per message, paid by your business directly to Meta.</li>
+          <li>Ready in 5–7 working days, counted from the day Meta approves your number.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Questions</p><h2>Common questions</h2></div>
+      <details><summary>Will it use my current WhatsApp number?</summary><p>Yes, your WhatsApp Business number is connected to the official WhatsApp Business Platform. We check with you before any change, so your customers keep messaging the same number.</p></details>
+      <details><summary>What if it does not know the answer?</summary><p>It says so politely and passes the chat to your team. It does not make up prices or promises.</p></details>
+      <details><summary>Can my staff still reply themselves?</summary><p>Yes. Your team can take over any chat at any time.</p></details>
+      <details><summary>Which businesses is it for?</summary><p>Any business that gets questions on WhatsApp: clinics, transport and logistics, maintenance companies, shops, schools, real estate and more.</p></details>
+      <details><summary>What does it cost?</summary><p>We start with a free trial. The monthly fee depends on what the assistant needs to do, and we agree it with you in writing before the trial ends. WhatsApp's own per-message fee is paid by your business to Meta.</p></details>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <div class="contact-box">
+        <p class="eyebrow">Free trial</p>
+        <h2>Want an assistant for your business?</h2>
+        <p>Tell us your business name and the questions your customers ask most. We will set the assistant up and you can see it answer before you decide.</p>
+        <div class="cta-row" style="margin-top:0">
+          <a class="btn btn-gold" href="https://wa.me/923338318082?text=Hello%20SkillsTribes%2C%20I%20would%20like%20a%20free%20trial%20of%20the%20WhatsApp%20AI%20assistant.%0ABusiness%3A%20" target="_blank" rel="noopener">Message us on WhatsApp</a>
+          <a class="btn btn-line" href="mailto:info@skillstribes.com?subject=WhatsApp%20AI%20assistant%20trial">info@skillstribes.com</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+<footer>
+  <div class="wrap">
+    <span>&copy; 2026 SkillsTribes</span>
+    <span><a href="/">Home</a> · <a href="/#services">Services</a> · <a href="/clinics/">Healthcare</a> · <a href="/hvac/">Technical</a> · <a href="/whatsapp-ai/">WhatsApp AI</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // Fixed sample script. Nothing is sent anywhere.
+  var BIZ = {
+    clinic: {
+      name: "Sample Clinic", av: "C",
+      hello: "Hello! This is the assistant of Sample Clinic. I can help with timings, services, prices and appointments. How can I help?",
+      chips: ["What are your timings?", "How much is a consultation?", "Where are you located?", "I want to book an appointment", "Can I talk to a person?"],
+      intents: [
+        { k: ["timing", "time", "open", "close", "hour", "friday", "sunday", "today"], a: "We are open Saturday to Thursday, 9 AM to 9 PM, and Friday 2 PM to 10 PM. Would you like to book a time?" },
+        { k: ["price", "fee", "cost", "charge", "how much", "consult"], a: "A general consultation is AED 150 (sample price). Prices for treatments depend on the doctor's assessment. Shall I book a consultation for you?" },
+        { k: ["where", "location", "address", "map", "parking"], a: "We are on Sample Street, near the City Mall, with free parking at the back. Here is the map pin: (sample link)." },
+        { k: ["service", "treat", "offer", "do you do", "doctor", "specialist"], a: "We offer general medicine, physiotherapy, dermatology and dental care (sample list). Which one are you interested in?" }
+      ],
+      book: { trigger: ["book", "appointment", "visit", "slot", "reserve"], steps: ["Sure. May I have your name, please?", "Thank you, {name}. Which service, and what day and time suit you?"], done: "Thank you, {name}. I have passed your request ({detail}) to our front desk. They will confirm your appointment on this chat.", label: "Appointment request" }
+    },
+    transport: {
+      name: "Sample Transport LLC", av: "T",
+      hello: "Hello! This is the assistant of Sample Transport. I can help with truck types, routes and quotes. How can I help?",
+      chips: ["What trucks do you have?", "Do you go to Saudi Arabia?", "I need a quote", "Where is my shipment?", "Can I talk to a person?"],
+      intents: [
+        { k: ["truck", "trailer", "flatbed", "lowbed", "type", "fleet", "vehicle", "chiller"], a: "We run 3-ton and 7-ton trucks, 40 ft flatbed trailers and lowbed trailers (sample fleet). What would you like to move?" },
+        { k: ["saudi", "oman", "qatar", "kuwait", "bahrain", "gcc", "cross", "border", "route"], a: "Yes, we cover all UAE emirates and run trips to Saudi Arabia, Oman and Qatar (sample routes). I can take your quote request now." },
+        { k: ["where is", "track", "status", "shipment", "delivered", "driver"], a: "I can't see live trip status in this demo. Please send your waybill number and I will pass it to our operations team to update you." },
+        { k: ["time", "open", "hour", "office"], a: "Our office is open Saturday to Thursday, 8 AM to 6 PM. Trips run every day." }
+      ],
+      book: { trigger: ["quote", "price", "rate", "cost", "how much", "book", "need a truck"], steps: ["Sure. From where to where, and what is the cargo?", "Thank you. What truck type and which date do you need?"], done: "Thank you. I have passed your quote request ({detail}) to our operations team. They will send you the rate on this chat.", label: "Quote request" }
+    },
+    ac: {
+      name: "Sample AC Services", av: "A",
+      hello: "Hello! This is the assistant of Sample AC Services. I can help with AC repair, maintenance contracts and visits. How can I help?",
+      chips: ["My AC is not cooling", "Do you have yearly contracts?", "How much is AC cleaning?", "What areas do you cover?", "Can I talk to a person?"],
+      intents: [
+        { k: ["contract", "amc", "yearly", "annual", "maintenance plan"], a: "Yes, we offer yearly maintenance contracts with 4 planned visits and priority breakdown calls (sample plan). Would you like a quote for your units?" },
+        { k: ["clean", "service", "price", "cost", "how much"], a: "AC cleaning is AED 120 per split unit (sample price), including filter and coil cleaning. Shall I book a visit?" },
+        { k: ["area", "cover", "where", "location", "emirate"], a: "We cover Dubai, Sharjah and Ajman (sample areas). Which area are you in?" },
+        { k: ["time", "open", "hour", "emergency", "24"], a: "Our team works every day from 8 AM to 10 PM, and we take emergency calls at night (sample timings)." }
+      ],
+      book: { trigger: ["not cooling", "leak", "noise", "broken", "repair", "visit", "complaint", "book"], steps: ["Sorry to hear that. May I have your name and area, please?", "Thank you, {name}. How many units, and what day and time suit you for a technician visit?"], done: "Thank you, {name}. I have logged your request ({detail}) and passed it to our team. A coordinator will confirm the technician's time on this chat.", label: "Service request" }
+    }
+  };
+  var HUMAN = ["person", "human", "agent", "staff", "talk to", "call me", "speak"];
+  var biz = "clinic", flow = null, chat = document.getElementById("chat"), chipsEl = document.getElementById("chips"), inbox = document.getElementById("inbox"), input = document.getElementById("msg");
+
+  function now() { var d = new Date(); return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); }
+  function bubble(text, side) {
+    var d = document.createElement("div"); d.className = "msg " + side; d.textContent = text;
+    var t = document.createElement("time"); t.textContent = now(); d.appendChild(t);
+    chat.appendChild(d); chat.scrollTop = chat.scrollHeight;
+  }
+  function typing(cb) {
+    var d = document.createElement("div"); d.className = "msg in typing"; d.textContent = "typing…"; chat.appendChild(d); chat.scrollTop = chat.scrollHeight;
+    setTimeout(function () { d.remove(); cb(); }, 650);
+  }
+  function has(t, list) { return list.some(function (k) { return t.indexOf(k) !== -1; }); }
+  function addInbox(label, detail) {
+    var e = inbox.querySelector(".empty-row"); if (e) e.remove();
+    var li = document.createElement("li");
+    var tag = document.createElement("span"); tag.className = "chip new"; tag.textContent = label;
+    var w = document.createElement("span"); w.className = "who"; var b = document.createElement("b"); b.textContent = BIZ[biz].name; var s = document.createElement("span"); s.textContent = detail;
+    w.appendChild(b); w.appendChild(s);
+    var tm = document.createElement("span"); tm.className = "id"; tm.textContent = now();
+    li.appendChild(tm); li.appendChild(w); li.appendChild(tag); inbox.insertBefore(li, inbox.firstChild);
+    li.className = "flash"; setTimeout(function () { li.className = ""; }, 900);
+  }
+  function reply(text) {
+    var B = BIZ[biz], t = text.toLowerCase();
+    if (flow) {
+      flow.answers.push(text);
+      if (flow.step === 0) flow.name = text.split(/[ ,]/)[0];
+      flow.step++;
+      if (flow.step < B.book.steps.length) return B.book.steps[flow.step].replace("{name}", flow.name || "");
+      var detail = flow.answers.join(" · ");
+      addInbox(B.book.label, detail);
+      var done = B.book.done.replace("{name}", flow.name || "").replace("{detail}", detail);
+      flow = null; return done;
+    }
+    if (has(t, HUMAN)) { addInbox("Handover", "Customer asked for a person"); return "Of course. I have asked a member of our team to reply to you here. They usually reply within working hours."; }
+    if (has(t, B.book.trigger)) { flow = { step: 0, answers: [], name: "" }; return B.book.steps[0]; }
+    for (var i = 0; i < B.intents.length; i++) if (has(t, B.intents[i].k)) return B.intents[i].a;
+    if (has(t, ["hi", "hello", "salam", "hey", "assalam"])) return "Hello! How can I help you today?";
+    if (has(t, ["thank", "shukria", "ok", "great"])) return "You're welcome! Is there anything else I can help with?";
+    return "I'm not sure about that one, and I don't want to guess. I can pass your question to our team, or you can ask about our timings, services, prices or bookings.";
+  }
+  function send(text) {
+    text = (text || "").trim(); if (!text) return;
+    bubble(text, "out"); input.value = "";
+    if (window.innerWidth < 720) { chat.parentNode.scrollIntoView({ behavior: "smooth", block: "center" }); }
+    typing(function () { bubble(reply(text), "in"); });
+  }
+  function start(b) {
+    biz = b; flow = null; var B = BIZ[b];
+    document.getElementById("biz-name").textContent = B.name;
+    document.getElementById("biz-av").textContent = B.av;
+    chat.innerHTML = ""; bubble(B.hello, "in");
+    chipsEl.innerHTML = "";
+    B.chips.forEach(function (c) { var x = document.createElement("button"); x.type = "button"; x.textContent = c; x.addEventListener("click", function () { send(c); }); chipsEl.appendChild(x); });
+    Array.prototype.forEach.call(document.querySelectorAll(".biz-tabs button"), function (x) { x.setAttribute("aria-selected", x.getAttribute("data-biz") === b ? "true" : "false"); });
+  }
+  document.getElementById("composer").addEventListener("submit", function (e) { e.preventDefault(); send(input.value); });
+  Array.prototype.forEach.call(document.querySelectorAll(".biz-tabs button"), function (x) { x.addEventListener("click", function () { start(x.getAttribute("data-biz")); }); });
+  document.getElementById("reset").addEventListener("click", function () { inbox.innerHTML = '<li class="empty-row">Booking and enquiry requests from the chat appear here.</li>'; start(biz); });
+  start("clinic");
+})();
+</script>
+
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "8590a0bbf29c44c5a4ed90fbe47d9633"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+</html>
